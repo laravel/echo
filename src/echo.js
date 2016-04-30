@@ -220,7 +220,7 @@ class Echo {
     /**
      * Set the default event namespace.
      */
-    defaultNamespace(value)
+    namespace(value)
     {
         defaultNamespace.value = value;
     }
