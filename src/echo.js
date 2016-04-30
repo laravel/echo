@@ -1,8 +1,9 @@
-var PusherConnector = {
+class PusherConnector {
     /**
      * Create a fresh Pusher connection.
      */
-    connect(pusherKey, customOptions = {}) {
+    static connect(pusherKey, customOptions = {})
+    {
         var csrfToken = PusherConnector.csrfToken();
 
         var pusher = new Pusher(
@@ -20,13 +21,13 @@ var PusherConnector = {
         });
 
         return pusher;
-    },
-
+    }
 
     /**
      * Merge the custom Pusher options with the defaults.
      */
-    options(csrfToken, customOptions) {
+    static options(csrfToken, customOptions)
+    {
         var options = {
             authEndpoint: '/broadcasting/auth',
             auth: {
@@ -39,13 +40,12 @@ var PusherConnector = {
         }
 
         return options;
-    },
-
+    }
 
     /**
      * Extract the CSRF token from the page.
      */
-    csrfToken() {
+    static csrfToken() {
         var selector = document.querySelector(
             'meta[name="csrf-token"]'
         );
@@ -56,126 +56,144 @@ var PusherConnector = {
             return selector.getAttribute('content');
         }
     }
-};
+}
 
 
 /**
  * This class represents a basic Pusher channel.
  */
-function EchoChannel (channel) {
-    this.channel = channel;
+class EchoChannel {
+    /**
+     * Create a new class instance.
+     */
+    constructor(channel)
+    {
+        this.channel = channel;
+    }
 
     /**
      * Listen for an event on the channel instance.
      */
-    this.on = (event, callback) => {
-        this.channel.bind(
-            event.replace(/\./g, '\\'), callback
-        );
+    on(event, callback)
+    {
+        this.channel.bind(event.replace(/\./g, '\\'), callback);
 
         return this;
-    };
+    }
 }
 
 
 /**
  * This class represents a Pusher presence channel.
  */
-function EchoPresenceChannel (channel) {
-    this.channel = channel;
+class EchoPresenceChannel {
+    /**
+     * Create a new class instance.
+     */
+    constructor(channel)
+    {
+        this.channel = channel;
+    }
 
     /**
      * Register a callback to be called on successfully joining the channel.
      */
-    this.then = (callback) => {
+    then(callback)
+    {
         this.channel.bind('pusher:subscription_succeeded', (members) => {
             callback(members, this.channel);
         });
 
         return this;
-    };
-
+    }
 
     /**
      * Listen for someone joining the channel.
      */
-    this.joining = (callback) => {
+    joining(callback)
+    {
         this.channel.bind('pusher:member_added', (member) => {
             callback(member, this.channel.members, this.channel);
         });
 
         return this;
-    };
-
+    }
 
     /**
      * Listen for someone leaving the channel.
      */
-    this.leaving = (callback) => {
+    leaving(callback)
+    {
         this.channel.bind('pusher:member_removed', (member) => {
             callback(member, this.channel.members, this.channel);
         });
 
         return this;
-    };
-
+    }
 
     /**
      * Listen for an event on the channel instance.
      */
-    this.on = (event, callback) => {
+    on(event, callback)
+    {
         this.channel.bind(event.replace(/\./g, '\\'), (data) => {
             callback(data, this.channel);
         });
 
         return this;
-    };
+    }
 }
 
 
 /**
  * This class is the primary API for interacting with Pusher.
  */
-function Echo (pusherKey, customOptions = {})
-{
-    this.channels = [];
+class Echo {
+    /**
+     * Create a new class instance.
+     */
+    constructor(pusherKey, customOptions = {})
+    {
+        this.channels = [];
 
-    this.pusher = PusherConnector.connect(pusherKey, customOptions);
+        this.pusher = PusherConnector.connect(pusherKey, customOptions);
+    }
 
     /**
      * Listen for an event on a channel instance.
      */
-    this.on = (channel, event, callback) => {
+    on(channel, event, callback)
+    {
         return this.channel(channel).on(event, callback);
-    };
-
+    }
 
     /**
      * Get a channel instance by name.
      */
-    this.channel = (channel) => {
+    channel(channel)
+    {
         return new EchoChannel(this.createChannel(channel));
-    };
-
+    }
 
     /**
      * Get a presence channel instance by name.
      */
-    this.join = (channel) => {
+    join(channel)
+    {
         return new EchoPresenceChannel(this.createChannel(channel));
-    };
-
+    }
 
     /**
      * Create an subscribe to a fresh channel instance.
      */
-    this.createChannel = (channel) => {
+    createChannel(channel)
+    {
         if ( ! this.channels[channel]) {
             this.channels[channel] = this.pusher.subscribe(channel);
         }
 
         return this.channels[channel];
-    };
+    }
 }
 
 export default Echo;
