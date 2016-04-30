@@ -198,11 +198,19 @@ class Echo {
     }
 
     /**
+     * Get a private channel instance by name.
+     */
+    private(channel)
+    {
+        return this.channel('private-' + channel);
+    }
+
+    /**
      * Get a presence channel instance by name.
      */
     join(channel)
     {
-        return new EchoPresenceChannel(this.createChannel(channel));
+        return new EchoPresenceChannel(this.createChannel('presence-' + channel));
     }
 
     /**
