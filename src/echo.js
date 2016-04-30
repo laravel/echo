@@ -1,9 +1,20 @@
+/**
+ * Default event namespace.
+ */
+var defaultNamespace = {
+    value: 'App.Events'
+};
+
 class EchoEventFormatter {
     /**
      * Format the given event name.
      */
     static format(event)
     {
+        if (event.charAt(0) != '\\') {
+            event = defaultNamespace.value + '.' + event;
+        }
+
         return event.replace(/\./g, '\\');
     }
 }
@@ -204,6 +215,14 @@ class Echo {
         }
 
         return this.channels[channel];
+    }
+
+    /**
+     * Set the default event namespace.
+     */
+    defaultNamespace(value)
+    {
+        defaultNamespace.value = value;
     }
 }
 
