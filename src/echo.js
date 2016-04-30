@@ -96,7 +96,7 @@ class EchoChannel {
     /**
      * Listen for an event on the channel instance.
      */
-    on(event, callback)
+    listen(event, callback)
     {
         this.channel.bind(EchoEventFormatter.format(event), callback);
 
@@ -156,7 +156,7 @@ class EchoPresenceChannel {
     /**
      * Listen for an event on the channel instance.
      */
-    on(event, callback)
+    listen(event, callback)
     {
         this.channel.bind(EchoEventFormatter.format(event), (data) => {
             callback(data, this.channel);
@@ -184,9 +184,9 @@ class Echo {
     /**
      * Listen for an event on a channel instance.
      */
-    on(channel, event, callback)
+    listen(channel, event, callback)
     {
-        return this.channel(channel).on(event, callback);
+        return this.channel(channel).listen(event, callback);
     }
 
     /**
