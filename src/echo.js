@@ -1,3 +1,14 @@
+class EchoEventFormatter {
+    /**
+     * Format the given event name.
+     */
+    static format(event)
+    {
+        return event.replace(/\./g, '\\');
+    }
+}
+
+
 class PusherConnector {
     /**
      * Create a fresh Pusher connection.
@@ -76,7 +87,7 @@ class EchoChannel {
      */
     on(event, callback)
     {
-        this.channel.bind(event.replace(/\./g, '\\'), callback);
+        this.channel.bind(EchoEventFormatter.format(event), callback);
 
         return this;
     }
@@ -136,7 +147,7 @@ class EchoPresenceChannel {
      */
     on(event, callback)
     {
-        this.channel.bind(event.replace(/\./g, '\\'), (data) => {
+        this.channel.bind(EchoEventFormatter.format(event), (data) => {
             callback(data, this.channel);
         });
 
