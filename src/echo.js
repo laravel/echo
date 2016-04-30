@@ -38,7 +38,7 @@ class PusherConnector {
             request.setRequestHeader('Content-Type', 'application/json');
             request.setRequestHeader('X-CSRF-Token', csrfToken);
             request.send(JSON.stringify({
-                socket: pusher.connection.socket_id
+                "socket_id": pusher.connection.socket_id
             }));
         });
 
