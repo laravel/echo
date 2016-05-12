@@ -127,7 +127,7 @@ class EchoPresenceChannel {
         var addedOrRemovedCallback = (member) => {
             var members = Object.keys(this.channel.members.members).map(k => this.channel.members.members[k]);
 
-            callback(member.info, members, this.channel);
+            callback(members, this.channel);
         }
 
         this.channel.bind('pusher:member_added', addedOrRemovedCallback);
