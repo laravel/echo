@@ -255,11 +255,15 @@ class Echo {
      */
     leave(channel)
     {
-        if (this.channels[channel]) {
-            this.pusher.unsubscribe(channel);
+        var channels = [channel, 'private-' + channel, 'presence-' + channel];
 
-            this.channels.splice(channel, 1);
-        }
+        channels.forEach(channelName => {
+            if (this.channels[channelName]) {
+                this.pusher.unsubscribe(channelName);
+
+                this.channels.splice(channelName, 1);
+            }
+        });
     }
 
     /**
