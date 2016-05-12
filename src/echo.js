@@ -118,6 +118,25 @@ class EchoPresenceChannel {
     }
 
     /**
+     * Register a callback to be called anytime the member list changes.
+     */
+    here(callback)
+    {
+        this.then(callback);
+
+        var addedOrRemovedCallback = (member) => {
+            var members = Object.keys(this.channel.members.members).map(k => this.channel.members.members[k]);
+
+            callback(member.info, members, this.channel);
+        }
+
+        this.channel.bind('pusher:member_added', addedOrRemovedCallback);
+        this.channel.bind('pusher:member_removed', addedOrRemovedCallback);
+
+        return this;
+    }
+
+    /**
      * Register a callback to be called on successfully joining the channel.
      */
     then(callback)
