@@ -251,6 +251,18 @@ class Echo {
     }
 
     /**
+     * Leave the given channel.
+     */
+    leave(channel)
+    {
+        if (this.channels[channel]) {
+            this.pusher.unsubscribe(channel);
+
+            this.channels.splice(channel, 1);
+        }
+    }
+
+    /**
      * Set the default event namespace.
      */
     namespace(value)
