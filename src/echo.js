@@ -137,7 +137,7 @@ class EchoPresenceChannel {
     joining(callback)
     {
         this.channel.bind('pusher:member_added', (member) => {
-            var members = Object.keys(this.channel.members).map(k => this.channel.members[k]);
+            var members = Object.keys(this.channel.members.members).map(k => this.channel.members.members[k]);
 
             callback(member.info, members, this.channel);
         });
@@ -151,7 +151,7 @@ class EchoPresenceChannel {
     leaving(callback)
     {
         this.channel.bind('pusher:member_removed', (member) => {
-            var members = Object.keys(this.channel.members).map(k => this.channel.members[k]);
+            var members = Object.keys(this.channel.members.members).map(k => this.channel.members.members[k]);
 
             callback(member.info, members, this.channel);
         });
