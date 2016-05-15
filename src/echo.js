@@ -57,11 +57,7 @@ class PusherConnector {
             }
         };
 
-        for (var attrname in customOptions) {
-            options[attrname] = customOptions[attrname];
-        }
-
-        return options;
+        return Object.assign(options, customOptions);
     }
 
     /**
