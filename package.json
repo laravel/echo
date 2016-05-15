@@ -4,7 +4,7 @@
   "description": "Laravel Echo library for beautiful Pusher integration",
   "main": "dist/echo.js",
   "scripts": {
-    "compile": "babel --presets=es2015 -d dist/ src/",
+    "compile": "babel -d dist/ src/",
     "prepublish": "npm run compile"
   },
   "repository": {
