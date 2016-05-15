@@ -24,9 +24,9 @@ class PusherConnector {
     /**
      * Create a fresh Pusher connection.
      */
-    static connect(pusherKey, customOptions = {})
+    static connect(pusherKey, { csrfToken, ...customOptions } = {})
     {
-        var csrfToken = PusherConnector.csrfToken();
+        csrfToken = csrfToken || PusherConnector.csrfToken();
 
         var pusher = new Pusher(
             pusherKey, PusherConnector.options(csrfToken, customOptions)
