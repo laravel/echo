@@ -267,6 +267,14 @@ class Echo {
     }
 
     /**
+     * Get the Socket ID for the connection.
+     */
+    socketId()
+    {
+        return this.pusher.connection.socket_id;
+    }
+
+    /**
      * Set the default event namespace.
      */
     namespace(value)
