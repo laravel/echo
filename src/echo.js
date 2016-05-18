@@ -26,7 +26,7 @@ class PusherConnector {
      */
     static connect(pusherKey, { csrfToken, ...customOptions } = {})
     {
-        csrfToken = csrfToken || PusherConnector.csrfToken();
+        var csrfToken = csrfToken || PusherConnector.csrfToken();
 
         var pusher = new Pusher(
             pusherKey, PusherConnector.options(csrfToken, customOptions)
