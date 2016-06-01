@@ -8,6 +8,9 @@ var defaultNamespace = {
 class EchoEventFormatter {
     /**
      * Format the given event name.
+     *
+     * @param event
+     * @returns {string}
      */
     static format(event)
     {
@@ -25,6 +28,11 @@ class EchoEventFormatter {
 class PusherConnector {
     /**
      * Create a fresh Pusher connection.
+     *
+     * @param pusherKey
+     * @param csrfToken
+     * @param customOptions
+     * @returns {Pusher}
      */
     static connect(pusherKey, { csrfToken, ...customOptions } = {})
     {
@@ -49,6 +57,10 @@ class PusherConnector {
 
     /**
      * Merge the custom Pusher options with the defaults.
+     *
+     * @param csrfToken
+     * @param customOptions
+     * @returns {*}
      */
     static options(csrfToken, customOptions)
     {
@@ -64,6 +76,8 @@ class PusherConnector {
 
     /**
      * Extract the CSRF token from the page.
+     *
+     * @returns {string}
      */
     static csrfToken() {
         var selector = document.querySelector(
@@ -85,6 +99,8 @@ class PusherConnector {
 class EchoChannel {
     /**
      * Create a new class instance.
+     *
+     * @param channel
      */
     constructor(channel)
     {
@@ -93,6 +109,10 @@ class EchoChannel {
 
     /**
      * Listen for an event on the channel instance.
+     *
+     * @param event
+     * @param callback
+     * @returns {EchoChannel}
      */
     listen(event, callback)
     {
@@ -109,6 +129,8 @@ class EchoChannel {
 class EchoPresenceChannel {
     /**
      * Create a new class instance.
+     *
+     * @param channel
      */
     constructor(channel)
     {
@@ -117,6 +139,9 @@ class EchoPresenceChannel {
 
     /**
      * Register a callback to be called anytime the member list changes.
+     *
+     * @param callback
+     * @returns {EchoPresenceChannel}
      */
     here(callback)
     {
@@ -136,6 +161,9 @@ class EchoPresenceChannel {
 
     /**
      * Register a callback to be called on successfully joining the channel.
+     *
+     * @param callback
+     * @returns {EchoPresenceChannel}
      */
     then(callback)
     {
@@ -150,6 +178,9 @@ class EchoPresenceChannel {
 
     /**
      * Listen for someone joining the channel.
+     *
+     * @param callback
+     * @returns {EchoPresenceChannel}
      */
     joining(callback)
     {
@@ -164,6 +195,9 @@ class EchoPresenceChannel {
 
     /**
      * Listen for someone leaving the channel.
+     *
+     * @param callback
+     * @returns {EchoPresenceChannel}
      */
     leaving(callback)
     {
@@ -178,6 +212,10 @@ class EchoPresenceChannel {
 
     /**
      * Listen for an event on the channel instance.
+     *
+     * @param event
+     * @param callback
+     * @returns {EchoPresenceChannel}
      */
     listen(event, callback)
     {
@@ -196,6 +234,9 @@ class EchoPresenceChannel {
 class Echo {
     /**
      * Create a new class instance.
+     *
+     * @param pusherKey
+     * @param customOptions
      */
     constructor(pusherKey, customOptions = {})
     {
@@ -206,6 +247,11 @@ class Echo {
 
     /**
      * Listen for an event on a channel instance.
+     *
+     * @param channel
+     * @param event
+     * @param callback
+     * @returns {EchoPresenceChannel|*|EchoChannel}
      */
     listen(channel, event, callback)
     {
@@ -214,6 +260,9 @@ class Echo {
 
     /**
      * Get a channel instance by name.
+     *
+     * @param channel
+     * @returns {EchoChannel}
      */
     channel(channel)
     {
@@ -222,6 +271,9 @@ class Echo {
 
     /**
      * Get a private channel instance by name.
+     *
+     * @param channel
+     * @returns {EchoChannel}
      */
     private(channel)
     {
@@ -230,6 +282,9 @@ class Echo {
 
     /**
      * Get a presence channel instance by name.
+     *
+     * @param channel
+     * @returns {EchoPresenceChannel}
      */
     join(channel)
     {
@@ -238,6 +293,9 @@ class Echo {
 
     /**
      * Create an subscribe to a fresh channel instance.
+     *
+     * @param channel
+     * @returns {*}
      */
     createChannel(channel)
     {
@@ -250,6 +308,8 @@ class Echo {
 
     /**
      * Leave the given channel.
+     *
+     * @param channel
      */
     leave(channel)
     {
@@ -266,6 +326,8 @@ class Echo {
 
     /**
      * Get the Socket ID for the connection.
+     *
+     * @returns {*}
      */
     socketId()
     {
@@ -274,6 +336,8 @@ class Echo {
 
     /**
      * Set the default event namespace.
+     *
+     * @param value
      */
     namespace(value)
     {
