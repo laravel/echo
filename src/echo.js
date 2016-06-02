@@ -14,7 +14,7 @@ class EchoEventFormatter {
      */
     static format(event)
     {
-        if (event.charAt(0) != '\\') {
+        if (event.charAt(0) != '\\' && event.charAt(0) != '.') {
             event = defaultNamespace.value + '.' + event;
         } else {
             event = event.substr(1);
