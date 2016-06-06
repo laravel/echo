@@ -7,30 +7,35 @@ export class PusherConnector extends Connector {
 
     /**
      * Pusher.
+     *
      * @type {object}
      */
     pusher: any;
 
     /**
      * Name of event when members updated.
+     *
      * @type {string}
      */
     updating: string = 'pusher:subscription_succeeded';
 
     /**
      * Name of event when member added.
+     *
      * @type {string}
      */
     adding: string = 'pusher:member_added';
 
     /**
      * Name of event when member removed.
+     *
      * @type {string}
      */
     removing: string = 'pusher:member_removed';
 
     /**
      * Create a fresh Pusher connection.
+     *
      * @return void
      */
     connect(): void {
@@ -51,6 +56,7 @@ export class PusherConnector extends Connector {
 
     /**
      * Subscribe to a channel.
+     *
      * @param  {string} channel
      * @return {object}
      */
@@ -60,6 +66,7 @@ export class PusherConnector extends Connector {
 
     /**
      * Unsubscribe from a channel.
+     *
      * @param  {string} channel
      * @return {void}
      */
@@ -69,6 +76,7 @@ export class PusherConnector extends Connector {
 
     /**
      * Get the socket_id of the connection.
+     *
      * @return {string}
      */
     socketId(): string {

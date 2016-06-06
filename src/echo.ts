@@ -9,18 +9,21 @@ export default class Echo {
 
     /**
      * Channel names.
+     *
      * @type {array}
      */
     channels: any[] = [];
 
     /**
      * The broadcasting connector.
+     *
      * @type {object}
      */
     connector: any;
 
     /**
      * Create a new class instance.
+     *
      * @param  {object} options
      */
     constructor(options: any) {
@@ -40,6 +43,7 @@ export default class Echo {
 
     /**
      * Get a channel instance by name.
+     *
      * @param  {string}  channel
      * @return {Channel}
      */
@@ -52,6 +56,7 @@ export default class Echo {
 
     /**
      * Get a private channel instance by name.
+     *
      * @param  {string} channel
      * @return {object}
      */
@@ -61,6 +66,7 @@ export default class Echo {
 
     /**
      * Get a presence channel instance by name.
+     *
      * @param  {string} channel
      * @return {EchoPresenceChannel}
      */
@@ -73,6 +79,7 @@ export default class Echo {
 
     /**
      * Create an subscribe to a fresh channel instance.
+     *
      * @param  {string} channel
      * @return {object}
      */
@@ -86,6 +93,7 @@ export default class Echo {
 
     /**
      * Leave the given channel.
+     *
      * @param  {string} channel
      */
     leave(channel: string) {
@@ -102,19 +110,11 @@ export default class Echo {
 
     /**
      * Get the Socket ID for the connection.
+     * 
      * @return {string}
      */
     socketId(): string {
         return this.connector.socketId();
-    }
-
-    /**
-     * Set the default event namespace.
-     * @param  {string} value
-     */
-    namespace(value: string) {
-        // REVIEW: When does this come into play?
-        EventFormatter.defaultNamespace = value;
     }
 }
 
