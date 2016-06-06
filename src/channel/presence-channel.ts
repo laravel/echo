@@ -1,4 +1,3 @@
-import {EventFormatter} from './../util';
 import {Channel} from './channel';
 
 /**
@@ -8,6 +7,7 @@ export class PresenceChannel extends Channel {
 
     /**
      * Register a callback to be called anytime the member list changes.
+     *
      * @param  {Function} callback
      * @return {object} this
      */
@@ -27,6 +27,7 @@ export class PresenceChannel extends Channel {
 
     /**
      * Listen for someone joining the channel.
+     *
      * @param  {Function} callback
      * @return {EchoPresenceChannel}
      */
@@ -42,6 +43,7 @@ export class PresenceChannel extends Channel {
 
     /**
      * Listen for someone leaving the channel.
+     * 
      * @param  {Function}  callback
      * @return {EchoPresenceChannel}
      */

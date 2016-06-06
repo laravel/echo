@@ -2,6 +2,7 @@ export abstract class Connector {
 
     /**
      * Default connector options.
+     *
      * @type {Object}
      */
     private _options: any = {
@@ -12,11 +13,13 @@ export abstract class Connector {
         connector: 'pusher',
         csrfToken: null,
         host: 'http://localhost',
-        pusherKey: null
+        pusherKey: null,
+        namespace: null
     };
 
     /**
      * Connector options.
+     *
      * @type {any}
      */
     options: any;
@@ -32,6 +35,7 @@ export abstract class Connector {
 
     /**
      * Merge the custom options with the defaults.
+     *
      * @param  {any}  options
      * @return {object}
      */
@@ -62,12 +66,14 @@ export abstract class Connector {
 
     /**
      * Create a fresh connection.
+     *
      * @retrn void
      */
     abstract connect(): void;
 
     /**
     * Subscribe to a channel.
+    *
     * @param  {string} channel
     * @return {object}
     */
@@ -75,6 +81,7 @@ export abstract class Connector {
 
     /**
      * Unsubscribe from a channel.
+     *
      * @param  {string} channel
      * @return {void}
      */
@@ -82,6 +89,7 @@ export abstract class Connector {
 
     /**
      * Get the socket_id of the connection.
+     * 
      * @return {string}
      */
     abstract socketId(): string;

@@ -6,31 +6,36 @@ import {Connector} from './connector';
 export class SocketIoConnector extends Connector {
 
     /**
-     * Socket.io connection
+     * Socket.io connection.
+     *
      * @type {object}
      */
     socket: any;
 
     /**
      * Name of event for updated members.
+     *
      * @type {string}
      */
     updating: string = 'members:updated';
 
     /**
      * Name of event when member added.
+     *
      * @type {string}
      */
     adding: string = 'member:added';
 
     /**
      * Name of event when member removed.
+     *
      * @type {string}
      */
     removing: string = 'member:removed';
 
     /**
      * Create a fresh Socket.io connection.
+     *
      * @return void
      */
     connect(): void {
@@ -41,6 +46,7 @@ export class SocketIoConnector extends Connector {
 
     /**
      * Subscribe socket to a channel.
+     *
      * @param  {string} channel
      * @return {object}
      */
@@ -53,6 +59,7 @@ export class SocketIoConnector extends Connector {
 
     /**
      * Unsubscribe socket from a channel.
+     *
      * @param  {string} channel
      * @return {void}
      */
@@ -65,6 +72,7 @@ export class SocketIoConnector extends Connector {
 
     /**
      * Get the socket_id of the connection.
+     *
      * @return {string}
      */
     socketId(): string {
