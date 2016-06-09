@@ -34,7 +34,7 @@ export class Connector {
             this.options.auth.headers['X-CSRF-TOKEN'] = this.csrfToken();
         }
 
-        return options;
+        return this.options;
     }
 
     /**
