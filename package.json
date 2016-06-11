@@ -4,7 +4,7 @@
   "description": "Laravel Echo library for beautiful Pusher integration",
   "main": "dist/echo.js",
   "scripts": {
-    "compile": "rollup -c",
+    "compile": "./node_modules/.bin/rollup -c",
     "prepublish": "npm run compile"
   },
   "repository": {
@@ -25,8 +25,8 @@
     "babel-plugin-transform-object-assign": "^6.8.0",
     "babel-preset-es2015-rollup": "^1.1.1",
     "babel-preset-stage-2": "^6.5.0",
+    "rollup": "^0.31.0",
     "rollup-plugin-babel": "^2.4.0",
-    "rollup-plugin-node-resolve": "^1.5.0",
     "rollup-plugin-typescript": "^0.7.5",
     "typings": "^1.0.4"
   }

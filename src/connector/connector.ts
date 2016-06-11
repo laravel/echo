@@ -20,9 +20,30 @@ export abstract class Connector {
     /**
      * Connector options.
      *
-     * @type {any}
+     * @type {object}
      */
     options: any;
+
+    /**
+     * Name of event when member added.
+     *
+     * @type {string}
+     */
+    adding: string = 'member:added';
+
+    /**
+     * Name of event when member removed.
+     *
+     * @type {string}
+     */
+    removing: string = 'member:removed';
+
+    /**
+     * Name of event for updated members.
+     *
+     * @type {string}
+     */
+    updating: string = 'members:updated';
 
     /**
      * Create a new class instance.
@@ -89,7 +110,7 @@ export abstract class Connector {
 
     /**
      * Get the socket_id of the connection.
-     * 
+     *
      * @return {string}
      */
     abstract socketId(): string;

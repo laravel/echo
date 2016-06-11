@@ -13,13 +13,6 @@ export class SocketIoConnector extends Connector {
     socket: any;
 
     /**
-     * Name of event for updated members.
-     *
-     * @type {string}
-     */
-    updating: string = 'members:updated';
-
-    /**
      * Name of event when member added.
      *
      * @type {string}
@@ -32,6 +25,13 @@ export class SocketIoConnector extends Connector {
      * @type {string}
      */
     removing: string = 'member:removed';
+
+    /**
+     * Name of event for updated members.
+     *
+     * @type {string}
+     */
+    updating: string = 'members:updated';
 
     /**
      * Create a fresh Socket.io connection.

@@ -17,7 +17,7 @@ export class EventFormatter {
      * @return {string}
      */
     format(event: string): string {
-        if (event.charAt(0) != '\\') {
+        if (event.charAt(0) != '\\' && event.charAt(0) != '.') {
             event = this.defaultNamespace + '.' + event;
         } else {
             event = event.substr(1);

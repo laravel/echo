@@ -1,4 +1,5 @@
 import {EventFormatter} from './../util';
+import {Connector} from './../connector';
 
 /**
  * This class represents a basic channel.
@@ -15,9 +16,9 @@ export class Channel {
     /**
      * Broadcasting connector.
      *
-     * @type {any}
+     * @type {Connector}
      */
-    connector: any;
+    connector: Connector;
 
     /**
      * The event formatter.
@@ -56,7 +57,7 @@ export class Channel {
 
     /**
      * Listen for an event on the channel instance.
-     * 
+     *
      * @param  {string} event
      * @param  {Function}   callback
      * @return {EchoChannel}
