@@ -5,7 +5,7 @@ import {PusherConnector, SocketIoConnector} from './connector';
 /**
  * This class is the primary API for interacting with broadcasting.
  */
-export default class Echo {
+class Echo {
 
     /**
      * Channel names.
@@ -110,7 +110,7 @@ export default class Echo {
 
     /**
      * Get the Socket ID for the connection.
-     * 
+     *
      * @return {string}
      */
     socketId(): string {
