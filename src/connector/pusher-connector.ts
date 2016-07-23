@@ -39,7 +39,7 @@ export class PusherConnector extends Connector {
      * @return void
      */
     connect(): void {
-        let pusher = new Pusher(this.options.pusher_key, this.options);
+        let pusher = new Pusher(this.options.pusherKey, this.options);
 
         pusher.connection.bind('connected', () => {
             var request = new XMLHttpRequest();
