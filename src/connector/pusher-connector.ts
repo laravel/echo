@@ -40,10 +40,11 @@ export class PusherConnector extends Connector {
      */
     connect(): void {
         let pusher = new Pusher(this.options.pusherKey, this.options);
+        let url = ( this.options.host ? this.options.host : '' ) + '/broadcasting/socket';
 
         pusher.connection.bind('connected', () => {
             var request = new XMLHttpRequest();
-            request.open('POST', '/broadcasting/socket', true);
+            request.open('POST', url, true);
             request.setRequestHeader('Content-Type', 'application/json');
             request.setRequestHeader('X-CSRF-Token', this.csrfToken());
             request.send(JSON.stringify({
