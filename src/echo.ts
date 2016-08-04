@@ -78,7 +78,7 @@ class Echo {
     }
 
     /**
-     * Create an subscribe to a fresh channel instance.
+     * Create and subscribe to a fresh channel instance.
      *
      * @param  {string} channel
      * @return {object}

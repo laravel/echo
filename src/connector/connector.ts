@@ -12,9 +12,9 @@ export abstract class Connector {
         authEndpoint: '/broadcasting/auth',
         connector: 'pusher',
         csrfToken: null,
-        host: 'http://localhost',
-        pusherKey: null,
-        namespace: null
+        host: null,
+        namespace: null,
+        pusherKey: null
     };
 
     /**
