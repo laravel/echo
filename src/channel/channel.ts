@@ -67,4 +67,15 @@ export class Channel {
 
         return this;
     }
+
+    /**
+     * Listen for an event on the channel instance.
+     *
+     * @param  {string} event
+     * @param  {Function}   callback
+     * @return {EchoChannel}
+     */
+    notification(callback: Function): Channel {
+        return this.listen('.Illuminate.Notifications.Events.DatabaseNotificationCreated', callback);
+    }
 }
