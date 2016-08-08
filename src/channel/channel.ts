@@ -76,6 +76,6 @@ export class Channel {
      * @return {EchoChannel}
      */
     notification(callback: Function): Channel {
-        return this.listen('.Illuminate.Notifications.Events.DatabaseNotificationCreated', callback);
+        return this.listen('.Illuminate.Notifications.Events.BroadcastNotificationCreated', callback);
     }
 }
