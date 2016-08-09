@@ -22,15 +22,24 @@ class Echo {
     connector: any;
 
     /**
+     * The Echo options.
+     *
+     * @type {array}
+     */
+    options: any[];
+
+    /**
      * Create a new class instance.
      *
      * @param  {object} options
      */
     constructor(options: any) {
-        if (options.connector == 'pusher') {
-            this.connector = new PusherConnector(options);
-        } else if (options.connector == 'socket.io') {
-            this.connector = new SocketIoConnector(options);
+        this.options = options;
+
+        if (this.options.connector == 'pusher') {
+            this.connector = new PusherConnector(this.options);
+        } else if (this.options.connector == 'socket.io') {
+            this.connector = new SocketIoConnector(this.options);
         }
     }
 
