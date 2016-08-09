@@ -49,7 +49,7 @@ class Echo {
      * @param  {string}  channel
      * @return {object}
      */
-    channel(channel: string): PusherChannel {
+    channel(channel: string): Channel {
         return this.connector.channel(channel);
     }
 

@@ -1,4 +1,5 @@
 import {Connector} from './connector';
+import {SocketIoChannel, SocketIoPresenceChannel} from './../channel';
 
 /**
  * This class creates a connnector to a Socket.io server.
@@ -6,32 +7,18 @@ import {Connector} from './connector';
 export class SocketIoConnector extends Connector {
 
     /**
-     * Socket.io connection.
+     * The Socket.io connection instance.
      *
      * @type {object}
      */
     socket: any;
 
     /**
-     * Name of event when member added.
+     * All of the subscribed channel names.
      *
-     * @type {string}
+     * @type {array}
      */
-    adding: string = 'member:added';
-
-    /**
-     * Name of event when member removed.
-     *
-     * @type {string}
-     */
-    removing: string = 'member:removed';
-
-    /**
-     * Name of event for updated members.
-     *
-     * @type {string}
-     */
-    updating: string = 'members:updated';
+    channels: any[] = [];
 
     /**
      * Create a fresh Socket.io connection.
@@ -45,7 +32,75 @@ export class SocketIoConnector extends Connector {
     }
 
     /**
-     * Subscribe socket to a channel.
+     * Listen for an event on a channel instance.
+     */
+    listen(channel: string, event: string, callback: Function) {
+        return this.channel(channel).listen(event, callback);
+    }
+
+    /**
+     * Get a channel instance by name.
+     *
+     * @param  {string}  channel
+     * @return {SocketIoChannel}
+     */
+    channel(channel: string): SocketIoChannel {
+        return new SocketIoChannel(this.createChannel(channel), this);
+    }
+
+    /**
+     * Get a private channel instance by name.
+     *
+     * @param  {string}  channel
+     * @return {SocketIoChannel}
+     */
+    privateChannel(channel: string): SocketIoChannel {
+        return new SocketIoChannel(this.createChannel('private-' + channel), this);
+    }
+
+    /**
+     * Get a presence channel instance by name.
+     *
+     * @param  {string} channel
+     * @return {PresenceChannel}
+     */
+    presenceChannel(channel: string): PresenceChannel {
+        return new SocketIoPresenceChannel(this.createChannel('presence-' + channel), this);
+    }
+
+    /**
+     * Create and subscribe to a fresh channel instance.
+     *
+     * @param  {string} channel
+     * @return {object}
+     */
+    createChannel(channel: string): any {
+        if (!this.channels[channel]) {
+            this.channels[channel] = this.subscribe(channel);
+        }
+
+        return this.channels[channel];
+    }
+
+    /**
+     * Leave the given channel.
+     *
+     * @param  {string} channel
+     */
+    leave(channel: string) {
+        let channels = [channel, 'private-' + channel, 'presence-' + channel];
+
+        channels.forEach((channelName: string, index: number) => {
+            if (this.channels[channelName]) {
+                this.unsubscribe(channelName);
+
+                delete this.channels[channelName];
+            }
+        });
+    }
+
+    /**
+     * Subscribe to a Socket.io channel.
      *
      * @param  {string} channel
      * @return {object}
@@ -58,7 +113,7 @@ export class SocketIoConnector extends Connector {
     }
 
     /**
-     * Unsubscribe socket from a channel.
+     * Unsubscribe from a Socket.io channel.
      *
      * @param  {string} channel
      * @return {void}
@@ -71,7 +126,7 @@ export class SocketIoConnector extends Connector {
     }
 
     /**
-     * Get the socket_id of the connection.
+     * Get the socket ID for the connection.
      *
      * @return {string}
      */

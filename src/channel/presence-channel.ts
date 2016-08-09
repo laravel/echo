@@ -14,7 +14,7 @@ export interface PresenceChannel {
      * Listen for someone joining the channel.
      *
      * @param  {Function} callback
-     * @return {EchoPresenceChannel}
+     * @return {PresenceChannel}
      */
     joining(callback): PresenceChannel;
 
@@ -22,7 +22,7 @@ export interface PresenceChannel {
      * Listen for someone leaving the channel.
      *
      * @param  {Function}  callback
-     * @return {EchoPresenceChannel}
+     * @return {PresenceChannel}
      */
     leaving(callback): PresenceChannel;
 }

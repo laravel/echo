@@ -35,6 +35,7 @@ export class PusherConnector extends Connector {
             request.open('POST', url, true);
             request.setRequestHeader('Content-Type', 'application/json');
             request.setRequestHeader('X-CSRF-Token', this.csrfToken());
+
             request.send(JSON.stringify({
                 "socket_id": pusher.connection.socket_id
             }));
@@ -74,7 +75,7 @@ export class PusherConnector extends Connector {
      * Get a presence channel instance by name.
      *
      * @param  {string} channel
-     * @return {EchoPresenceChannel}
+     * @return {PresenceChannel}
      */
     presenceChannel(channel: string): PresenceChannel {
         return new PusherPresenceChannel(this.createChannel('presence-' + channel), this);
@@ -112,7 +113,7 @@ export class PusherConnector extends Connector {
     }
 
     /**
-     * Subscribe to a channel.
+     * Subscribe to a Pusher channel.
      *
      * @param  {string} channel
      * @return {object}
@@ -122,7 +123,7 @@ export class PusherConnector extends Connector {
     }
 
     /**
-     * Unsubscribe from a channel.
+     * Unsubscribe from a Pusher channel.
      *
      * @param  {string} channel
      * @return {void}
@@ -132,7 +133,7 @@ export class PusherConnector extends Connector {
     }
 
     /**
-     * Get the socket_id of the connection.
+     * Get the socket ID for the connection.
      *
      * @return {string}
      */
