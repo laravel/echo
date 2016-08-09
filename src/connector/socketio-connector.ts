@@ -1,5 +1,5 @@
-import {Connector} from './connector';
-import {SocketIoChannel, SocketIoPresenceChannel} from './../channel';
+import { Connector } from './connector';
+import { SocketIoChannel, SocketIoPresenceChannel } from './../channel';
 
 /**
  * This class creates a connnector to a Socket.io server.
@@ -64,7 +64,7 @@ export class SocketIoConnector extends Connector {
      * @param  {string} channel
      * @return {PresenceChannel}
      */
-    presenceChannel(channel: string): PresenceChannel {
+    presenceChannel(channel: string): SocketIoPresenceChannel {
         return new SocketIoPresenceChannel(this.createChannel('presence-' + channel), this);
     }
 

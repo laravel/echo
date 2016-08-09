@@ -1,5 +1,7 @@
-import {Connector} from './connector';
-import {PusherChannel, PusherPresenceChannel} from './../channel';
+import { Connector} from './connector';
+import {
+    PusherChannel, PusherPresenceChannel, PresenceChannel
+} from './../channel';
 
 /**
  * This class creates a connector to Pusher.
@@ -28,7 +30,7 @@ export class PusherConnector extends Connector {
     connect(): void {
         let pusher = new Pusher(this.options.pusherKey, this.options);
 
-        let url = ( this.options.host ? this.options.host : '' ) + '/broadcasting/socket';
+        let url = (this.options.host ? this.options.host : '') + '/broadcasting/socket';
 
         pusher.connection.bind('connected', () => {
             var request = new XMLHttpRequest();
