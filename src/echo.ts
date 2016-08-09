@@ -44,26 +44,33 @@ class Echo {
     }
 
     /**
+     * Get a channel instance by name.
+     *
+     * @param  {string}  channel
+     * @return {object}
+     */
+    channel(channel: string): PusherChannel {
+        return this.connector.channel(channel);
+    }
+
+    /**
      * Get a private channel instance by name.
      *
      * @param  {string} channel
      * @return {object}
      */
     private(channel: string): Channel {
-        return this.channel('private-' + channel);
+        return this.connector.privateChannel(channel);
     }
 
     /**
      * Get a presence channel instance by name.
      *
      * @param  {string} channel
-     * @return {EchoPresenceChannel}
+     * @return {object}
      */
     join(channel: string): PresenceChannel {
-        return new PresenceChannel(
-            this.createChannel('presence-' + channel),
-            this.connector
-        );
+        return this.connector.presenceChannel(channel);
     }
 
     /**
@@ -72,15 +79,7 @@ class Echo {
      * @param  {string} channel
      */
     leave(channel: string) {
-        let channels = [channel, 'private-' + channel, 'presence-' + channel];
-
-        channels.forEach((channelName: string, index: number) => {
-            if (this.channels[channelName]) {
-                this.connector.unsubscribe(channelName);
-
-                delete this.channels[channelName];
-            }
-        });
+        this.connector.leave(channel);
     }
 
     /**

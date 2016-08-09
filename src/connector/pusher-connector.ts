@@ -1,5 +1,5 @@
 import {Connector} from './connector';
-import {PusherChannel} from './../channel';
+import {PusherChannel, PusherPresenceChannel} from './../channel';
 
 /**
  * This class creates a connector to Pusher.
@@ -21,33 +21,13 @@ export class PusherConnector extends Connector {
     channels: any[] = [];
 
     /**
-     * Name of event when members are updated.
-     *
-     * @type {string}
-     */
-    updating: string = 'pusher:subscription_succeeded';
-
-    /**
-     * Name of event when member are added.
-     *
-     * @type {string}
-     */
-    adding: string = 'pusher:member_added';
-
-    /**
-     * Name of event when member are removed.
-     *
-     * @type {string}
-     */
-    removing: string = 'pusher:member_removed';
-
-    /**
      * Create a fresh Pusher connection.
      *
      * @return void
      */
     connect(): void {
         let pusher = new Pusher(this.options.pusherKey, this.options);
+
         let url = ( this.options.host ? this.options.host : '' ) + '/broadcasting/socket';
 
         pusher.connection.bind('connected', () => {
@@ -81,6 +61,26 @@ export class PusherConnector extends Connector {
     }
 
     /**
+     * Get a private channel instance by name.
+     *
+     * @param  {string}  channel
+     * @return {PusherChannel}
+     */
+    privateChannel(channel: string): PusherChannel {
+        return new PusherChannel(this.createChannel('private-' + channel), this);
+    }
+
+    /**
+     * Get a presence channel instance by name.
+     *
+     * @param  {string} channel
+     * @return {EchoPresenceChannel}
+     */
+    presenceChannel(channel: string): PresenceChannel {
+        return new PusherPresenceChannel(this.createChannel('presence-' + channel), this);
+    }
+
+    /**
      * Create and subscribe to a fresh channel instance.
      *
      * @param  {string} channel
@@ -92,6 +92,23 @@ export class PusherConnector extends Connector {
         }
 
         return this.channels[channel];
+    }
+
+    /**
+     * Leave the given channel.
+     *
+     * @param  {string} channel
+     */
+    leave(channel: string) {
+        let channels = [channel, 'private-' + channel, 'presence-' + channel];
+
+        channels.forEach((channelName: string, index: number) => {
+            if (this.channels[channelName]) {
+                this.unsubscribe(channelName);
+
+                delete this.channels[channelName];
+            }
+        });
     }
 
     /**

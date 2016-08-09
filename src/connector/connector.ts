@@ -1,3 +1,5 @@
+import {Channel, PresenceChannel} from './../channel';
+
 export abstract class Connector {
 
     /**
@@ -5,7 +7,7 @@ export abstract class Connector {
      *
      * @type {Object}
      */
-    private _options: any = {
+    private _defaultOptions: any = {
         auth: {
             headers: {}
         },
@@ -25,27 +27,6 @@ export abstract class Connector {
     options: any;
 
     /**
-     * Name of event when member added.
-     *
-     * @type {string}
-     */
-    adding: string = 'member:added';
-
-    /**
-     * Name of event when member removed.
-     *
-     * @type {string}
-     */
-    removing: string = 'member:removed';
-
-    /**
-     * Name of event for updated members.
-     *
-     * @type {string}
-     */
-    updating: string = 'members:updated';
-
-    /**
      * Create a new class instance.
      */
     constructor(options) {
@@ -61,7 +42,7 @@ export abstract class Connector {
      * @return {object}
      */
     protected setOptions(options: any) {
-        this.options = Object.assign(this._options, options);
+        this.options = Object.assign(this._defaultOptions, options);
 
         if (this.csrfToken()) {
             this.options.auth.headers['X-CSRF-TOKEN'] = this.csrfToken();
@@ -93,20 +74,35 @@ export abstract class Connector {
     abstract connect(): void;
 
     /**
-    * Subscribe to a channel.
-    *
-    * @param  {string} channel
-    * @return {object}
-    */
-    abstract subscribe(channel: string): any;
+     * Get a channel instance by name.
+     *
+     * @param  {string}  channel
+     * @return {PusherChannel}
+     */
+    abstract channel(channel: string): Channel;
 
     /**
-     * Unsubscribe from a channel.
+     * Get a private channel instance by name.
+     *
+     * @param  {string}  channel
+     * @return {PusherChannel}
+     */
+    abstract privateChannel(channel: string): Channel;
+
+    /**
+     * Get a presence channel instance by name.
      *
      * @param  {string} channel
-     * @return {void}
+     * @return {PresenceChannel}
      */
-    abstract unsubscribe(channel: string): void;
+    abstract presenceChannel(channel: string): PresenceChannel;
+
+    /**
+     * Leave the given channel.
+     *
+     * @param  {string} channel
+     */
+    abstract leave(channel: string);
 
     /**
      * Get the socket_id of the connection.

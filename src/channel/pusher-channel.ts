@@ -1,10 +1,11 @@
 import {EventFormatter} from './../util';
 import {Connector} from './../connector';
+import {Channel} from './channel';
 
 /**
- * This class represents a basic channel.
+ * This class represents a Pusher channel.
  */
-export class PusherChannel {
+export class PusherChannel extends Channel {
 
     /**
      * Channel object.
@@ -44,18 +45,6 @@ export class PusherChannel {
     }
 
     /**
-     * Bind a channel to an event.
-     *
-     * @param  {string}   event
-     * @param  {Function} callback
-     */
-    bind(event: string, callback: Function) {
-        let func = (typeof this.channel.bind === 'function') ? 'bind' : 'on';
-
-        this.channel[func](event, callback);
-    }
-
-    /**
      * Listen for an event on the channel instance.
      *
      * @param  {string} event
@@ -69,13 +58,12 @@ export class PusherChannel {
     }
 
     /**
-     * Listen for an event on the channel instance.
+     * Bind a channel to an event.
      *
-     * @param  {string} event
-     * @param  {Function}   callback
-     * @return {PusherChannel}
+     * @param  {string}   event
+     * @param  {Function} callback
      */
-    notification(callback: Function): PusherChannel {
-        return this.listen('.Illuminate.Notifications.Events.BroadcastNotificationCreated', callback);
+    bind(event: string, callback: Function) {
+        this.channel.bind(event, callback);
     }
 }
