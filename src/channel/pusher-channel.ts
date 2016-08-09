@@ -1,6 +1,6 @@
-import {EventFormatter} from './../util';
-import {Connector} from './../connector';
-import {Channel} from './channel';
+import { EventFormatter } from './../util';
+import { Connector } from './../connector';
+import { Channel } from './channel';
 
 /**
  * This class represents a Pusher channel.

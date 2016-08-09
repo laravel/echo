@@ -1,11 +1,11 @@
-import {EventFormatter} from './util';
-import {Channel, PresenceChannel} from './channel'
-import {PusherConnector, SocketIoConnector} from './connector';
+import { EventFormatter } from './util';
+import { Channel, PresenceChannel } from './channel'
+import { PusherConnector, SocketIoConnector } from './connector';
 
 /**
  * This class is the primary API for interacting with broadcasting.
  */
-class Echo {
+export class Echo {
 
     /**
      * The broadcasting connector.
@@ -91,5 +91,3 @@ class Echo {
         return this.connector.socketId();
     }
 }
-
-module.exports = Echo;

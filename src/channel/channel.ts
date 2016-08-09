@@ -1,7 +1,7 @@
 /**
  * This class represents a basic channel.
  */
-export class Channel {
+export abstract class Channel {
 
     /**
      * Listen for an event on the channel instance.
@@ -22,4 +22,13 @@ export class Channel {
     notification(callback: Function): Channel {
         return this.listen('.Illuminate.Notifications.Events.BroadcastNotificationCreated', callback);
     }
+
+    /**
+     * Listen for an event on the channel instance.
+     *
+     * @param  {string} event
+     * @param  {Function} callback
+     * @return {Channel}
+     */
+    abstract listen(event: string, callback: Function): Channel;
 }

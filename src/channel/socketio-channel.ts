@@ -1,6 +1,6 @@
-import {EventFormatter} from './../util';
-import {Connector} from './../connector';
-import {Channel} from './channel';
+import { EventFormatter } from './../util';
+import { Connector} from './../connector';
+import { Channel } from './channel';
 
 /**
  * This class represents a Socket.io channel.
@@ -50,10 +50,10 @@ export class SocketIoChannel extends Channel {
      * Listen for an event on the channel instance.
      *
      * @param  {string} event
-     * @param  {Function}   callback
-     * @return {PusherChannel}
+     * @param  {Function} callback
+     * @return {SocketIoChannel}
      */
-    listen(event: string, callback: Function): PusherChannel {
+    listen(event: string, callback: Function): SocketIoChannel {
         this.on(this.eventFormatter.format(event), callback);
 
         return this;
