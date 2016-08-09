@@ -28,22 +28,7 @@ export class PusherConnector extends Connector {
      * @return void
      */
     connect(): void {
-        let pusher = new Pusher(this.options.pusherKey, this.options);
-
-        let url = (this.options.host ? this.options.host : '') + '/broadcasting/socket';
-
-        pusher.connection.bind('connected', () => {
-            var request = new XMLHttpRequest();
-            request.open('POST', url, true);
-            request.setRequestHeader('Content-Type', 'application/json');
-            request.setRequestHeader('X-CSRF-Token', this.csrfToken());
-
-            request.send(JSON.stringify({
-                "socket_id": pusher.connection.socket_id
-            }));
-        });
-
-        this.pusher = pusher;
+        this.pusher = new Pusher(this.options.pusherKey, this.options);
     }
 
     /**
