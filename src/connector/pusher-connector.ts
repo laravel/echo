@@ -1,4 +1,5 @@
 import {Connector} from './connector';
+import {PusherChannel} from './../channel';
 
 /**
  * This class creates a connector to Pusher.
@@ -6,28 +7,35 @@ import {Connector} from './connector';
 export class PusherConnector extends Connector {
 
     /**
-     * Pusher.
+     * The Pusher instance.
      *
      * @type {object}
      */
     pusher: any;
 
     /**
-     * Name of event when members updated.
+     * All of the subscribed channel names.
+     *
+     * @type {array}
+     */
+    channels: any[] = [];
+
+    /**
+     * Name of event when members are updated.
      *
      * @type {string}
      */
     updating: string = 'pusher:subscription_succeeded';
 
     /**
-     * Name of event when member added.
+     * Name of event when member are added.
      *
      * @type {string}
      */
     adding: string = 'pusher:member_added';
 
     /**
-     * Name of event when member removed.
+     * Name of event when member are removed.
      *
      * @type {string}
      */
@@ -53,6 +61,37 @@ export class PusherConnector extends Connector {
         });
 
         this.pusher = pusher;
+    }
+
+    /**
+     * Listen for an event on a channel instance.
+     */
+    listen(channel: string, event: string, callback: Function) {
+        return this.channel(channel).listen(event, callback);
+    }
+
+    /**
+     * Get a channel instance by name.
+     *
+     * @param  {string}  channel
+     * @return {PusherChannel}
+     */
+    channel(channel: string): PusherChannel {
+        return new PusherChannel(this.createChannel(channel), this);
+    }
+
+    /**
+     * Create and subscribe to a fresh channel instance.
+     *
+     * @param  {string} channel
+     * @return {object}
+     */
+    createChannel(channel: string): any {
+        if (!this.channels[channel]) {
+            this.channels[channel] = this.subscribe(channel);
+        }
+
+        return this.channels[channel];
     }
 
     /**

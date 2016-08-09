@@ -8,13 +8,6 @@ import {PusherConnector, SocketIoConnector} from './connector';
 class Echo {
 
     /**
-     * Channel names.
-     *
-     * @type {array}
-     */
-    channels: any[] = [];
-
-    /**
      * The broadcasting connector.
      *
      * @type {object}
@@ -26,7 +19,7 @@ class Echo {
      *
      * @type {array}
      */
-    options: any[];
+    options: any;
 
     /**
      * Create a new class instance.
@@ -47,20 +40,7 @@ class Echo {
      * Listen for an event on a channel instance.
      */
     listen(channel: string, event: string, callback: Function) {
-        return this.channel(channel).listen(event, callback);
-    }
-
-    /**
-     * Get a channel instance by name.
-     *
-     * @param  {string}  channel
-     * @return {Channel}
-     */
-    channel(channel: string): Channel {
-        return new Channel(
-            this.createChannel(channel),
-            this.connector
-        );
+        return this.connector.listen(channel, event, callback);
     }
 
     /**
@@ -84,20 +64,6 @@ class Echo {
             this.createChannel('presence-' + channel),
             this.connector
         );
-    }
-
-    /**
-     * Create and subscribe to a fresh channel instance.
-     *
-     * @param  {string} channel
-     * @return {object}
-     */
-    createChannel(channel: string): any {
-        if (!this.channels[channel]) {
-            this.channels[channel] = this.connector.subscribe(channel);
-        }
-
-        return this.channels[channel];
     }
 
     /**
