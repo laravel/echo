@@ -1,5 +1,4 @@
-import {SocketIoChannel} from './socketio-channel';
-import {PresenceChannel} from './presence-channel';
+import { PresenceChannel, SocketIoChannel } from './';
 
 /**
  * This class represents a Socket.io presence channel.
@@ -12,7 +11,7 @@ export class SocketIoPresenceChannel extends SocketIoChannel implements Presence
      * @param  {Function} callback
      * @return {object} this
      */
-    here(callback): PusherPresenceChannel {
+    here(callback): SocketIoPresenceChannel {
         this.on('presence:subscribed', (members) => {
             callback(members, this.channel);
         });
@@ -26,7 +25,7 @@ export class SocketIoPresenceChannel extends SocketIoChannel implements Presence
      * @param  {Function} callback
      * @return {PusherPresenceChannel}
      */
-    joining(callback): PusherPresenceChannel {
+    joining(callback): SocketIoPresenceChannel {
         this.on('presence:joining', (member) => {
             callback(member, this.channel);
         });
@@ -40,7 +39,7 @@ export class SocketIoPresenceChannel extends SocketIoChannel implements Presence
      * @param  {Function}  callback
      * @return {PusherPresenceChannel}
      */
-    leaving(callback): PusherPresenceChannel {
+    leaving(callback): SocketIoPresenceChannel {
         this.on('presence:leaving', (member) => {
             callback(member, this.channel);
         });

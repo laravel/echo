@@ -1,5 +1,5 @@
-import {PusherChannel} from './pusher-channel';
-import {PresenceChannel} from './presence-channel';
+import { PusherChannel } from './pusher-channel';
+import { PresenceChannel } from './presence-channel';
 
 /**
  * This class represents a Pusher presence channel.
