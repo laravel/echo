@@ -34,6 +34,10 @@ class Echo {
         }
 
         if (this.options.connector == 'pusher') {
+            if ( ! window.Pusher) {
+                window.Pusher = require('pusher-js');
+            }
+
             this.connector = new PusherConnector(this.options);
         } else if (this.options.connector == 'socket.io') {
             this.connector = new SocketIoConnector(this.options);
