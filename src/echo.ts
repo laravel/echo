@@ -29,11 +29,28 @@ class Echo {
     constructor(options: any) {
         this.options = options;
 
+        if (Vue && Vue.http) {
+            this.registerVueRequestInterceptor();
+        }
+
         if (this.options.connector == 'pusher') {
             this.connector = new PusherConnector(this.options);
         } else if (this.options.connector == 'socket.io') {
             this.connector = new SocketIoConnector(this.options);
         }
+    }
+
+    /**
+     * Register a Vue HTTP interceptor to add the X-Socket-ID header.
+     */
+    registerVueRequestInterceptor() {
+        Vue.http.interceptors.push((request, next) => {
+            if (this.socketId()) {
+                request.headers['X-Socket-ID'] = this.socketId();
+            }
+
+            next();
+        });
     }
 
     /**
