@@ -13,7 +13,7 @@ export class SocketIoPresenceChannel extends SocketIoChannel implements Presence
      */
     here(callback): SocketIoPresenceChannel {
         this.on('presence:subscribed', (members) => {
-            callback(members, this.channel);
+            callback(members.map(m => m.user_info), this.channel);
         });
 
         return this;
@@ -27,7 +27,7 @@ export class SocketIoPresenceChannel extends SocketIoChannel implements Presence
      */
     joining(callback): SocketIoPresenceChannel {
         this.on('presence:joining', (member) => {
-            callback(member, this.channel);
+            callback(member.user_info, this.channel);
         });
 
         return this;
@@ -41,7 +41,7 @@ export class SocketIoPresenceChannel extends SocketIoChannel implements Presence
      */
     leaving(callback): SocketIoPresenceChannel {
         this.on('presence:leaving', (member) => {
-            callback(member, this.channel);
+            callback(member.user_info, this.channel);
         });
 
         return this;
