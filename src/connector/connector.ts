@@ -15,8 +15,8 @@ export abstract class Connector {
         connector: 'pusher',
         csrfToken: null,
         host: null,
-        namespace: null,
-        pusherKey: null
+        key: null,
+        namespace: null
     };
 
     /**
@@ -57,7 +57,9 @@ export abstract class Connector {
     protected csrfToken() {
         let selector = document.querySelector('meta[name="csrf-token"]');
 
-        if (this.options.csrfToken) {
+        if (window.Laravel && window.Laravel.csrfToken) {
+            return window.Laravel.csrfToken;
+        } else if (this.options.csrfToken) {
             return this.options.csrfToken;
         } else if (selector) {
             return selector.getAttribute('content');
