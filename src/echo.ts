@@ -33,13 +33,13 @@ class Echo {
             this.registerVueRequestInterceptor();
         }
 
-        if (this.options.connector == 'pusher') {
+        if (this.options.broadcaster == 'pusher') {
             if ( ! window.Pusher) {
                 window.Pusher = require('pusher-js');
             }
 
             this.connector = new PusherConnector(this.options);
-        } else if (this.options.connector == 'socket.io') {
+        } else if (this.options.broadcaster == 'socket.io') {
             this.connector = new SocketIoConnector(this.options);
         }
     }
