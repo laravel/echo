@@ -29,7 +29,7 @@ class Echo {
     constructor(options: any) {
         this.options = options;
 
-        if (Vue && Vue.http) {
+        if (typeof Vue === 'function' && Vue.http) {
             this.registerVueRequestInterceptor();
         }
 
