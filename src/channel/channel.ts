@@ -22,13 +22,4 @@ export abstract class Channel {
     notification(callback: Function): Channel {
         return this.listen('.Illuminate.Notifications.Events.BroadcastNotificationCreated', callback);
     }
-
-    /**
-     * Listen for an event on the channel instance.
-     *
-     * @param  {string} event
-     * @param  {Function} callback
-     * @return {Channel}
-     */
-    abstract listen(event: string, callback: Function): Channel;
 }
