@@ -34,8 +34,8 @@ class Echo {
         }
 
         if (this.options.broadcaster == 'pusher') {
-            if ( ! window.Pusher) {
-                window.Pusher = require('pusher-js');
+            if (!window['Pusher']) {
+                window['Pusher'] = require('pusher-js');
             }
 
             this.connector = new PusherConnector(this.options);
