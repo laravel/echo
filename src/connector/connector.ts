@@ -57,8 +57,8 @@ export abstract class Connector {
     protected csrfToken() {
         let selector = document.querySelector('meta[name="csrf-token"]');
 
-        if (window.Laravel && window.Laravel.csrfToken) {
-            return window.Laravel.csrfToken;
+        if (window['Laravel'] && window['Laravel'].csrfToken) {
+            return window['Laravel'].csrfToken;
         } else if (this.options.csrfToken) {
             return this.options.csrfToken;
         } else if (selector) {

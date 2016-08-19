@@ -29,13 +29,13 @@ class Echo {
     constructor(options: any) {
         this.options = options;
 
-        if (Vue && Vue.http) {
+        if (typeof Vue === 'function' && Vue.http) {
             this.registerVueRequestInterceptor();
         }
 
         if (this.options.broadcaster == 'pusher') {
-            if ( ! window.Pusher) {
-                window.Pusher = require('pusher-js');
+            if (!window['Pusher']) {
+                window['Pusher'] = require('pusher-js');
             }
 
             this.connector = new PusherConnector(this.options);
