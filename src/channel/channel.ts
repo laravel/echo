@@ -4,6 +4,13 @@
 export abstract class Channel {
 
     /**
+     * The Echo options.
+     *
+     * @type {any}
+     */
+    options: any;
+
+    /**
      * Listen for an event on the channel instance.
      *
      * @param  {string} event

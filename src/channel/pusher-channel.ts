@@ -14,13 +14,6 @@ export class PusherChannel extends Channel {
     channel: any;
 
     /**
-     * The Echo options.
-     *
-     * @type {any}
-     */
-    options: any;
-
-    /**
      * The event formatter.
      *
      * @type {EventFormatter}
