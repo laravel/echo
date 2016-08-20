@@ -45,7 +45,7 @@ export class PusherConnector extends Connector {
      * @return {PusherChannel}
      */
     channel(channel: string): PusherChannel {
-        return new PusherChannel(this.createChannel(channel), this);
+        return new PusherChannel(this.createChannel(channel), this.options);
     }
 
     /**
@@ -55,7 +55,7 @@ export class PusherConnector extends Connector {
      * @return {PusherChannel}
      */
     privateChannel(channel: string): PusherChannel {
-        return new PusherChannel(this.createChannel('private-' + channel), this);
+        return new PusherChannel(this.createChannel('private-' + channel), this.options);
     }
 
     /**
@@ -65,7 +65,7 @@ export class PusherConnector extends Connector {
      * @return {PresenceChannel}
      */
     presenceChannel(channel: string): PresenceChannel {
-        return new PusherPresenceChannel(this.createChannel('presence-' + channel), this);
+        return new PusherPresenceChannel(this.createChannel('presence-' + channel), this.options);
     }
 
     /**

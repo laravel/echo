@@ -45,7 +45,7 @@ export class SocketIoConnector extends Connector {
      * @return {SocketIoChannel}
      */
     channel(channel: string): SocketIoChannel {
-        return new SocketIoChannel(this.createChannel(channel), this);
+        return new SocketIoChannel(this.createChannel(channel), this.options);
     }
 
     /**
@@ -55,7 +55,7 @@ export class SocketIoConnector extends Connector {
      * @return {SocketIoChannel}
      */
     privateChannel(channel: string): SocketIoChannel {
-        return new SocketIoChannel(this.createChannel('private-' + channel), this);
+        return new SocketIoChannel(this.createChannel('private-' + channel), this.options);
     }
 
     /**
@@ -65,7 +65,7 @@ export class SocketIoConnector extends Connector {
      * @return {PresenceChannel}
      */
     presenceChannel(channel: string): SocketIoPresenceChannel {
-        return new SocketIoPresenceChannel(this.createChannel('presence-' + channel), this);
+        return new SocketIoPresenceChannel(this.createChannel('presence-' + channel), this.options);
     }
 
     /**

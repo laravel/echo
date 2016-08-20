@@ -1,5 +1,4 @@
 import { EventFormatter } from './../util';
-import { Connector } from './../connector';
 import { Channel } from './channel';
 
 /**
@@ -15,11 +14,11 @@ export class PusherChannel extends Channel {
     channel: any;
 
     /**
-     * Broadcasting connector.
+     * The Echo options.
      *
-     * @type {Connector}
+     * @type {any}
      */
-    connector: Connector;
+    options: any;
 
     /**
      * The event formatter.
@@ -32,17 +31,17 @@ export class PusherChannel extends Channel {
      * Create a new class instance.
      *
      * @param  {object}  channel
-     * @param  {Connector}  connector
+     * @param  {any}  options
      */
-    constructor(channel: any, connector: any) {
+    constructor(channel: any, options: any) {
         super();
 
         this.channel = channel;
-        this.connector = connector;
+        this.options = options;
         this.eventFormatter = new EventFormatter;
 
-        if (this.connector.options.namespace) {
-            this.eventFormatter.namespace(this.connector.options.namespace);
+        if (this.options.namespace) {
+            this.eventFormatter.namespace(this.options.namespace);
         }
     }
 
