@@ -1,6 +1,6 @@
 {
   "name": "laravel-echo",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Laravel Echo library for beautiful Pusher integration",
   "main": "dist/echo.js",
   "scripts": {
