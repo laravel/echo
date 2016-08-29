@@ -3,3 +3,4 @@
 declare let Pusher: any;
 declare let io: any;
 declare let Vue: any;
+declare let _: any;
