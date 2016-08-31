@@ -1,4 +1,4 @@
-import { EventFormatter } from './../util';
+import { EventFormatter, ArrayHelper } from './../util';
 import { Channel } from './channel';
 
 /**
@@ -61,7 +61,7 @@ export class SocketIoChannel extends Channel {
 
         if(!this.subscription.events) this.subscription.events = {};
 
-        if(!_.has(this.subscription.events, event)) this.subscription.events[event] = [];
+        if(!ArrayHelper.has(this.subscription.events, event)) this.subscription.events[event] = [];
 
         this.subscription.events[event].push(callback);
     }
