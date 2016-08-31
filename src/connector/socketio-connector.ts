@@ -88,9 +88,9 @@ export class SocketIoConnector extends Connector {
      */
     createChannel(channel: string): any {
         if (!this.channels[channel]) {
-            this.channels[channel] = _.create({
+            this.channels[channel] = {
                 channel: this.subscribe(channel)
-            });
+            };
         }
 
         return this.channels[channel];
@@ -155,11 +155,10 @@ export class SocketIoConnector extends Connector {
         let channel = this.channels[channelName]['channel'];
         let events = this.channels[channelName]['events'];
 
-        _.map(_.keys(events), event => {
-
-            _.map(events[event], callback => {
+        for (let event in events) {
+            events[event].forEach(callback => {
                 channel.removeListener(event, callback)
             });
-        });
+        }
     }
 }

@@ -1,5 +1,5 @@
 /**
- * Event helper
+ * Array helper
  */
 export class ArrayHelper {
 
