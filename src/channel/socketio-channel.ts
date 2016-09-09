@@ -5,14 +5,6 @@ import { Channel } from './channel';
  * This class represents a Socket.io channel.
  */
 export class SocketIoChannel extends Channel {
-
-    /**
-     * Channel object.
-     *
-     * @type {object}
-     */
-    channel: any;
-
     /**
      * The event formatter.
      *
@@ -23,14 +15,17 @@ export class SocketIoChannel extends Channel {
     /**
      * Create a new class instance.
      *
-     * @param  {object}  channel
-     * @param  {any}  options
+     * @param  {string} name
+     * @param  {object} subscription
+     * @param  {any} options
      */
-    constructor(channel: any, options: any) {
+    constructor(
+        public name: string,
+        public subscription: any,
+        public options: any
+    ) {
         super();
 
-        this.channel = channel;
-        this.options = options;
         this.eventFormatter = new EventFormatter;
 
         if (this.options.namespace) {
@@ -58,6 +53,10 @@ export class SocketIoChannel extends Channel {
      * @param  {Function} callback
      */
     on(event: string, callback: Function) {
-        this.channel.on(event, callback);
+        this.subscription.on(event, (channel, data) => {
+            if (this.name == channel) {
+                callback(data);
+            }
+        });
     }
 }
