@@ -60,7 +60,7 @@ export class SocketIoConnector extends Connector {
      */
     privateChannel(channel: string): SocketIoChannel {
         return new SocketIoChannel(
-            channel,
+            'private-' + channel,
             this.createChannel('private-' + channel),
             this.options
         );
@@ -74,7 +74,7 @@ export class SocketIoConnector extends Connector {
      */
     presenceChannel(channel: string): SocketIoPresenceChannel {
         return new SocketIoPresenceChannel(
-            channel,
+            'presence-' + channel,
             this.createChannel('presence-' + channel),
             this.options
         );
