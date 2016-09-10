@@ -54,9 +54,42 @@ export class SocketIoChannel extends Channel {
      */
     on(event: string, callback: Function) {
         this.subscription.on(event, (channel, data) => {
-            if (this.name == channel) {
+            if (this.name == this.subscription.name) {
                 callback(data);
             }
         });
+    }
+
+    /**
+     * Send request message to the server.
+     *
+     * @param  {string}   request
+     * @param  {Object}   data
+     */
+    request(request: string, data: Object) {
+        if (!this.isPrivate())
+            return false;
+
+        return this.subscription.emit('request', {
+            channel: this.name,
+            request: request,
+            data:    data,
+            auth:    this.options.auth || {}
+        });
+    }
+
+    /**
+     * Check if channel is private
+     */
+    isPrivate() {
+        var _privateChannels = ['private-*', 'presence-*'];
+        var isPrivateChannel = false;
+        var channel = this.name;
+        _privateChannels.forEach(function (privateChannel) {
+            var regex = new RegExp(privateChannel.replace('\*', '.*'));
+            if (regex.test(channel))
+                isPrivateChannel = true;
+        });
+        return isPrivateChannel;
     }
 }
