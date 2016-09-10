@@ -131,8 +131,6 @@ export class SocketIoConnector extends Connector {
      * @return {void}
      */
     unsubscribe(channel: string): void {
-        this.socket.removeAllListeners();
-
         this.socket.emit('unsubscribe', {
             channel: channel,
             auth: this.options.auth || {}
