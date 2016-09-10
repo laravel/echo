@@ -1,4 +1,4 @@
-import { EventFormatter } from './../util';
+import { EventFormatter, ArrayHelper } from './../util';
 import { Channel } from './channel';
 
 /**
@@ -53,10 +53,16 @@ export class SocketIoChannel extends Channel {
      * @param  {Function} callback
      */
     on(event: string, callback: Function) {
-        this.subscription.on(event, (channel, data) => {
+        this.subscription.socket.on(event, (channel, data) => {
             if (this.name == channel) {
                 callback(data);
             }
         });
+
+        if(!this.subscription.events) this.subscription.events = {};
+
+        if(!ArrayHelper.has(this.subscription.events, event)) this.subscription.events[event] = [];
+
+        this.subscription.events[event].push(callback);
     }
 }

@@ -88,7 +88,9 @@ export class SocketIoConnector extends Connector {
      */
     createChannel(channel: string): any {
         if (!this.channels[channel]) {
-            this.channels[channel] = this.subscribe(channel);
+            this.channels[channel] = {
+                socket: this.subscribe(channel)
+            };
         }
 
         return this.channels[channel];
@@ -104,6 +106,8 @@ export class SocketIoConnector extends Connector {
 
         channels.forEach((channelName: string, index: number) => {
             if (this.channels[channelName]) {
+                this.clearCallbacks(channelName);
+
                 this.unsubscribe(channelName);
 
                 delete this.channels[channelName];
@@ -131,7 +135,6 @@ export class SocketIoConnector extends Connector {
      * @return {void}
      */
     unsubscribe(channel: string): void {
-        this.socket.removeAllListeners();
 
         this.socket.emit('unsubscribe', {
             channel: channel,
@@ -146,5 +149,16 @@ export class SocketIoConnector extends Connector {
      */
     socketId(): string {
         return this.socket.id;
+    }
+
+    private clearCallbacks(channelName: string) {
+        let channel = this.channels[channelName]['socket'];
+        let events = this.channels[channelName]['events'];
+
+        for (let event in events) {
+            events[event].forEach(callback => {
+                channel.removeListener(event, callback)
+            });
+        }
     }
 }
