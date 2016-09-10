@@ -53,7 +53,7 @@ export class SocketIoChannel extends Channel {
      * @param  {Function} callback
      */
     on(event: string, callback: Function) {
-        this.subscription.on(event, (channel, data) => {
+        this.subscription.on(event, (data) => {
             if (this.name == this.subscription.name) {
                 callback(data);
             }
