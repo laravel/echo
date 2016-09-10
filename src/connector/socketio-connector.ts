@@ -90,7 +90,7 @@ export class SocketIoConnector extends Connector {
         if (!this.channels[channel]) {
             this.channels[channel] = this.subscribe(channel);
         }
-
+        this.channels[channel].name = channel;
         return this.channels[channel];
     }
 
