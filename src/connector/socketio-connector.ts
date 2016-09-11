@@ -5,7 +5,6 @@ import { SocketIoChannel, SocketIoPresenceChannel } from './../channel';
  * This class creates a connnector to a Socket.io server.
  */
 export class SocketIoConnector extends Connector {
-
     /**
      * The Socket.io connection instance.
      *
@@ -33,6 +32,11 @@ export class SocketIoConnector extends Connector {
 
     /**
      * Listen for an event on a channel instance.
+     *
+     * @param  {string} name
+     * @param  {string} event
+     * @param  {Function} callback
+     * @return {SocketIoChannel}
      */
     listen(name: string, event: string, callback: Function): SocketIoChannel {
         return this.channel(name).listen(event, callback);
@@ -41,7 +45,7 @@ export class SocketIoConnector extends Connector {
     /**
      * Get a channel instance by name.
      *
-     * @param  {string}  name
+     * @param  {string} name
      * @return {SocketIoChannel}
      */
     channel(name: string): SocketIoChannel {
@@ -59,7 +63,7 @@ export class SocketIoConnector extends Connector {
     /**
      * Get a private channel instance by name.
      *
-     * @param  {string}  name
+     * @param  {string} name
      * @return {SocketIoChannel}
      */
     privateChannel(name: string): SocketIoChannel {
@@ -78,7 +82,7 @@ export class SocketIoConnector extends Connector {
      * Get a presence channel instance by name.
      *
      * @param  {string} name
-     * @return {PresenceChannel}
+     * @return {SocketIoPresenceChannel}
      */
     presenceChannel(name: string): SocketIoPresenceChannel {
         if (!this.channels['presence-' + name]) {

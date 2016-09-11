@@ -2,7 +2,6 @@
  * This class represents a basic channel.
  */
 export abstract class Channel {
-
     /**
      * The Echo options.
      *

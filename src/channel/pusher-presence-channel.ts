@@ -5,7 +5,6 @@ import { PresenceChannel } from './presence-channel';
  * This class represents a Pusher presence channel.
  */
 export class PusherPresenceChannel extends PusherChannel implements PresenceChannel {
-
     /**
      * Register a callback to be called anytime the member list changes.
      *

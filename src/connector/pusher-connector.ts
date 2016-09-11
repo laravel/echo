@@ -7,7 +7,6 @@ import {
  * This class creates a connector to Pusher.
  */
 export class PusherConnector extends Connector {
-
     /**
      * The Pusher instance.
      *

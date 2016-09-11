@@ -91,7 +91,7 @@ export class SocketIoChannel extends Channel {
     /**
      * Bind the channel's socket to an event and store the callback.
      *
-     * @param  {string}   event
+     * @param  {string} event
      * @param  {Function} callback
      */
     on(event: string, callback: Function): void {
@@ -110,6 +110,7 @@ export class SocketIoChannel extends Channel {
      *
      * @param  {string}   event
      * @param  {Function} callback
+     * @return {void}
      */
     bind(event: string, callback: Function): void {
         this.events[event] = this.events[event] || [];

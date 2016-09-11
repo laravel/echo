@@ -37,7 +37,8 @@ export class PusherChannel extends Channel {
     constructor(
         public name: any,
         public pusher: any,
-        public options: any) {
+        public options: any
+    ) {
         super();
 
         this.eventFormatter = new EventFormatter;
@@ -86,8 +87,9 @@ export class PusherChannel extends Channel {
      *
      * @param  {string}   event
      * @param  {Function} callback
+     * @return {void}
      */
-    on(event: string, callback: Function) {
+    on(event: string, callback: Function): void {
         this.subscription.bind(event, callback);
     }
 }

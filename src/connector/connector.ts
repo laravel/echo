@@ -28,8 +28,10 @@ export abstract class Connector {
 
     /**
      * Create a new class instance.
+     *
+     * @params  {any} options
      */
-    constructor(options) {
+    constructor(options: any) {
         this.setOptions(options);
 
         this.connect();
@@ -39,9 +41,9 @@ export abstract class Connector {
      * Merge the custom options with the defaults.
      *
      * @param  {any}  options
-     * @return {object}
+     * @return {any}
      */
-    protected setOptions(options: any) {
+    protected setOptions(options: any): any {
         this.options = Object.assign(this._defaultOptions, options);
 
         if (this.csrfToken()) {
@@ -53,8 +55,10 @@ export abstract class Connector {
 
     /**
      * Extract the CSRF token from the page.
+     *
+     * @return {string}
      */
-    protected csrfToken() {
+    protected csrfToken(): string {
         let selector = document.querySelector('meta[name="csrf-token"]');
 
         if (window['Laravel'] && window['Laravel'].csrfToken) {
@@ -86,8 +90,8 @@ export abstract class Connector {
     /**
      * Get a private channel instance by name.
      *
-     * @param  {string}  channel
-     * @return {PusherChannel}
+     * @param  {string} channel
+     * @return {Channel}
      */
     abstract privateChannel(channel: string): Channel;
 
@@ -103,8 +107,9 @@ export abstract class Connector {
      * Leave the given channel.
      *
      * @param  {string} channel
+     * @return {void}
      */
-    abstract leave(channel: string);
+    abstract leave(channel: string): void;
 
     /**
      * Get the socket_id of the connection.

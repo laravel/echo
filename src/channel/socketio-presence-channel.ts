@@ -4,14 +4,13 @@ import { PresenceChannel, SocketIoChannel } from './';
  * This class represents a Socket.io presence channel.
  */
 export class SocketIoPresenceChannel extends SocketIoChannel implements PresenceChannel {
-
     /**
      * Register a callback to be called anytime the member list changes.
      *
      * @param  {Function} callback
-     * @return {object} this
+     * @return {object} SocketIoPresenceChannel
      */
-    here(callback): SocketIoPresenceChannel {
+    here(callback: Function): SocketIoPresenceChannel {
         this.on('presence:subscribed', (members) => {
             callback(members.map(m => m.user_info), this.subscription);
         });
@@ -23,9 +22,9 @@ export class SocketIoPresenceChannel extends SocketIoChannel implements Presence
      * Listen for someone joining the channel.
      *
      * @param  {Function} callback
-     * @return {PusherPresenceChannel}
+     * @return {SocketIoPresenceChannel}
      */
-    joining(callback): SocketIoPresenceChannel {
+    joining(callback: Function): SocketIoPresenceChannel {
         this.on('presence:joining', (member) => {
             callback(member.user_info, this.subscription);
         });
@@ -37,9 +36,9 @@ export class SocketIoPresenceChannel extends SocketIoChannel implements Presence
      * Listen for someone leaving the channel.
      *
      * @param  {Function}  callback
-     * @return {PusherPresenceChannel}
+     * @return {SocketIoPresenceChannel}
      */
-    leaving(callback): SocketIoPresenceChannel {
+    leaving(callback: Function): SocketIoPresenceChannel {
         this.on('presence:leaving', (member) => {
             callback(member.user_info, this.subscription);
         });
