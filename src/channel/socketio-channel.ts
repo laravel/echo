@@ -13,15 +13,29 @@ export class SocketIoChannel extends Channel {
     eventFormatter: EventFormatter;
 
     /**
+     * The subsciption of the channel.
+     *
+     * @type {any}
+     */
+    subscription: any;
+
+    /**
+     * The event callbacks applied to the channel.
+     *
+     * @type {any}
+     */
+    events: any = {};
+
+    /**
      * Create a new class instance.
      *
      * @param  {string} name
-     * @param  {object} subscription
+     * @param  {any} socket
      * @param  {any} options
      */
     constructor(
         public name: string,
-        public subscription: any,
+        public socket: any,
         public options: any
     ) {
         super();
@@ -31,6 +45,34 @@ export class SocketIoChannel extends Channel {
         if (this.options.namespace) {
             this.eventFormatter.namespace(this.options.namespace);
         }
+
+        this.subscribe();
+    }
+
+    /**
+     * Subscribe to a Socket.io channel.
+     *
+     * @return {object}
+     */
+    subscribe(): any {
+        this.subscription = this.socket.emit('subscribe', {
+            channel: this.name,
+            auth: this.options.auth || {}
+        });
+    }
+
+    /**
+     * Unsubscribe from channel and ubind event callbacks.
+     *
+     * @return {void}
+     */
+    unsubscribe(): void {
+        this.unbind();
+
+        this.socket.emit('unsubscribe', {
+            channel: this.name,
+            auth: this.options.auth || {}
+        });
     }
 
     /**
@@ -47,16 +89,45 @@ export class SocketIoChannel extends Channel {
     }
 
     /**
-     * Bind a channel to an event.
+     * Bind the channel's socket to an event and store the callback.
      *
      * @param  {string}   event
      * @param  {Function} callback
      */
-    on(event: string, callback: Function) {
-        this.subscription.on(event, (channel, data) => {
+    on(event: string, callback: Function): void {
+        let listener = (channel, data) => {
             if (this.name == channel) {
                 callback(data);
             }
+        };
+
+        this.socket.on(event, listener);
+        this.bind(event, listener);
+    }
+
+    /**
+     * Bind the channel's socket to an event and store the callback.
+     *
+     * @param  {string}   event
+     * @param  {Function} callback
+     */
+    bind(event: string, callback: Function): void {
+        this.events[event] = this.events[event] || [];
+        this.events[event].push(callback);
+    }
+
+    /**
+     * Unbind the channel's socket from all stored event callbacks.
+     *
+     * @return {void}
+     */
+    unbind(): void {
+        Object.keys(this.events).forEach(event => {
+            this.events[event].forEach(callback => {
+                this.subscription.removeListener(event, callback);
+            });
+
+            delete this.events[event];
         });
     }
 }

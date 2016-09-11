@@ -21,21 +21,51 @@ export class PusherChannel extends Channel {
     eventFormatter: EventFormatter;
 
     /**
+     * The subsciption of the channel.
+     *
+     * @type {any}
+     */
+    subscription: any;
+
+    /**
      * Create a new class instance.
      *
-     * @param  {object}  channel
+     * @param  {object} name
+     * @param  {any} pusher
      * @param  {any}  options
      */
-    constructor(channel: any, options: any) {
+    constructor(
+        public name: any,
+        public pusher: any,
+        public options: any) {
         super();
 
-        this.channel = channel;
-        this.options = options;
         this.eventFormatter = new EventFormatter;
 
         if (this.options.namespace) {
             this.eventFormatter.namespace(this.options.namespace);
         }
+
+        this.subscribe();
+    }
+
+    /**
+     * Subscribe to a Pusher channel.
+     *
+     * @param  {string} channel
+     * @return {object}
+     */
+    subscribe(): any {
+        this.subscription = this.pusher.subscribe(this.name);
+    }
+
+    /**
+     * Unsubscribe from a Pusher channel.
+     *
+     * @return {void}
+     */
+    unsubscribe(channel: string): void {
+        this.pusher.unsubscribe(this.name);
     }
 
     /**
@@ -46,7 +76,7 @@ export class PusherChannel extends Channel {
      * @return {PusherChannel}
      */
     listen(event: string, callback: Function): PusherChannel {
-        this.bind(this.eventFormatter.format(event), callback);
+        this.on(this.eventFormatter.format(event), callback);
 
         return this;
     }
@@ -57,7 +87,7 @@ export class PusherChannel extends Channel {
      * @param  {string}   event
      * @param  {Function} callback
      */
-    bind(event: string, callback: Function) {
-        this.channel.bind(event, callback);
+    on(event: string, callback: Function) {
+        this.subscription.bind(event, callback);
     }
 }

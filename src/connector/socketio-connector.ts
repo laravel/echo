@@ -16,9 +16,9 @@ export class SocketIoConnector extends Connector {
     /**
      * All of the subscribed channel names.
      *
-     * @type {array}
+     * @type {any}
      */
-    channels: any[] = [];
+    channels: any = {};
 
     /**
      * Create a fresh Socket.io connection.
@@ -34,106 +34,79 @@ export class SocketIoConnector extends Connector {
     /**
      * Listen for an event on a channel instance.
      */
-    listen(channel: string, event: string, callback: Function) {
-        return this.channel(channel).listen(event, callback);
+    listen(name: string, event: string, callback: Function): SocketIoChannel {
+        return this.channel(name).listen(event, callback);
     }
 
     /**
      * Get a channel instance by name.
      *
-     * @param  {string}  channel
+     * @param  {string}  name
      * @return {SocketIoChannel}
      */
-    channel(channel: string): SocketIoChannel {
-        return new SocketIoChannel(
-            channel,
-            this.createChannel(channel),
-            this.options
-        );
+    channel(name: string): SocketIoChannel {
+        if (!this.channels[name]) {
+            this.channels[name] = new SocketIoChannel(
+                name,
+                this.socket,
+                this.options
+            );
+        }
+
+        return this.channels[name];
     }
 
     /**
      * Get a private channel instance by name.
      *
-     * @param  {string}  channel
+     * @param  {string}  name
      * @return {SocketIoChannel}
      */
-    privateChannel(channel: string): SocketIoChannel {
-        return new SocketIoChannel(
-            'private-' + channel,
-            this.createChannel('private-' + channel),
-            this.options
-        );
+    privateChannel(name: string): SocketIoChannel {
+        if (!this.channels['private-' + name]) {
+            this.channels['private-' + name] = new SocketIoChannel(
+                'private-' + name,
+                this.socket,
+                this.options
+            );
+        }
+
+        return this.channels['private-' + name];
     }
 
     /**
      * Get a presence channel instance by name.
      *
-     * @param  {string} channel
+     * @param  {string} name
      * @return {PresenceChannel}
      */
-    presenceChannel(channel: string): SocketIoPresenceChannel {
-        return new SocketIoPresenceChannel(
-            'presence-' + channel,
-            this.createChannel('presence-' + channel),
-            this.options
-        );
-    }
-
-    /**
-     * Create and subscribe to a fresh channel instance.
-     *
-     * @param  {string} channel
-     * @return {object}
-     */
-    createChannel(channel: string): any {
-        if (!this.channels[channel]) {
-            this.channels[channel] = this.subscribe(channel);
+    presenceChannel(name: string): SocketIoPresenceChannel {
+        if (!this.channels['presence-' + name]) {
+            this.channels['presence-' + name] = new SocketIoPresenceChannel(
+                'presence-' + name,
+                this.socket,
+                this.options
+            );
         }
 
-        return this.channels[channel];
+        return this.channels['presence-' + name];
     }
 
     /**
      * Leave the given channel.
      *
-     * @param  {string} channel
-     */
-    leave(channel: string) {
-        let channels = [channel, 'private-' + channel, 'presence-' + channel];
-
-        channels.forEach((channelName: string, index: number) => {
-            if (this.channels[channelName]) {
-                this.unsubscribe(channelName);
-
-                delete this.channels[channelName];
-            }
-        });
-    }
-
-    /**
-     * Subscribe to a Socket.io channel.
-     *
-     * @param  {string} channel
-     * @return {object}
-     */
-    subscribe(channel: string): any {
-        return this.socket.emit('subscribe', {
-            channel: channel,
-            auth: this.options.auth || {}
-        });
-    }
-
-    /**
-     * Unsubscribe from a Socket.io channel.
-     *
-     * @param  {string} channel
+     * @param  {string} name
      * @return {void}
      */
-    unsubscribe(channel: string): void {
-        this.socket.emit('unsubscribe', {
-            channel: channel,
-            auth: this.options.auth || {}
+    leave(name: string): void {
+        let channels = [name, 'private-' + name, 'presence-' + name];
+
+        channels.forEach(name => {
+            if (this.channels[name]) {
+                this.channels[name].unsubscribe();
+
+                delete this.channels[name];
+            }
         });
     }
 
