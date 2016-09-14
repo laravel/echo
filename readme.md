@@ -1,5 +1,5 @@
-## Laravel Echo
+# Laravel Echo
 
-Beautiful real-time applications with Laravel + Pusher.
+JavaScript client for Laravel event broadcasting.
 
-_This is experimental..._
+Official documentation [is located here](http://laravel.com/docs/broadcasting).
