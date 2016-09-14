@@ -65,7 +65,7 @@ export class PusherChannel extends Channel {
      *
      * @return {void}
      */
-    unsubscribe(channel: string): void {
+    unsubscribe(): void {
         this.pusher.unsubscribe(this.name);
     }
 

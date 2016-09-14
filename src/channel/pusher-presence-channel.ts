@@ -13,7 +13,7 @@ export class PusherPresenceChannel extends PusherChannel implements PresenceChan
      */
     here(callback): PusherPresenceChannel {
         this.on('pusher:subscription_succeeded', (data) => {
-            callback(Object.keys(data.members).map(k => data.members[k]), this.name);
+            callback(Object.keys(data.members).map(k => data.members[k]));
         });
 
         return this;
@@ -27,7 +27,7 @@ export class PusherPresenceChannel extends PusherChannel implements PresenceChan
      */
     joining(callback): PusherPresenceChannel {
         this.on('pusher:member_added', (member) => {
-            callback(member.info, this.name);
+            callback(member.info);
         });
 
         return this;
@@ -41,7 +41,7 @@ export class PusherPresenceChannel extends PusherChannel implements PresenceChan
      */
     leaving(callback): PusherPresenceChannel {
         this.on('pusher:member_removed', (member) => {
-            callback(member.info, this.name);
+            callback(member.info);
         });
 
         return this;
