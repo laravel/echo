@@ -6,9 +6,9 @@ export interface PresenceChannel {
      * Register a callback to be called anytime the member list changes.
      *
      * @param  {Function} callback
-     * @return {object} this
+     * @return {object} PresenceChannel
      */
-    here(callback): PresenceChannel;
+    here(callback: Function): PresenceChannel;
 
     /**
      * Listen for someone joining the channel.
@@ -16,13 +16,13 @@ export interface PresenceChannel {
      * @param  {Function} callback
      * @return {PresenceChannel}
      */
-    joining(callback): PresenceChannel;
+    joining(callback: Function): PresenceChannel;
 
     /**
      * Listen for someone leaving the channel.
      *
-     * @param  {Function}  callback
+     * @param  {Function} callback
      * @return {PresenceChannel}
      */
-    leaving(callback): PresenceChannel;
+    leaving(callback: Function): PresenceChannel;
 }

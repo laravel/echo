@@ -7,7 +7,6 @@ import {
  * This class creates a connector to Pusher.
  */
 export class PusherConnector extends Connector {
-
     /**
      * The Pusher instance.
      *
@@ -20,7 +19,7 @@ export class PusherConnector extends Connector {
      *
      * @type {array}
      */
-    channels: any[] = [];
+    channels: any = {};
 
     /**
      * Create a fresh Pusher connection.
@@ -33,53 +32,68 @@ export class PusherConnector extends Connector {
 
     /**
      * Listen for an event on a channel instance.
+     *
+     * @param  {string} name
+     * @param  {event} string
+     * @param  {Function} callback
+     * @return {PusherChannel}
      */
-    listen(channel: string, event: string, callback: Function) {
-        return this.channel(channel).listen(event, callback);
+    listen(name: string, event: string, callback: Function): PusherChannel {
+        return this.channel(name).listen(event, callback);
     }
 
     /**
      * Get a channel instance by name.
      *
-     * @param  {string}  channel
+     * @param  {string} name
      * @return {PusherChannel}
      */
-    channel(channel: string): PusherChannel {
-        return new PusherChannel(this.createChannel(channel), this.options);
+    channel(name: string): PusherChannel {
+        if (!this.channels[name]) {
+            this.channels[name] = new PusherChannel(
+                name,
+                this.pusher,
+                this.options
+            );
+        }
+
+        return this.channels[name];
     }
 
     /**
      * Get a private channel instance by name.
      *
-     * @param  {string}  channel
+     * @param  {string} name
      * @return {PusherChannel}
      */
-    privateChannel(channel: string): PusherChannel {
-        return new PusherChannel(this.createChannel('private-' + channel), this.options);
+    privateChannel(name: string): PusherChannel {
+        if (!this.channels['private-' + name]) {
+            this.channels['private-' + name] = new PusherChannel(
+                'private-' + name,
+                this.pusher,
+                this.options
+            );
+        }
+
+        return this.channels['private-' + name];
     }
 
     /**
      * Get a presence channel instance by name.
      *
-     * @param  {string} channel
+     * @param  {string} name
      * @return {PresenceChannel}
      */
-    presenceChannel(channel: string): PresenceChannel {
-        return new PusherPresenceChannel(this.createChannel('presence-' + channel), this.options);
-    }
-
-    /**
-     * Create and subscribe to a fresh channel instance.
-     *
-     * @param  {string} channel
-     * @return {object}
-     */
-    createChannel(channel: string): any {
-        if (!this.channels[channel]) {
-            this.channels[channel] = this.subscribe(channel);
+    presenceChannel(name: string): PresenceChannel {
+        if (!this.channels['presence-' + name]) {
+            this.channels['presence-' + name] = new PusherPresenceChannel(
+                'presence-' + name,
+                this.pusher,
+                this.options
+            );
         }
 
-        return this.channels[channel];
+        return this.channels['presence-' + name];
     }
 
     /**
@@ -87,36 +101,16 @@ export class PusherConnector extends Connector {
      *
      * @param  {string} channel
      */
-    leave(channel: string) {
-        let channels = [channel, 'private-' + channel, 'presence-' + channel];
+    leave(name: string) {
+        let channels = [name, 'private-' + name, 'presence-' + name];
 
-        channels.forEach((channelName: string, index: number) => {
-            if (this.channels[channelName]) {
-                this.unsubscribe(channelName);
+        channels.forEach((name: string, index: number) => {
+            if (this.channels[name]) {
+                this.channels[name].unsubscribe();
 
-                delete this.channels[channelName];
+                delete this.channels[name];
             }
         });
-    }
-
-    /**
-     * Subscribe to a Pusher channel.
-     *
-     * @param  {string} channel
-     * @return {object}
-     */
-    subscribe(channel: string): any {
-        return this.pusher.subscribe(channel);
-    }
-
-    /**
-     * Unsubscribe from a Pusher channel.
-     *
-     * @param  {string} channel
-     * @return {void}
-     */
-    unsubscribe(channel: string): void {
-        this.pusher.unsubscribe(channel);
     }
 
     /**

@@ -2,7 +2,6 @@
  * This class represents a basic channel.
  */
 export abstract class Channel {
-
     /**
      * The Echo options.
      *
@@ -14,7 +13,7 @@ export abstract class Channel {
      * Listen for an event on the channel instance.
      *
      * @param  {string} event
-     * @param  {Function}   callback
+     * @param  {Function} callback
      * @return {Channel}
      */
     abstract listen(event: string, callback: Function): Channel;
@@ -23,7 +22,7 @@ export abstract class Channel {
      * Listen for an event on the channel instance.
      *
      * @param  {string} event
-     * @param  {Function}   callback
+     * @param  {Function} callback
      * @return {Channel}
      */
     notification(callback: Function): Channel {
