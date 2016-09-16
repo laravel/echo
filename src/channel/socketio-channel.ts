@@ -6,6 +6,27 @@ import { Channel } from './channel';
  */
 export class SocketIoChannel extends Channel {
     /**
+     * The name of the channel.
+     *
+     * @type {object}
+     */
+    name: any;
+
+    /**
+     * The socket.io client instance.
+     *
+     * @type {any}
+     */
+    socket: any;
+
+    /**
+     * Channel options.
+     *
+     * @type {any}
+     */
+    options: any;
+
+    /**
      * The event formatter.
      *
      * @type {EventFormatter}
@@ -33,12 +54,12 @@ export class SocketIoChannel extends Channel {
      * @param  {any} socket
      * @param  {any} options
      */
-    constructor(
-        public name: string,
-        public socket: any,
-        public options: any
-    ) {
+    constructor(name: string, socket: any, options: any) {
         super();
+
+        this.name = name;
+        this.socket = socket;
+        this.options = options;
 
         this.eventFormatter = new EventFormatter;
 

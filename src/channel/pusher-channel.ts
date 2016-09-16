@@ -5,13 +5,26 @@ import { Channel } from './channel';
  * This class represents a Pusher channel.
  */
 export class PusherChannel extends Channel {
-
     /**
-     * Channel object.
+     * The name of the channel.
      *
      * @type {object}
      */
-    channel: any;
+    name: any;
+
+    /**
+     * The pusher client instance.
+     *
+     * @type {any}
+     */
+    pusher: any;
+
+    /**
+     * Channel options.
+     *
+     * @type {any}
+     */
+    options: any;
 
     /**
      * The event formatter.
@@ -34,12 +47,12 @@ export class PusherChannel extends Channel {
      * @param  {any} pusher
      * @param  {any}  options
      */
-    constructor(
-        public name: any,
-        public pusher: any,
-        public options: any
-    ) {
+    constructor(name: any, pusher: any, options: any) {
         super();
+
+        this.name = name;
+        this.pusher = pusher;
+        this.options = options;
 
         this.eventFormatter = new EventFormatter;
 
