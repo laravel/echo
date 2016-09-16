@@ -51,8 +51,8 @@ export class SocketIoConnector extends Connector {
     channel(name: string): SocketIoChannel {
         if (!this.channels[name]) {
             this.channels[name] = new SocketIoChannel(
-                name,
                 this.socket,
+                name,
                 this.options
             );
         }
@@ -69,8 +69,8 @@ export class SocketIoConnector extends Connector {
     privateChannel(name: string): SocketIoChannel {
         if (!this.channels['private-' + name]) {
             this.channels['private-' + name] = new SocketIoChannel(
-                'private-' + name,
                 this.socket,
+                'private-' + name,
                 this.options
             );
         }
@@ -87,8 +87,8 @@ export class SocketIoConnector extends Connector {
     presenceChannel(name: string): SocketIoPresenceChannel {
         if (!this.channels['presence-' + name]) {
             this.channels['presence-' + name] = new SocketIoPresenceChannel(
-                'presence-' + name,
                 this.socket,
+                'presence-' + name,
                 this.options
             );
         }

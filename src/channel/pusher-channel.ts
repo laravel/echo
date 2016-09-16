@@ -6,18 +6,18 @@ import { Channel } from './channel';
  */
 export class PusherChannel extends Channel {
     /**
+     * The Pusher client instance.
+     *
+     * @type {any}
+     */
+    pusher: any;
+
+    /**
      * The name of the channel.
      *
      * @type {object}
      */
     name: any;
-
-    /**
-     * The pusher client instance.
-     *
-     * @type {any}
-     */
-    pusher: any;
 
     /**
      * Channel options.
@@ -43,11 +43,11 @@ export class PusherChannel extends Channel {
     /**
      * Create a new class instance.
      *
-     * @param  {object} name
      * @param  {any} pusher
+     * @param  {object} name
      * @param  {any}  options
      */
-    constructor(name: any, pusher: any, options: any) {
+    constructor(pusher: any, name: any, options: any) {
         super();
 
         this.name = name;

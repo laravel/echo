@@ -6,18 +6,18 @@ import { Channel } from './channel';
  */
 export class SocketIoChannel extends Channel {
     /**
+     * The Socket.io client instance.
+     *
+     * @type {any}
+     */
+    socket: any;
+
+    /**
      * The name of the channel.
      *
      * @type {object}
      */
     name: any;
-
-    /**
-     * The socket.io client instance.
-     *
-     * @type {any}
-     */
-    socket: any;
 
     /**
      * Channel options.
@@ -50,11 +50,11 @@ export class SocketIoChannel extends Channel {
     /**
      * Create a new class instance.
      *
-     * @param  {string} name
      * @param  {any} socket
+     * @param  {string} name
      * @param  {any} options
      */
-    constructor(name: string, socket: any, options: any) {
+    constructor(socket: any, name: string, options: any) {
         super();
 
         this.name = name;

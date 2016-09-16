@@ -51,8 +51,8 @@ export class PusherConnector extends Connector {
     channel(name: string): PusherChannel {
         if (!this.channels[name]) {
             this.channels[name] = new PusherChannel(
-                name,
                 this.pusher,
+                name,
                 this.options
             );
         }
@@ -69,8 +69,8 @@ export class PusherConnector extends Connector {
     privateChannel(name: string): PusherChannel {
         if (!this.channels['private-' + name]) {
             this.channels['private-' + name] = new PusherChannel(
-                'private-' + name,
                 this.pusher,
+                'private-' + name,
                 this.options
             );
         }
@@ -87,8 +87,8 @@ export class PusherConnector extends Connector {
     presenceChannel(name: string): PresenceChannel {
         if (!this.channels['presence-' + name]) {
             this.channels['presence-' + name] = new PusherPresenceChannel(
-                'presence-' + name,
                 this.pusher,
+                'presence-' + name,
                 this.options
             );
         }
