@@ -76,7 +76,7 @@ export class SocketIoChannel extends Channel {
      * @return {object}
      */
     subscribe(): any {
-        this.subscription = this.socket.emit('subscribe', {
+        this.socket = this.socket.emit('subscribe', {
             channel: this.name,
             auth: this.options.auth || {}
         });
@@ -146,7 +146,7 @@ export class SocketIoChannel extends Channel {
     unbind(): void {
         Object.keys(this.events).forEach(event => {
             this.events[event].forEach(callback => {
-                this.subscription.removeListener(event, callback);
+                this.socket.removeListener(event, callback);
             });
 
             delete this.events[event];
