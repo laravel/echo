@@ -67,15 +67,7 @@ export class SocketIoConnector extends Connector {
      * @return {SocketIoChannel}
      */
     privateChannel(name: string): SocketIoChannel {
-        if (!this.channels['private-' + name]) {
-            this.channels['private-' + name] = new SocketIoChannel(
-                this.socket,
-                'private-' + name,
-                this.options
-            );
-        }
-
-        return this.channels['private-' + name];
+        return this.channel('private-' + name);
     }
 
     /**
