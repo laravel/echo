@@ -50,7 +50,7 @@ class Echo {
     registerVueRequestInterceptor() {
         Vue.http.interceptors.push((request, next) => {
             if (this.socketId()) {
-                request.headers.set('X-Socket-ID', this.socketId());
+                request.headers['X-Socket-ID'] = this.socketId();
             }
 
             next();
