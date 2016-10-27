@@ -16,7 +16,7 @@ export abstract class Connector {
         csrfToken: null,
         host: null,
         key: null,
-        namespace: null
+        namespace: ''
     };
 
     /**
