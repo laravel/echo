@@ -22,26 +22,58 @@ class Echo {
     options: any;
 
     /**
+     * Default global settings
+     *
+     * @type: {object}
+     */
+    private _defaultSettings: any = {
+        convertNameSpaces: true,
+        prefixNamespace: true,
+        defaultNameSpace: 'App.Events'
+    };
+
+    /**
+     * Global settings
+     *
+     * @type: {object}
+     */
+    settings: any;
+
+    /**
      * Create a new class instance.
      *
      * @param  {object} options
      */
-    constructor(options: any) {
+    constructor(options: any, settings?: any) {
         this.options = options;
 
         if (typeof Vue === 'function' && Vue.http) {
             this.registerVueRequestInterceptor();
         }
 
+        this.settings = this.normaliseSettings(settings);
+
         if (this.options.broadcaster == 'pusher') {
             if (!window['Pusher']) {
                 window['Pusher'] = require('pusher-js');
             }
 
-            this.connector = new PusherConnector(this.options);
+            this.connector = new PusherConnector(this.options, this.settings);
         } else if (this.options.broadcaster == 'socket.io') {
-            this.connector = new SocketIoConnector(this.options);
+            this.connector = new SocketIoConnector(this.options, this.settings);
         }
+    }
+
+    /**
+     * Take the given settings and overwrite the default ones.
+     */
+    normaliseSettings(settings?: any) {
+        if(!settings)
+        {
+            settings = {};
+        }
+
+        return Object.assign({}, this._defaultSettings, settings);
     }
 
     /**
@@ -50,7 +82,7 @@ class Echo {
     registerVueRequestInterceptor() {
         Vue.http.interceptors.push((request, next) => {
             if (this.socketId()) {
-                request.headers.set('X-Socket-ID', this.socketId());
+                request.headers['X-Socket-ID'] = this.socketId();
             }
 
             next();

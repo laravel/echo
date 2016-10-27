@@ -4,11 +4,15 @@
 export class EventFormatter {
 
     /**
-     * Default event namespace.
+     * Global options
      *
-     * @type {string}
+     * @type: {object}
      */
-    defaultNamespace: string = 'App.Events';
+    settings: any;
+
+    constructor(settings: any) {
+        this.settings = settings;
+    }
 
     /**
      * Format the given event name.
@@ -17,13 +21,19 @@ export class EventFormatter {
      * @return {string}
      */
     format(event: string): string {
-        if (event.charAt(0) != '\\' && event.charAt(0) != '.') {
-            event = this.defaultNamespace + '.' + event;
-        } else {
+        // If we're prefixing the event with namespaces and the first char isn't '\' or '.'
+        if (this.settings.prefixNamespace && event.charAt(0) != '\\' && event.charAt(0) != '.')
+        {
+            event = this.settings.defaultNamespace + '.' + event;
+        }
+        // If we're prefixing and one of those chars start off the string
+        else if(this.settings.prefixNamespace)
+        {
             event = event.substr(1);
         }
 
-        return event.replace(/\./g, '\\');
+        // If we're converting namespaces, replace '.' with '\'
+        return (this.settings.convertNameSpaces) ? event.replace(/\./g, '\\') : event;
     }
 
     /**

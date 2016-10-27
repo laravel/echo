@@ -53,7 +53,8 @@ export class PusherConnector extends Connector {
             this.channels[name] = new PusherChannel(
                 this.pusher,
                 name,
-                this.options
+                this.options,
+                this.settings
             );
         }
 
@@ -71,7 +72,8 @@ export class PusherConnector extends Connector {
             this.channels['private-' + name] = new PusherChannel(
                 this.pusher,
                 'private-' + name,
-                this.options
+                this.options,
+                this.settings
             );
         }
 
@@ -89,7 +91,8 @@ export class PusherConnector extends Connector {
             this.channels['presence-' + name] = new PusherPresenceChannel(
                 this.pusher,
                 'presence-' + name,
-                this.options
+                this.options,
+                this.settings
             );
         }
 

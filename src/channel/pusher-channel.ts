@@ -47,14 +47,14 @@ export class PusherChannel extends Channel {
      * @param  {object} name
      * @param  {any}  options
      */
-    constructor(pusher: any, name: any, options: any) {
+    constructor(pusher: any, name: any, options: any, settings: any) {
         super();
 
         this.name = name;
         this.pusher = pusher;
         this.options = options;
 
-        this.eventFormatter = new EventFormatter;
+        this.eventFormatter = new EventFormatter(settings);
 
         if (this.options.namespace) {
             this.eventFormatter.namespace(this.options.namespace);
