@@ -27,12 +27,21 @@ export abstract class Connector {
     options: any;
 
     /**
+     * Global options
+     *
+     * @type: {object}
+     */
+    settings: any;
+
+    /**
      * Create a new class instance.
      *
      * @params  {any} options
      */
-    constructor(options: any) {
+    constructor(options: any, settings: any) {
         this.setOptions(options);
+
+        this.settings = settings;
 
         this.connect();
     }

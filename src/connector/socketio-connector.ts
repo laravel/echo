@@ -53,7 +53,8 @@ export class SocketIoConnector extends Connector {
             this.channels[name] = new SocketIoChannel(
                 this.socket,
                 name,
-                this.options
+                this.options,
+                this.settings
             );
         }
 
@@ -71,7 +72,8 @@ export class SocketIoConnector extends Connector {
             this.channels['private-' + name] = new SocketIoChannel(
                 this.socket,
                 'private-' + name,
-                this.options
+                this.options,
+                this.settings
             );
         }
 
@@ -89,7 +91,8 @@ export class SocketIoConnector extends Connector {
             this.channels['presence-' + name] = new SocketIoPresenceChannel(
                 this.socket,
                 'presence-' + name,
-                this.options
+                this.options,
+                this.settings
             );
         }
 
