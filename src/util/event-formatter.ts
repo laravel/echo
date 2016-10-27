@@ -8,7 +8,7 @@ export class EventFormatter {
      *
      * @type {string}
      */
-    defaultNamespace: string = 'App.Events';
+    defaultNamespace: string | boolean = 'App.Events';
 
     /**
      * Format the given event name.
@@ -17,10 +17,12 @@ export class EventFormatter {
      * @return {string}
      */
     format(event: string): string {
-        if (event.charAt(0) != '\\' && event.charAt(0) != '.') {
-            event = this.defaultNamespace + '.' + event;
-        } else {
-            event = event.substr(1);
+        if (this.defaultNamespace !== false) {
+            if (event.charAt(0) != '\\' && event.charAt(0) != '.') {
+                event = this.defaultNamespace + '.' + event;
+            } else {
+                event = event.substr(1);
+            }
         }
 
         return event.replace(/\./g, '\\');
