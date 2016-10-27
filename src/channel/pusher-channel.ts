@@ -102,9 +102,9 @@ export class PusherChannel extends Channel {
      * @param  {Function} callback
      * @return {void}
      */
-    on(event: string, callback: Function): void {
+    on(event: string, callback: Function): PusherChannel {
         this.subscription.bind(event, callback);
-        
+
         return this;
     }
 }
