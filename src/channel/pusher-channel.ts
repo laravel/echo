@@ -55,10 +55,7 @@ export class PusherChannel extends Channel {
         this.options = options;
 
         this.eventFormatter = new EventFormatter;
-
-        if (this.options.namespace) {
-            this.eventFormatter.namespace(this.options.namespace);
-        }
+        this.eventFormatter.namespace(this.options.namespace);
 
         this.subscribe();
     }
