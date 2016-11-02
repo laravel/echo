@@ -4,11 +4,20 @@
 export class EventFormatter {
 
     /**
-     * Default event namespace.
+     * Event namespace.
      *
      * @type {string}
      */
-    defaultNamespace: string | boolean = 'App.Events';
+    namespace: string | boolean;
+
+    /**
+     * Create a new class instance.
+     *
+     * @params  {string | boolean} namespace
+     */
+    constructor(namespace: string | boolean) {
+        this.setNamespace(namespace);
+    }
 
     /**
      * Format the given event name.
@@ -17,9 +26,9 @@ export class EventFormatter {
      * @return {string}
      */
     format(event: string): string {
-        if (this.defaultNamespace !== false) {
+        if (this.namespace) {
             if (event.charAt(0) != '\\' && event.charAt(0) != '.') {
-                event = this.defaultNamespace + '.' + event;
+                event = this.namespace + '.' + event;
             } else {
                 event = event.substr(1);
             }
@@ -29,12 +38,12 @@ export class EventFormatter {
     }
 
     /**
-     * Set the default event namespace.
+     * Set the event namespace.
      *
      * @param  {string} value
      * @return {void}
      */
-    namespace(value: string): void {
-        this.defaultNamespace = value;
+    setNamespace(value: string | boolean): void {
+        this.namespace = value;
     }
 }
