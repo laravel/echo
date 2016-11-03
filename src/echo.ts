@@ -33,6 +33,10 @@ class Echo {
             this.registerVueRequestInterceptor();
         }
 
+        if (typeof axios === 'function') {
+            this.registerAxiosRequestInterceptor();
+        }
+
         if (this.options.broadcaster == 'pusher') {
             if (!window['Pusher']) {
                 window['Pusher'] = require('pusher-js');
@@ -54,6 +58,19 @@ class Echo {
             }
 
             next();
+        });
+    }
+
+    /**
+     * Register an Axios HTTP interceptor to add the X-Socket-ID header.
+     */
+    registerAxiosRequestInterceptor() {
+        axios.interceptors.request.use((config) => {
+            if (this.socketId()) {
+                config.headers['X-Socket-Id'] = this.socketId();
+            }
+
+            return config;
         });
     }
 
