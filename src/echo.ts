@@ -37,6 +37,10 @@ class Echo {
             this.registerAxiosRequestInterceptor();
         }
 
+        if (typeof jQuery === 'function') {
+            this.registerjQueryAjaxSetup();
+        }
+
         if (this.options.broadcaster == 'pusher') {
             if (!window['Pusher']) {
                 window['Pusher'] = require('pusher-js');
@@ -71,6 +75,17 @@ class Echo {
             }
 
             return config;
+        });
+    }
+
+    /**
+     * Register jQuery AjaxSetup to add the X-Socket-ID header.
+     */
+    registerjQueryAjaxSetup() {
+        jQuery.ajaxSetup({
+            beforeSend: (xhr) => {
+                xhr.setRequestHeader('X-Socket-Id', this.socketId());
+            }
         });
     }
 
