@@ -64,6 +64,9 @@ export class SocketIoChannel extends Channel {
         this.eventFormatter = new EventFormatter(this.options.namespace);
 
         this.subscribe();
+        this.socket.on('reconnect', () => {
+            this.subscribe();
+        });
     }
 
     /**
