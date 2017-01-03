@@ -1,7 +1,7 @@
 {
   "name": "laravel-echo",
   "version": "1.1.2",
-  "description": "Laravel Echo library for beautiful Pusher integration",
+  "description": "Laravel Echo library for beautiful Pusher and Socket.IO integration",
   "main": "dist/echo.js",
   "scripts": {
     "compile": "./node_modules/.bin/rollup -c",
