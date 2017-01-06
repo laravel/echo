@@ -46,4 +46,16 @@ export class PusherPresenceChannel extends PusherChannel implements PresenceChan
 
         return this;
     }
+    
+    /**
+     * Trigger client event on the channel.
+     *
+     * @param  {Function}  callback
+     * @return {PusherPresenceChannel}
+     */
+    trigger(eventName, data): PusherPresenceChannel {
+        this.pusher.channels.channels[this.name].trigger(eventName, data);
+
+        return this;
+    }
 }
