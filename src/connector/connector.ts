@@ -12,7 +12,7 @@ export abstract class Connector {
             headers: {}
         },
         authEndpoint: '/broadcasting/auth',
-        connector: 'pusher',
+        broadcaster: 'pusher',
         csrfToken: null,
         host: null,
         key: null,
