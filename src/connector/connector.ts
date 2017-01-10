@@ -59,13 +59,13 @@ export abstract class Connector {
      * @return {string}
      */
     protected csrfToken(): string {
-        let selector = document.querySelector('meta[name="csrf-token"]');
+        let selector = null;
 
-        if (window['Laravel'] && window['Laravel'].csrfToken) {
+        if (window && window['Laravel'] && window['Laravel'].csrfToken) {
             return window['Laravel'].csrfToken;
         } else if (this.options.csrfToken) {
             return this.options.csrfToken;
-        } else if (selector) {
+        } else if (document && (selector = document.querySelector('meta[name="csrf-token"]'))) {
             return selector.getAttribute('content');
         }
 
