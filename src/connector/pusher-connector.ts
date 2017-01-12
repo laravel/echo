@@ -1,6 +1,6 @@
 import { Connector} from './connector';
 import {
-    PusherChannel, PusherPresenceChannel, PresenceChannel
+    PusherChannel, PusherPrivateChannel, PusherPresenceChannel, PresenceChannel
 } from './../channel';
 
 /**
@@ -64,11 +64,11 @@ export class PusherConnector extends Connector {
      * Get a private channel instance by name.
      *
      * @param  {string} name
-     * @return {PusherChannel}
+     * @return {PusherPrivateChannel}
      */
     privateChannel(name: string): PusherChannel {
         if (!this.channels['private-' + name]) {
-            this.channels['private-' + name] = new PusherChannel(
+            this.channels['private-' + name] = new PusherPrivateChannel(
                 this.pusher,
                 'private-' + name,
                 this.options
