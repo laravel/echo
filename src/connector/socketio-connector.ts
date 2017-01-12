@@ -1,5 +1,6 @@
 import { Connector } from './connector';
 import { SocketIoChannel, SocketIoPresenceChannel } from './../channel';
+import {SocketIoPrivateChannel} from "../channel/socketio-private-channel";
 
 /**
  * This class creates a connnector to a Socket.io server.
@@ -66,9 +67,9 @@ export class SocketIoConnector extends Connector {
      * @param  {string} name
      * @return {SocketIoChannel}
      */
-    privateChannel(name: string): SocketIoChannel {
+    privateChannel(name: string): SocketIoPrivateChannel {
         if (!this.channels['private-' + name]) {
-            this.channels['private-' + name] = new SocketIoChannel(
+            this.channels['private-' + name] = new SocketIoPrivateChannel(
                 this.socket,
                 'private-' + name,
                 this.options
