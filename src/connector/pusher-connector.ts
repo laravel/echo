@@ -17,7 +17,7 @@ export class PusherConnector extends Connector {
     /**
      * All of the subscribed channel names.
      *
-     * @type {array}
+     * @type {any}
      */
     channels: any = {};
 
@@ -34,8 +34,8 @@ export class PusherConnector extends Connector {
      * Listen for an event on a channel instance.
      *
      * @param  {string} name
-     * @param  {event} string
      * @param  {Function} callback
+     * @param  {string} event
      * @return {PusherChannel}
      */
     listen(name: string, event: string, callback: Function): PusherChannel {
@@ -99,12 +99,12 @@ export class PusherConnector extends Connector {
     /**
      * Leave the given channel.
      *
-     * @param  {string} channel
+     * @param {string} name
      */
     leave(name: string) {
         let channels = [name, 'private-' + name, 'presence-' + name];
 
-        channels.forEach((name: string, index: number) => {
+        channels.forEach((name: string) => {
             if (this.channels[name]) {
                 this.channels[name].unsubscribe();
 

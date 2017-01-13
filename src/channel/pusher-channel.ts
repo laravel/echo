@@ -62,7 +62,6 @@ export class PusherChannel extends Channel {
     /**
      * Subscribe to a Pusher channel.
      *
-     * @param  {string} channel
      * @return {object}
      */
     subscribe(): any {

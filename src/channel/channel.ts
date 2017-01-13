@@ -21,7 +21,6 @@ export abstract class Channel {
     /**
      * Listen for an event on the channel instance.
      *
-     * @param  {string} event
      * @param  {Function} callback
      * @return {Channel}
      */
