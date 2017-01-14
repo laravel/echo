@@ -34,13 +34,6 @@ export class SocketIoChannel extends Channel {
     eventFormatter: EventFormatter;
 
     /**
-     * The subsciption of the channel.
-     *
-     * @type {any}
-     */
-    subscription: any;
-
-    /**
      * The event callbacks applied to the channel.
      *
      * @type {any}
@@ -64,10 +57,7 @@ export class SocketIoChannel extends Channel {
         this.eventFormatter = new EventFormatter(this.options.namespace);
 
         this.subscribe();
-
-        this.socket.on('reconnect', () => {
-            this.subscribe();
-        });
+        this.onReconnect();
     }
 
     /**
@@ -76,7 +66,7 @@ export class SocketIoChannel extends Channel {
      * @return {object}
      */
     subscribe(): any {
-        this.subscription = this.socket.emit('subscribe', {
+        this.socket.emit('subscribe', {
             channel: this.name,
             auth: this.options.auth || {}
         });
@@ -127,6 +117,18 @@ export class SocketIoChannel extends Channel {
     }
 
     /**
+     * Attach a 'reconnect' listener and bind the event.
+     */
+    onReconnect(): void {
+        let listener = () => {
+            this.subscribe();
+        };
+
+        this.socket.on('reconnect', listener);
+        this.bind('reconnect', listener);
+    }
+
+    /**
      * Bind the channel's socket to an event and store the callback.
      *
      * @param  {string}   event
@@ -146,7 +148,7 @@ export class SocketIoChannel extends Channel {
     unbind(): void {
         Object.keys(this.events).forEach(event => {
             this.events[event].forEach(callback => {
-                this.subscription.removeListener(event, callback);
+                this.socket.removeListener(event, callback);
             });
 
             delete this.events[event];
