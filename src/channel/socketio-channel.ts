@@ -138,6 +138,7 @@ export class SocketIoChannel extends Channel {
      */
     bind(event: string, callback: Function): void {
         this.events[event] = this.events[event] || [];
+
         this.events[event].push(callback);
     }
 
