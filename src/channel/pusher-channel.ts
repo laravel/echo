@@ -92,6 +92,17 @@ export class PusherChannel extends Channel {
     }
 
     /**
+     * Listen for a whisper event on the channel instance.
+     *
+     * @param  {string} event
+     * @param  {Function}   callback
+     * @return {PusherChannel}
+     */
+    listenForWhisper(event: string, callback: Function): PusherChannel {
+        return this.listen('.client-' + event, callback);
+    }
+
+    /**
      * Bind a channel to an event.
      *
      * @param  {string}   event

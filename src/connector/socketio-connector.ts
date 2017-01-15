@@ -25,7 +25,7 @@ export class SocketIoConnector extends Connector {
      * @return void
      */
     connect(): void {
-        this.socket = io(this.options.host);
+        this.socket = io(this.options.host, this.options);
 
         return this.socket;
     }
