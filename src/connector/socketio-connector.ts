@@ -1,6 +1,5 @@
 import { Connector } from './connector';
-import { SocketIoChannel, SocketIoPresenceChannel } from './../channel';
-import {SocketIoPrivateChannel} from "../channel/socketio-private-channel";
+import { SocketIoChannel, SocketIoPrivateChannel, SocketIoPresenceChannel } from './../channel';
 
 /**
  * This class creates a connnector to a Socket.io server.
