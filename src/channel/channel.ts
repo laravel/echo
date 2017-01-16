@@ -28,4 +28,15 @@ export abstract class Channel {
     notification(callback: Function): Channel {
         return this.listen('.Illuminate.Notifications.Events.BroadcastNotificationCreated', callback);
     }
+
+    /**
+     * Listen for a whisper event on the channel instance.
+     *
+     * @param  {string} event
+     * @param  {Function}   callback
+     * @return {PusherChannel}
+     */
+    listenForWhisper(event: string, callback: Function): Channel {
+        return this.listen('.client-' + event, callback);
+    }
 }
