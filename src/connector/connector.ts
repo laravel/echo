@@ -59,6 +59,8 @@ export abstract class Connector {
      * @return {string}
      */
     protected csrfToken(): string {
+        let selector;
+
         if (window && window['Laravel'] && window['Laravel'].csrfToken) {
             return window['Laravel'].csrfToken;
         } else if (this.options.csrfToken) {
