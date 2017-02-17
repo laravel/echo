@@ -82,11 +82,13 @@ class Echo {
      * Register jQuery AjaxSetup to add the X-Socket-ID header.
      */
     registerjQueryAjaxSetup() {
-        jQuery.ajaxSetup({
-            beforeSend: (xhr) => {
-                xhr.setRequestHeader('X-Socket-Id', this.socketId());
-            }
-        });
+        if (typeof jQuery.ajax != 'undefined' ) {
+            jQuery.ajaxSetup({
+                beforeSend: (xhr) => {
+                    xhr.setRequestHeader('X-Socket-Id', this.socketId());
+                }
+            });
+        }
     }
 
     /**
