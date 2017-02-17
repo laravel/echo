@@ -85,7 +85,9 @@ class Echo {
         if (typeof jQuery.ajax != 'undefined' ) {
             jQuery.ajaxSetup({
                 beforeSend: (xhr) => {
-                    xhr.setRequestHeader('X-Socket-Id', this.socketId());
+					if (this.socketId()) {
+						xhr.setRequestHeader('X-Socket-Id', this.socketId());
+					}
                 }
             });
         }
