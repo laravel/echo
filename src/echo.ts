@@ -43,16 +43,20 @@ class Echo {
 
         if (this.options.broadcaster == 'pusher') {
             if (! window['Pusher']) {
-                window['Pusher'] = require('pusher-js');
+                let pusherJs = 'pusher-js';
+
+                window['Pusher'] = require('' + pusherJs);
             }
 
             this.connector = new PusherConnector(this.options);
         } else if (this.options.broadcaster == 'pusher/react-native') {
-                if (! window['Pusher']) {
-                    window['Pusher'] = require('pusher-js/react-native');
-                }
+            if (! window['Pusher']) {
+                let pusherReactNative = 'pusher-js/react-native';
 
-                this.connector = new PusherConnector(this.options);
+                window['Pusher'] = require('' + pusherReactNative);
+            }
+
+            this.connector = new PusherConnector(this.options);
         } else if (this.options.broadcaster == 'socket.io') {
             this.connector = new SocketIoConnector(this.options);
         }
@@ -88,12 +92,12 @@ class Echo {
      * Register jQuery AjaxSetup to add the X-Socket-ID header.
      */
     registerjQueryAjaxSetup() {
-        if (typeof jQuery.ajax != 'undefined' ) {
+        if (typeof jQuery.ajax != 'undefined') {
             jQuery.ajaxSetup({
                 beforeSend: (xhr) => {
-					if (this.socketId()) {
-						xhr.setRequestHeader('X-Socket-Id', this.socketId());
-					}
+                    if (this.socketId()) {
+                        xhr.setRequestHeader('X-Socket-Id', this.socketId());
+                    }
                 }
             });
         }
