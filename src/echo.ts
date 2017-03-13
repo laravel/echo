@@ -42,11 +42,17 @@ class Echo {
         }
 
         if (this.options.broadcaster == 'pusher') {
-            if (!window['Pusher']) {
+            if (! window['Pusher']) {
                 window['Pusher'] = require('pusher-js');
             }
 
             this.connector = new PusherConnector(this.options);
+        } else if (this.options.broadcaster == 'pusher/react-native') {
+                if (! window['Pusher']) {
+                    window['Pusher'] = require('pusher-js/react-native');
+                }
+
+                this.connector = new PusherConnector(this.options);
         } else if (this.options.broadcaster == 'socket.io') {
             this.connector = new SocketIoConnector(this.options);
         }
