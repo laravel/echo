@@ -42,20 +42,6 @@ class Echo {
         }
 
         if (this.options.broadcaster == 'pusher') {
-            if (! window['Pusher']) {
-                let pusherJs = 'pusher-js';
-
-                window['Pusher'] = require('' + pusherJs);
-            }
-
-            this.connector = new PusherConnector(this.options);
-        } else if (this.options.broadcaster == 'pusher/react-native') {
-            if (! window['Pusher']) {
-                let pusherReactNative = 'pusher-js/react-native';
-
-                window['Pusher'] = require('' + pusherReactNative);
-            }
-
             this.connector = new PusherConnector(this.options);
         } else if (this.options.broadcaster == 'socket.io') {
             this.connector = new SocketIoConnector(this.options);
