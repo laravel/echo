@@ -30,6 +30,12 @@ export class SocketIoConnector extends Connector {
         return this.socket;
     }
 
+    disconnect(): void {
+        this.socket = io(this.options.host, this.options).close();
+
+        return this.socket;
+    }
+
     /**
      * Listen for an event on a channel instance.
      *
