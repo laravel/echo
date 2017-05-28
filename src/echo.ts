@@ -1,6 +1,6 @@
 import { EventFormatter } from './util';
 import { Channel, PresenceChannel } from './channel'
-import { PusherConnector, SocketIoConnector } from './connector';
+import { Connector, PusherConnector, SocketIoConnector } from './connector';
 
 /**
  * This class is the primary API for interacting with broadcasting.
@@ -10,9 +10,9 @@ class Echo {
     /**
      * The broadcasting connector.
      *
-     * @type {object}
+     * @type {Connector}
      */
-    connector: any;
+    connector: Connector;
 
     /**
      * The Echo options.
@@ -142,6 +142,15 @@ class Echo {
      */
     socketId(): string {
         return this.connector.socketId();
+    }
+
+    /**
+     * Disconnect Echo connection to server.
+     *
+     * @return void
+     */
+    disconnect(): void {
+        this.connector.disconnect();
     }
 }
 
