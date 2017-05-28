@@ -117,4 +117,11 @@ export abstract class Connector {
      * @return {string}
      */
     abstract socketId(): string;
+
+    /**
+     * Disconnect connection.
+     *
+     * @return void
+     */
+    abstract disconnect(): void;
 }
