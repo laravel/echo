@@ -119,7 +119,7 @@ export abstract class Connector {
     abstract socketId(): string;
 
     /**
-     * Disconnect connection.
+     * Disconnect from the Echo server.
      *
      * @return void
      */
