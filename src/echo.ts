@@ -1,6 +1,6 @@
 import { EventFormatter } from './util';
 import { Channel, PresenceChannel } from './channel'
-import { Connector, PusherConnector, SocketIoConnector } from './connector';
+import { PusherConnector, SocketIoConnector } from './connector';
 
 /**
  * This class is the primary API for interacting with broadcasting.
