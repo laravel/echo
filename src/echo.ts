@@ -145,7 +145,7 @@ class Echo {
     }
 
     /**
-     * Disconnect Echo connection to server.
+     * Disconnect from the Echo server.
      *
      * @return void
      */
