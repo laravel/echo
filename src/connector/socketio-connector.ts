@@ -122,4 +122,13 @@ export class SocketIoConnector extends Connector {
     socketId(): string {
         return this.socket.id;
     }
+
+    /**
+     * Disconnect Socketio connection.
+     *
+     * @return void
+     */
+    disconnect(): void {
+        this.socket.disconnect();
+    }
 }

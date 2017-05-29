@@ -143,6 +143,15 @@ class Echo {
     socketId(): string {
         return this.connector.socketId();
     }
+
+    /**
+     * Disconnect from the Echo server.
+     *
+     * @return void
+     */
+    disconnect(): void {
+        this.connector.disconnect();
+    }
 }
 
 module.exports = Echo;
