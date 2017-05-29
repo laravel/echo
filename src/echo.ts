@@ -10,9 +10,9 @@ class Echo {
     /**
      * The broadcasting connector.
      *
-     * @type {Connector}
+     * @type {object}
      */
-    connector: Connector;
+    connector: any;
 
     /**
      * The Echo options.
