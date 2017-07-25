@@ -11,12 +11,21 @@ export class EventFormatter {
     namespace: string | boolean;
 
     /**
+     * Allow dot syntax.
+     *
+     * @type {boolean}
+     */
+    allowDotSyntax: boolean;
+
+    /**
      * Create a new class instance.
      *
-     * @params  {string | boolean} namespace
+     * @param  {string | boolean} namespace
+     * @param  {boolean} allowDotSyntax
      */
-    constructor(namespace: string | boolean) {
+    constructor(namespace: string | boolean, allowDotSyntax: boolean) {
         this.setNamespace(namespace);
+        this.setAllowDotSyntax(allowDotSyntax);
     }
 
     /**
@@ -34,7 +43,11 @@ export class EventFormatter {
             }
         }
 
-        return event.replace(/\./g, '\\');
+        if (this.allowDotSyntax) {
+            return event;
+        } else {
+            return event.replace(/\./g, '\\');
+        }
     }
 
     /**
@@ -45,5 +58,15 @@ export class EventFormatter {
      */
     setNamespace(value: string | boolean): void {
         this.namespace = value;
+    }
+
+    /**
+     * Set allowDotSyntax.
+     *
+     * @param  {boolean} value
+     * @return {void}
+     */
+    setAllowDotSyntax(value: boolean): void {
+        this.allowDotSyntax = value;
     }
 }
