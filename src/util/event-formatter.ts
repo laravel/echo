@@ -27,14 +27,10 @@ export class EventFormatter {
      */
     format(event: string): string {
         if (this.namespace) {
-            if (event.charAt(0) != '\\' && event.charAt(0) != '.') {
-                event = this.namespace + '.' + event;
-            } else {
-                event = event.substr(1);
-            }
+            event = this.namespace + '\\' + event;
         }
 
-        return event.replace(/\./g, '\\');
+        return event;
     }
 
     /**

@@ -16,7 +16,7 @@ export abstract class Connector {
         csrfToken: null,
         host: null,
         key: null,
-        namespace: 'App.Events'
+        namespace: 'App\\Events'
     };
 
     /**
