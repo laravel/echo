@@ -53,7 +53,9 @@ export class SocketIoChannel extends Channel {
         this.name = name;
         this.socket = socket;
         this.options = options;
-        this.eventFormatter = new EventFormatter(this.options.namespace);
+        this.eventFormatter = new EventFormatter(
+            this.options.namespace, this.options.formatEvents
+        );
 
         this.subscribe();
 
