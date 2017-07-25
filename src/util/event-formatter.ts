@@ -11,12 +11,21 @@ export class EventFormatter {
     namespace: string | boolean;
 
     /**
+     * Format event names.
+     *
+     * @param  {boolean}
+     */
+    formatEvents: boolean;
+
+    /**
      * Create a new class instance.
      *
-     * @params  {string | boolean} namespace
+     * @param  {string | boolean} namespace
+     * @param  {boolean} formatEvents
      */
-    constructor(namespace: string | boolean) {
+    constructor(namespace: string | boolean, formatEvents: boolean) {
         this.setNamespace(namespace);
+        this.setFormatEvents(formatEvents);
     }
 
     /**
@@ -34,7 +43,11 @@ export class EventFormatter {
             }
         }
 
-        return event.replace(/\./g, '\\');
+        if (this.formatEvents) {
+            event = event.replace(/\./g, '\\');
+        }
+
+        return event;
     }
 
     /**
@@ -45,5 +58,15 @@ export class EventFormatter {
      */
     setNamespace(value: string | boolean): void {
         this.namespace = value;
+    }
+
+    /**
+     * Set the formatEvents.
+     *
+     * @param  {boolean} value
+     * @return {void}
+     */
+    setFormatEvents(value: boolean): void {
+        this.formatEvents = value;
     }
 }
