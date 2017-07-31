@@ -121,4 +121,13 @@ export class PusherConnector extends Connector {
     socketId(): string {
         return this.pusher.connection.socket_id;
     }
+
+    /**
+     * Disconnect Pusher connection.
+     *
+     * @return void
+     */
+    disconnect(): void {
+        this.pusher.disconnect();
+    }
 }
