@@ -5,7 +5,7 @@ import { PusherConnector, SocketIoConnector } from './connector';
 /**
  * This class is the primary API for interacting with broadcasting.
  */
-class Echo {
+export class Echo {
 
     /**
      * The broadcasting connector.
@@ -29,63 +29,10 @@ class Echo {
     constructor(options: any) {
         this.options = options;
 
-        if (typeof Vue === 'function' && Vue.http) {
-            this.registerVueRequestInterceptor();
-        }
-
-        if (typeof axios === 'function') {
-            this.registerAxiosRequestInterceptor();
-        }
-
-        if (typeof jQuery === 'function') {
-            this.registerjQueryAjaxSetup();
-        }
-
         if (this.options.broadcaster == 'pusher') {
             this.connector = new PusherConnector(this.options);
         } else if (this.options.broadcaster == 'socket.io') {
             this.connector = new SocketIoConnector(this.options);
-        }
-    }
-
-    /**
-     * Register a Vue HTTP interceptor to add the X-Socket-ID header.
-     */
-    registerVueRequestInterceptor() {
-        Vue.http.interceptors.push((request, next) => {
-            if (this.socketId()) {
-                request.headers.set('X-Socket-ID', this.socketId());
-            }
-
-            next();
-        });
-    }
-
-    /**
-     * Register an Axios HTTP interceptor to add the X-Socket-ID header.
-     */
-    registerAxiosRequestInterceptor() {
-        axios.interceptors.request.use((config) => {
-            if (this.socketId()) {
-                config.headers['X-Socket-Id'] = this.socketId();
-            }
-
-            return config;
-        });
-    }
-
-    /**
-     * Register jQuery AjaxSetup to add the X-Socket-ID header.
-     */
-    registerjQueryAjaxSetup() {
-        if (typeof jQuery.ajax != 'undefined') {
-            jQuery.ajaxSetup({
-                beforeSend: (xhr) => {
-                    if (this.socketId()) {
-                        xhr.setRequestHeader('X-Socket-Id', this.socketId());
-                    }
-                }
-            });
         }
     }
 
@@ -153,5 +100,3 @@ class Echo {
         this.connector.disconnect();
     }
 }
-
-module.exports = Echo;
