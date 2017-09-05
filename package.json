@@ -1,6 +1,6 @@
 {
   "name": "laravel-echo-ionic",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Laravel Echo library for beautiful Pusher and Socket.IO integration",
   "main": "dist/echo.js",
   "scripts": {
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/laravel/echo"
+    "url": "https://github.com/ThunderBirdsX3/echo"
   },
   "keywords": [
     "ionic",
@@ -18,7 +18,8 @@
     "socket.io"
   ],
   "author": {
-    "name": "Taylor Otwell"
+    "original": "Taylor Otwell",
+    "name": "Supasin Dum-umpai"
   },
   "homepage": "https://github.com/ThunderBirdsX3/echo",
   "engines": {
