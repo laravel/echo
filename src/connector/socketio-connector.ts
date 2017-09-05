@@ -1,5 +1,6 @@
 import { Connector } from './connector';
 import { SocketIoChannel, SocketIoPrivateChannel, SocketIoPresenceChannel } from './../channel';
+import * as io from 'socket.io-client';
 
 /**
  * This class creates a connnector to a Socket.io server.
