@@ -12,7 +12,6 @@
     "url": "https://github.com/laravel/echo"
   },
   "keywords": [
-    "ionic",
     "laravel",
     "pusher",
     "socket.io"
