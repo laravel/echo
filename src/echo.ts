@@ -29,16 +29,18 @@ class Echo {
     constructor(options: any) {
         this.options = options;
 
-        if (typeof Vue === 'function' && Vue.http) {
-            this.registerVueRequestInterceptor();
-        }
+        if (typeof this.options.registerSocketIdHeader === 'undefined' || this.options.registerSocketIdHeader) {
+            if (typeof Vue === 'function' && Vue.http) {
+                this.registerVueRequestInterceptor();
+            }
 
-        if (typeof axios === 'function') {
-            this.registerAxiosRequestInterceptor();
-        }
+            if (typeof axios === 'function') {
+                this.registerAxiosRequestInterceptor();
+            }
 
-        if (typeof jQuery === 'function') {
-            this.registerjQueryAjaxSetup();
+            if (typeof jQuery === 'function') {
+                this.registerjQueryAjaxSetup();
+            }
         }
 
         if (this.options.broadcaster == 'pusher') {
