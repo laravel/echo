@@ -26,9 +26,27 @@ export class SocketIoConnector extends Connector {
      */
     connect(): void {
         let io = this.getSocketIO();
+
         this.socket = io(this.options.host, this.options);
 
         return this.socket;
+    }
+
+    /**
+     * Get socket.io module from global scope or options.
+     *
+     * @type {object}
+     */
+    getSocketIO(): any {
+        if (typeof io !== 'undefined') {
+            return io;
+        }
+
+        if (this.options.client !== 'undefined') {
+            return this.options.client;
+        }
+
+        throw new Error('Socket.io client not found. Should be globally available or passed via options.client');
     }
 
     /**
@@ -131,22 +149,5 @@ export class SocketIoConnector extends Connector {
      */
     disconnect(): void {
         this.socket.disconnect();
-    }
-
-    /**
-     * Get socket.io module from global scope or options.
-     *
-     * @type {object}
-     */
-    getSocketIO(): any {
-        if (typeof io === 'undefined') {
-            if (this.options.client !== 'undefined') {
-                return this.options.client;
-            }
-
-            throw new Error('make socket.io client globally available or pass via options.client');
-        }
-        
-        return io;
     }
 }
