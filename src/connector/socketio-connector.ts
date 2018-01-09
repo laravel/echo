@@ -25,7 +25,9 @@ export class SocketIoConnector extends Connector {
      * @return void
      */
     connect(): void {
-        this.socket = io(this.options.host, this.options);
+        let io = this.getSocketIo();
+
+         this.socket = io(this.options.host, this.options);
 
         return this.socket;
     }
@@ -130,5 +132,15 @@ export class SocketIoConnector extends Connector {
      */
     disconnect(): void {
         this.socket.disconnect();
+    }
+
+    getSocketIo(){
+        if(typeof io === 'undefined'){
+            if(this.options.client !== undefined) {
+                return this.options.client;
+            }
+
+            throw new Error('When using echo in node-js cli, pass socket.io-client as `client` option!');
+        }
     }
 }
