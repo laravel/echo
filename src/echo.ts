@@ -72,12 +72,6 @@ class Echo {
               }
             }
           });
-            if (this.socketId()) {
-                request.headers.set('X-Socket-ID', this.socketId());
-            }
-
-            next();
-        });
     }
 
     /**
