@@ -53,12 +53,25 @@ class Echo {
      */
     registerVueRequestInterceptor() {
         Vue.http.interceptors.push((request, next) => {
-            if (this.socketId()) {
+            if(request && next){
+              if (this.socketId()) {
                 request.headers.set('X-Socket-ID', this.socketId());
+              }
+              next();
             }
-
-            next();
-        });
+            //version<0.8.0
+            else {
+              return {
+                request: (request) => {
+                  if (this.socketId()) {
+                    request.headers['X-Socket-ID'] = this.socketId();
+                  }
+                  return request;
+                },
+                response: response=>response
+              }
+            }
+          });
     }
 
     /**
