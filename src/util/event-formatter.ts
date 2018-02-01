@@ -27,7 +27,7 @@ export class EventFormatter {
      */
     format(event: string): string {
         if (event.charAt(0) === '.' || event.charAt(0) === '\\') {
-            event = event.substr(1);
+            return event.substr(1);
         } else if (this.namespace) {
             event = this.namespace + '.' + event;
         }
