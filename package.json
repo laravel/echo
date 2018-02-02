@@ -23,15 +23,31 @@
   "engines": {
     "node": ">6.0.*"
   },
-  "dependencies": {},
   "devDependencies": {
+    "@types/jest": "^22.1.0",
     "@types/node": "^6.0.85",
     "babel-plugin-transform-object-assign": "^6.8.0",
     "babel-preset-es2015-rollup": "^3.0.0",
     "babel-preset-stage-2": "^6.5.0",
+    "jest": "^22.1.0",
     "pusher-js": "^3.2.1",
-    "rollup": "^0.31.0",
     "rollup-plugin-babel": "^2.4.0",
-    "rollup-plugin-typescript": "^0.7.5"
+    "rollup-plugin-typescript": "^0.7.5",
+    "rollup": "^0.31.0",
+    "ts-jest": "^22.0.0"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
   }
 }
