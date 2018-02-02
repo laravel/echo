@@ -5,7 +5,8 @@
   "main": "dist/echo.js",
   "scripts": {
     "compile": "./node_modules/.bin/rollup -c",
-    "prepublish": "npm run compile"
+    "prepublish": "npm run compile",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
