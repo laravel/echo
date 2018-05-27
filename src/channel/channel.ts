@@ -34,7 +34,7 @@ export abstract class Channel {
      *
      * @param  {string} event
      * @param  {Function}   callback
-     * @return {PusherChannel}
+     * @return {Channel}
      */
     listenForWhisper(event: string, callback: Function): Channel {
         return this.listen('.client-' + event, callback);

@@ -6,3 +6,6 @@ export * from './pusher-presence-channel';
 export * from './socketio-channel';
 export * from './socketio-private-channel';
 export * from './socketio-presence-channel';
+export * from './null-channel';
+export * from './null-private-channel';
+export * from './null-presence-channel';
