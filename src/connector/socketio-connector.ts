@@ -42,7 +42,7 @@ export class SocketIoConnector extends Connector {
             return io;
         }
 
-        if (this.options.client !== 'undefined') {
+        if (typeof this.options.client !== 'undefined') {
             return this.options.client;
         }
 
