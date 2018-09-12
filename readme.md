@@ -11,4 +11,4 @@ Laravel Echo is a JavaScript library that makes it painless to subscribe to chan
 
 ## Documentation
 
-Official documentation [is located here](http://laravel.com/docs/broadcasting).
+Official documentation [is located here](https://laravel.com/docs/broadcasting).
