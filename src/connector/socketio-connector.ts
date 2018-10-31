@@ -1,5 +1,6 @@
 import { Connector } from './connector';
 import { SocketIoChannel, SocketIoPrivateChannel, SocketIoPresenceChannel } from './../channel';
+import Socket = SocketIOClient.Socket;
 
 /**
  * This class creates a connnector to a Socket.io server.
@@ -10,21 +11,21 @@ export class SocketIoConnector extends Connector {
      *
      * @type {object}
      */
-    socket: any;
+    socket: Socket;
 
     /**
      * All of the subscribed channel names.
      *
      * @type {any}
      */
-    channels: any = {};
+    channels: { [name: string]: SocketIoChannel | SocketIoPresenceChannel } = {};
 
     /**
      * Create a fresh Socket.io connection.
      *
-     * @return void
+     * @return {Socket}
      */
-    connect(): void {
+    connect(): Socket {
         let io = this.getSocketIO();
 
         this.socket = io(this.options.host, this.options);
@@ -94,7 +95,7 @@ export class SocketIoConnector extends Connector {
             );
         }
 
-        return this.channels['private-' + name];
+        return this.channels['private-' + name] as SocketIoPrivateChannel;
     }
 
     /**
@@ -112,7 +113,7 @@ export class SocketIoConnector extends Connector {
             );
         }
 
-        return this.channels['presence-' + name];
+        return this.channels['presence-' + name] as SocketIoPresenceChannel;
     }
 
     /**

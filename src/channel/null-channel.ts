@@ -1,4 +1,3 @@
-import { EventFormatter } from './../util';
 import { Channel } from './channel';
 
 /**

@@ -5,14 +5,14 @@ import { PusherConnector, SocketIoConnector, NullConnector } from './connector';
 /**
  * This class is the primary API for interacting with broadcasting.
  */
-class Echo {
+export class Echo {
 
     /**
      * The broadcasting connector.
      *
      * @type {object}
      */
-    connector: any;
+    connector: PusherConnector | SocketIoConnector | NullConnector;
 
     /**
      * The Echo options.
@@ -155,5 +155,3 @@ class Echo {
         this.connector.disconnect();
     }
 }
-
-module.exports = Echo;

@@ -1,5 +1,6 @@
-import { EventFormatter } from './../util';
+import { EventFormatter } from '../util';
 import { Channel } from './channel';
+import Socket = SocketIOClient.Socket;
 
 /**
  * This class represents a Socket.io channel.
@@ -10,14 +11,14 @@ export class SocketIoChannel extends Channel {
      *
      * @type {any}
      */
-    socket: any;
+    socket: Socket;
 
     /**
      * The name of the channel.
      *
-     * @type {object}
+     * @type {string}
      */
-    name: any;
+    name: string;
 
     /**
      * Channel options.
@@ -73,7 +74,7 @@ export class SocketIoChannel extends Channel {
     }
 
     /**
-     * Unsubscribe from channel and ubind event callbacks.
+     * Unsubscribe from channel and unbind event callbacks.
      *
      * @return {void}
      */

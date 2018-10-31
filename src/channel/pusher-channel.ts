@@ -1,5 +1,6 @@
-import { EventFormatter } from './../util';
+import { EventFormatter } from '../util';
 import { Channel } from './channel';
+import { Pusher } from "pusher-js";
 
 /**
  * This class represents a Pusher channel.
@@ -10,7 +11,7 @@ export class PusherChannel extends Channel {
      *
      * @type {any}
      */
-    pusher: any;
+    pusher: Pusher;
 
     /**
      * The name of the channel.

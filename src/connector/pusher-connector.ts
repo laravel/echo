@@ -1,7 +1,8 @@
 import { Connector} from './connector';
 import {
     PusherChannel, PusherPrivateChannel, PusherPresenceChannel, PresenceChannel
-} from './../channel';
+} from '../channel';
+import { Pusher } from "pusher-js";
 
 /**
  * This class creates a connector to Pusher.
@@ -10,16 +11,16 @@ export class PusherConnector extends Connector {
     /**
      * The Pusher instance.
      *
-     * @type {object}
+     * @type {Pusher}
      */
-    pusher: any;
+    pusher: Pusher;
 
     /**
      * All of the subscribed channel names.
      *
-     * @type {array}
+     * @type { [name: string]: PusherChannel | PresenceChannel }
      */
-    channels: any = {};
+    channels: { [name: string]: PusherChannel | PusherPresenceChannel } = {};
 
     /**
      * Create a fresh Pusher connection.
@@ -79,7 +80,7 @@ export class PusherConnector extends Connector {
             );
         }
 
-        return this.channels['private-' + name];
+        return this.channels['private-' + name] as PusherChannel;
     }
 
     /**
@@ -97,7 +98,7 @@ export class PusherConnector extends Connector {
             );
         }
 
-        return this.channels['presence-' + name];
+        return this.channels['presence-' + name] as PusherPresenceChannel;
     }
 
     /**
