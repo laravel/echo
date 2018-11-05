@@ -7,14 +7,14 @@
         "isolatedModules": false,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
-        "declaration": false,
         "noImplicitAny": false,
         "noImplicitUseStrict": false,
         "noLib": false,
         "preserveConstEnums": true,
         "suppressImplicitAnyIndexErrors": true,
         "pretty": true,
-        "outDir": "build"
+        "declaration": true,
+        "declarationDir": "dist/types"
     },
     "exclude": [
         "node_modules/*",

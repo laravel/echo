@@ -3,6 +3,7 @@
   "version": "1.4.0",
   "description": "Laravel Echo library for beautiful Pusher and Socket.IO integration",
   "main": "dist/echo.js",
+  "typings": "dist/types/echo.d.ts",
   "scripts": {
     "compile": "./node_modules/.bin/rollup -c",
     "prepublish": "npm run compile",
@@ -32,15 +33,17 @@
     "babel-preset-stage-2": "^6.5.0",
     "jest": "^22.1.0",
     "pusher-js": "^3.2.1",
+    "rollup": "^0.66.2",
     "rollup-plugin-babel": "^2.4.0",
-    "rollup-plugin-typescript": "^0.7.5",
-    "rollup": "^0.31.0",
-    "ts-jest": "^22.0.0"
+    "rollup-plugin-typescript2": "^0.17.2",
+    "ts-jest": "^22.0.0",
+    "typescript": "^3.1.6"
   },
   "jest": {
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
+    "testURL": "http://localhost",
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "moduleFileExtensions": [
       "ts",
