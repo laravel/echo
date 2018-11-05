@@ -22,8 +22,8 @@
         "typings/browser",
         "typings/browser.d.ts"
     ],
-    "files": [
-      "src/echo.ts"
+    "include": [
+        "src/**/*"
     ],
     "compileOnSave": false,
     "buildOnSave": false,
