@@ -28,8 +28,6 @@
   "devDependencies": {
     "@types/jest": "^22.1.0",
     "@types/node": "^6.0.85",
-    "@types/pusher-js": "^4.2.0",
-    "@types/socket.io-client": "^1.4.32",
     "babel-plugin-transform-object-assign": "^6.8.0",
     "babel-preset-es2015-rollup": "^3.0.0",
     "babel-preset-stage-2": "^6.5.0",
@@ -40,6 +38,10 @@
     "rollup-plugin-typescript2": "^0.17.2",
     "ts-jest": "^22.0.0",
     "typescript": "^3.1.6"
+  },
+  "dependencies": {
+    "@types/pusher-js": "^4.2.0",
+    "@types/socket.io-client": "^1.4.32"
   },
   "jest": {
     "transform": {
