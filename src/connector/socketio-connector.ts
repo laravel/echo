@@ -10,21 +10,21 @@ export class SocketIoConnector extends Connector {
      *
      * @type {object}
      */
-    socket: any;
+    socket!: SocketIOClient.Socket;
 
     /**
      * All of the subscribed channel names.
      *
      * @type {any}
      */
-    channels: any = {};
+    channels: { [key: string]: SocketIoChannel } = {};
 
     /**
      * Create a fresh Socket.io connection.
      *
-     * @return void
+     * @return SocketIOClient.Socket
      */
-    connect(): void {
+    connect(): SocketIOClient.Socket {
         let io = this.getSocketIO();
 
         this.socket = io(this.options.host, this.options);
@@ -94,7 +94,7 @@ export class SocketIoConnector extends Connector {
             );
         }
 
-        return this.channels['private-' + name];
+        return <SocketIoPrivateChannel>this.channels['private-' + name];
     }
 
     /**
@@ -112,7 +112,7 @@ export class SocketIoConnector extends Connector {
             );
         }
 
-        return this.channels['presence-' + name];
+        return <SocketIoPresenceChannel>this.channels['presence-' + name];
     }
 
     /**

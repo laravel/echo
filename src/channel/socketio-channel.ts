@@ -1,5 +1,6 @@
 import { EventFormatter } from './../util';
 import { Channel } from './channel';
+import EchoOptions from '../echoOptions';
 
 /**
  * This class represents a Socket.io channel.
@@ -10,21 +11,21 @@ export class SocketIoChannel extends Channel {
      *
      * @type {any}
      */
-    socket: any;
+    socket: SocketIOClient.Socket;
 
     /**
      * The name of the channel.
      *
      * @type {object}
      */
-    name: any;
+    name: string;
 
     /**
      * Channel options.
      *
      * @type {any}
      */
-    options: any;
+    options: EchoOptions;
 
     /**
      * The event formatter.
@@ -38,7 +39,7 @@ export class SocketIoChannel extends Channel {
      *
      * @type {any}
      */
-    events: any = {};
+    events: { [key: string]: Function[] } = {};
 
     /**
      * Create a new class instance.
@@ -106,7 +107,7 @@ export class SocketIoChannel extends Channel {
      * @param  {Function} callback
      */
     on(event: string, callback: Function): void {
-        let listener = (channel, data) => {
+        let listener = (channel: any, data: any) => {
             if (this.name == channel) {
                 callback(data);
             }
@@ -149,7 +150,7 @@ export class SocketIoChannel extends Channel {
      */
     unbind(): void {
         Object.keys(this.events).forEach(event => {
-            this.events[event].forEach(callback => {
+            this.events[event].forEach((callback: Function) => {
                 this.socket.removeListener(event, callback);
             });
 

@@ -1,5 +1,7 @@
+import { Connector } from './connector';
 import { EventFormatter } from './util';
 import { Channel, PresenceChannel } from './channel'
+import EchoOptions from './echoOptions'
 import { PusherConnector, SocketIoConnector, NullConnector } from './connector';
 
 /**
@@ -12,32 +14,32 @@ export default class Echo {
      *
      * @type {object}
      */
-    connector: any;
+    connector!: Connector;
 
     /**
      * The Echo options.
      *
      * @type {array}
      */
-    options: any;
+    options: EchoOptions;
 
     /**
      * Create a new class instance.
      *
      * @param  {object} options
      */
-    constructor(options: any) {
+    constructor(options: EchoOptions) {
         this.options = options;
 
-        if (typeof Vue === 'function' && Vue.http) {
+        if (typeof (<any>window).Vue === 'function' && (<any>window).Vue.http) {
             this.registerVueRequestInterceptor();
         }
 
-        if (typeof axios === 'function') {
+        if (typeof (<any>window).axios === 'function') {
             this.registerAxiosRequestInterceptor();
         }
 
-        if (typeof jQuery === 'function') {
+        if (typeof (<any>window).jQuery === 'function') {
             this.registerjQueryAjaxSetup();
         }
 
@@ -54,7 +56,7 @@ export default class Echo {
      * Register a Vue HTTP interceptor to add the X-Socket-ID header.
      */
     registerVueRequestInterceptor() {
-        Vue.http.interceptors.push((request, next) => {
+        (<any>window).Vue.http.interceptors.push((request: any, next: any) => {
             if (this.socketId()) {
                 request.headers.set('X-Socket-ID', this.socketId());
             }
@@ -67,7 +69,7 @@ export default class Echo {
      * Register an Axios HTTP interceptor to add the X-Socket-ID header.
      */
     registerAxiosRequestInterceptor() {
-        axios.interceptors.request.use((config) => {
+        (<any>window).axios.interceptors.request.use((config: any) => {
             if (this.socketId()) {
                 config.headers['X-Socket-Id'] = this.socketId();
             }
@@ -80,9 +82,9 @@ export default class Echo {
      * Register jQuery AjaxSetup to add the X-Socket-ID header.
      */
     registerjQueryAjaxSetup() {
-        if (typeof jQuery.ajax != 'undefined') {
-            jQuery.ajaxSetup({
-                beforeSend: (xhr) => {
+        if (typeof (<any>window).jQuery.ajax != 'undefined') {
+            (<any>window).jQuery.ajaxSetup({
+                beforeSend: (xhr: any) => {
                     if (this.socketId()) {
                         xhr.setRequestHeader('X-Socket-Id', this.socketId());
                     }

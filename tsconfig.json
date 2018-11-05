@@ -7,11 +7,12 @@
         "isolatedModules": false,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
-        "noImplicitAny": false,
+        "strict": true,
+        // "noImplicitAny": true,
         "noImplicitUseStrict": false,
         "noLib": false,
         "preserveConstEnums": true,
-        "suppressImplicitAnyIndexErrors": true,
+        // "suppressImplicitAnyIndexErrors": true,
         "pretty": true,
         "declaration": true,
         "declarationDir": "dist/types"
@@ -22,7 +23,6 @@
         "typings/browser.d.ts"
     ],
     "files": [
-      "typings/index.d.ts",
       "src/echo.ts"
     ],
     "compileOnSave": false,

@@ -1,5 +1,6 @@
 import { EventFormatter } from './../util';
 import { Channel } from './channel';
+import EchoOptions from '../echoOptions';
 
 /**
  * This class represents a Pusher channel.
@@ -8,23 +9,23 @@ export class PusherChannel extends Channel {
     /**
      * The Pusher client instance.
      *
-     * @type {any}
+     * @type {Pusher.Pusher}
      */
-    pusher: any;
+    pusher: Pusher.Pusher;
 
     /**
      * The name of the channel.
      *
-     * @type {object}
+     * @type {string}
      */
-    name: any;
+    name: string;
 
     /**
      * Channel options.
      *
-     * @type {any}
+     * @type {EchoOptions}
      */
-    options: any;
+    options: EchoOptions;
 
     /**
      * The event formatter.
@@ -38,16 +39,16 @@ export class PusherChannel extends Channel {
      *
      * @type {any}
      */
-    subscription: any;
+    subscription!: Pusher.Channel;
 
     /**
      * Create a new class instance.
      *
-     * @param  {any} pusher
-     * @param  {object} name
-     * @param  {any}  options
+     * @param  {Pusher.Pusher} pusher
+     * @param  {string} name
+     * @param  {EchoOptions}  options
      */
-    constructor(pusher: any, name: any, options: any) {
+    constructor(pusher: Pusher.Pusher, name: string, options: EchoOptions) {
         super();
 
         this.name = name;
@@ -85,7 +86,7 @@ export class PusherChannel extends Channel {
      * @param  {Function}   callback
      * @return {PusherChannel}
      */
-    listen(event: string, callback: Function): PusherChannel {
+    listen(event: string, callback: Pusher.EventCallback): PusherChannel {
         this.on(this.eventFormatter.format(event), callback);
 
         return this;
@@ -110,7 +111,7 @@ export class PusherChannel extends Channel {
      * @param  {Function} callback
      * @return {void}
      */
-    on(event: string, callback: Function): PusherChannel {
+    on(event: string, callback: Pusher.EventCallback): PusherChannel {
         this.subscription.bind(event, callback);
 
         return this;

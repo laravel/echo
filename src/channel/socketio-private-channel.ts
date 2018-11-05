@@ -11,7 +11,7 @@ export class SocketIoPrivateChannel extends SocketIoChannel {
      * @param  {object}  data
      * @return {PusherPrivateChannel}
      */
-    whisper(eventName, data) {
+    whisper(eventName: any, data: any) {
         this.socket.emit('client event', {
             channel: this.name,
             event: `client-${eventName}`,

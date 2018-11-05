@@ -10,7 +10,7 @@ export class NullPrivateChannel extends NullChannel {
      * @param  {Function}  callback
      * @return {NullPrivateChannel}
      */
-    whisper(eventName, data): NullPrivateChannel {
+    whisper(eventName: any, data: any): NullPrivateChannel {
         return this;
     }
 }

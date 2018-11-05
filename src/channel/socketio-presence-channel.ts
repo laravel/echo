@@ -11,8 +11,8 @@ export class SocketIoPresenceChannel extends SocketIoPrivateChannel implements P
      * @return {object} SocketIoPresenceChannel
      */
     here(callback: Function): SocketIoPresenceChannel {
-        this.on('presence:subscribed', (members) => {
-            callback(members.map(m => m.user_info));
+        this.on('presence:subscribed', (members: any) => {
+            callback(members.map((m: any) => m.user_info));
         });
 
         return this;
@@ -25,7 +25,7 @@ export class SocketIoPresenceChannel extends SocketIoPrivateChannel implements P
      * @return {SocketIoPresenceChannel}
      */
     joining(callback: Function): SocketIoPresenceChannel {
-        this.on('presence:joining', (member) => callback(member.user_info));
+        this.on('presence:joining', (member: any) => callback(member.user_info));
 
         return this;
     }
@@ -37,7 +37,7 @@ export class SocketIoPresenceChannel extends SocketIoPrivateChannel implements P
      * @return {SocketIoPresenceChannel}
      */
     leaving(callback: Function): SocketIoPresenceChannel {
-        this.on('presence:leaving', (member) => callback(member.user_info));
+        this.on('presence:leaving', (member: any) => callback(member.user_info));
 
         return this;
     }

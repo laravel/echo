@@ -10,7 +10,7 @@ export class PusherPrivateChannel extends PusherChannel {
      * @param  {Function}  callback
      * @return {PusherPrivateChannel}
      */
-    whisper(eventName, data): PusherPrivateChannel {
+    whisper(eventName: any, data: any): PusherPrivateChannel {
         this.pusher.channels.channels[this.name].trigger(`client-${eventName}`, data);
 
         return this;

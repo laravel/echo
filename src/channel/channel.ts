@@ -1,3 +1,5 @@
+import EchoOptions from "../echoOptions";
+
 /**
  * This class represents a basic channel.
  */
@@ -7,7 +9,7 @@ export abstract class Channel {
      *
      * @type {any}
      */
-    options: any;
+    options!: EchoOptions;
 
     /**
      * Listen for an event on the channel instance.

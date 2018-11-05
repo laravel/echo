@@ -1,7 +1,8 @@
 import { Connector} from './connector';
 import {
-    PusherChannel, PusherPrivateChannel, PusherPresenceChannel, PresenceChannel
+    PusherChannel, PusherPrivateChannel, PusherPresenceChannel, PresenceChannel, Channel
 } from './../channel';
+import { PusherStatic } from 'pusher-js';
 
 /**
  * This class creates a connector to Pusher.
@@ -12,14 +13,14 @@ export class PusherConnector extends Connector {
      *
      * @type {object}
      */
-    pusher: any;
+    pusher!: Pusher.Pusher;
 
     /**
      * All of the subscribed channel names.
      *
      * @type {array}
      */
-    channels: any = {};
+    channels: { [key: string]: PusherChannel } = {};
 
     /**
      * Create a fresh Pusher connection.
@@ -28,9 +29,9 @@ export class PusherConnector extends Connector {
      */
     connect(): void {
         if (typeof this.options.client !== 'undefined') {
-            this.pusher = this.options.client;
+            this.pusher = <Pusher.Pusher>this.options.client;
         } else {
-            this.pusher = new Pusher(this.options.key, this.options);
+            this.pusher = new (<any>window).Pusher(this.options.key!, this.options);
         }
     }
 
@@ -42,7 +43,7 @@ export class PusherConnector extends Connector {
      * @param  {Function} callback
      * @return {PusherChannel}
      */
-    listen(name: string, event: string, callback: Function): PusherChannel {
+    listen(name: string, event: string, callback: Pusher.EventCallback): PusherChannel {
         return this.channel(name).listen(event, callback);
     }
 
@@ -86,9 +87,9 @@ export class PusherConnector extends Connector {
      * Get a presence channel instance by name.
      *
      * @param  {string} name
-     * @return {PresenceChannel}
+     * @return {PusherPresenceChannel}
      */
-    presenceChannel(name: string): PresenceChannel {
+    presenceChannel(name: string): PusherPresenceChannel {
         if (!this.channels['presence-' + name]) {
             this.channels['presence-' + name] = new PusherPresenceChannel(
                 this.pusher,
@@ -97,7 +98,7 @@ export class PusherConnector extends Connector {
             );
         }
 
-        return this.channels['presence-' + name];
+        return (<PusherPresenceChannel>this.channels['presence-' + name]);
     }
 
     /**

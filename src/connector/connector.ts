@@ -1,4 +1,5 @@
 import { Channel, PresenceChannel } from './../channel';
+import EchoOptions from '../echoOptions'
 
 export abstract class Connector {
 
@@ -22,16 +23,16 @@ export abstract class Connector {
     /**
      * Connector options.
      *
-     * @type {object}
+     * @type {EchoOptions}
      */
-    options: any;
+    options!: EchoOptions;
 
     /**
      * Create a new class instance.
      *
      * @params  {any} options
      */
-    constructor(options: any) {
+    constructor(options: EchoOptions) {
         this.setOptions(options);
 
         this.connect();
@@ -43,11 +44,11 @@ export abstract class Connector {
      * @param  {any}  options
      * @return {any}
      */
-    protected setOptions(options: any): any {
+    protected setOptions(options: EchoOptions): any {
         this.options = Object.assign(this._defaultOptions, options);
 
         if (this.csrfToken()) {
-            this.options.auth.headers['X-CSRF-TOKEN'] = this.csrfToken();
+            this.options.auth.headers!['X-CSRF-TOKEN'] = this.csrfToken();
         }
 
         return options;
@@ -56,13 +57,13 @@ export abstract class Connector {
     /**
      * Extract the CSRF token from the page.
      *
-     * @return {string}
+     * @return {string | null}
      */
-    protected csrfToken(): string {
+    protected csrfToken(): string | null {
         let selector;
 
-        if (typeof window !== 'undefined' && window['Laravel'] && window['Laravel'].csrfToken) {
-            return window['Laravel'].csrfToken;
+        if (typeof window !== 'undefined' && (<any>window)['Laravel'] && (<any>window)['Laravel'].csrfToken) {
+            return (<any>window)['Laravel'].csrfToken;
         } else if (this.options.csrfToken) {
             return this.options.csrfToken;
         } else if (typeof document !== 'undefined' && (selector = document.querySelector('meta[name="csrf-token"]'))) {
@@ -78,6 +79,16 @@ export abstract class Connector {
      * @retrn void
      */
     abstract connect(): void;
+
+    /**
+     * Listen for an event on a channel instance.
+     *
+     * @param  {string} name
+     * @param  {event} string
+     * @param  {Function} callback
+     * @return {Channel}
+     */
+    abstract listen(name: string, event: string, callback: Function): Channel;
 
     /**
      * Get a channel instance by name.

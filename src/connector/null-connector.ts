@@ -1,4 +1,4 @@
-import { Connector} from './connector';
+import { Connector } from './connector';
 import {
     NullChannel, NullPrivateChannel, NullPresenceChannel, PresenceChannel
 } from './../channel';

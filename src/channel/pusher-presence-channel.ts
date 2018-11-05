@@ -11,8 +11,8 @@ export class PusherPresenceChannel extends PusherChannel implements PresenceChan
      * @param  {Function} callback
      * @return {object} this
      */
-    here(callback): PusherPresenceChannel {
-        this.on('pusher:subscription_succeeded', (data) => {
+    here(callback: Function): PusherPresenceChannel {
+        this.on('pusher:subscription_succeeded', (data: any) => {
             callback(Object.keys(data.members).map(k => data.members[k]));
         });
 
@@ -25,8 +25,8 @@ export class PusherPresenceChannel extends PusherChannel implements PresenceChan
      * @param  {Function} callback
      * @return {PusherPresenceChannel}
      */
-    joining(callback): PusherPresenceChannel {
-        this.on('pusher:member_added', (member) => {
+    joining(callback: Function): PusherPresenceChannel {
+        this.on('pusher:member_added', (member: any) => {
             callback(member.info);
         });
 
@@ -39,8 +39,8 @@ export class PusherPresenceChannel extends PusherChannel implements PresenceChan
      * @param  {Function}  callback
      * @return {PusherPresenceChannel}
      */
-    leaving(callback): PusherPresenceChannel {
-        this.on('pusher:member_removed', (member) => {
+    leaving(callback: Function): PusherPresenceChannel {
+        this.on('pusher:member_removed', (member: any) => {
             callback(member.info);
         });
 
@@ -53,7 +53,7 @@ export class PusherPresenceChannel extends PusherChannel implements PresenceChan
      * @param  {Function}  callback
      * @return {PusherPresenceChannel}
      */
-    whisper(eventName, data): PusherPresenceChannel {
+    whisper(eventName: any, data: any): PusherPresenceChannel {
         this.pusher.channels.channels[this.name].trigger(`client-${eventName}`, data);
 
         return this;

@@ -11,7 +11,7 @@ export class NullPresenceChannel extends NullChannel implements PresenceChannel 
      * @param  {Function} callback
      * @return {object} this
      */
-    here(callback): NullPresenceChannel {
+    here(callback: Function): NullPresenceChannel {
         return this;
     }
 
@@ -21,7 +21,7 @@ export class NullPresenceChannel extends NullChannel implements PresenceChannel 
      * @param  {Function} callback
      * @return {NullPresenceChannel}
      */
-    joining(callback): NullPresenceChannel {
+    joining(callback: Function): NullPresenceChannel {
         return this;
     }
 
@@ -31,7 +31,7 @@ export class NullPresenceChannel extends NullChannel implements PresenceChannel 
      * @param  {Function}  callback
      * @return {NullPresenceChannel}
      */
-    leaving(callback): NullPresenceChannel {
+    leaving(callback: Function): NullPresenceChannel {
         return this;
     }
 
@@ -41,7 +41,7 @@ export class NullPresenceChannel extends NullChannel implements PresenceChannel 
      * @param  {Function}  callback
      * @return {NullPresenceChannel}
      */
-    whisper(eventName, data): NullPresenceChannel {
+    whisper(eventName: any, data: any): NullPresenceChannel {
         return this;
     }
 }
