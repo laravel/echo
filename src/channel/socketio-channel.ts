@@ -48,13 +48,13 @@ export class SocketIoChannel extends Channel {
      * @param  {string} name
      * @param  {any} options
      */
-    constructor(socket: any, name: string, options: any) {
+    constructor(socket: any, name: string, options: EchoOptions) {
         super();
 
         this.name = name;
         this.socket = socket;
         this.options = options;
-        this.eventFormatter = new EventFormatter(this.options.namespace);
+        this.eventFormatter = new EventFormatter(<string | boolean>this.options.namespace);
 
         this.subscribe();
 
