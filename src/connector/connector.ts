@@ -48,7 +48,7 @@ export abstract class Connector {
         this.options = Object.assign(this._defaultOptions, options);
 
         if (this.csrfToken()) {
-            this.options.auth.headers!['X-CSRF-TOKEN'] = this.csrfToken();
+            this.options.auth!.headers!['X-CSRF-TOKEN'] = this.csrfToken();
         }
 
         return options;
