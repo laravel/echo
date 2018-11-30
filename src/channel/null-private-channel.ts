@@ -6,11 +6,8 @@ import { NullChannel } from './null-channel';
 export class NullPrivateChannel extends NullChannel {
     /**
      * Trigger client event on the channel.
-     *
-     * @param  {Function}  callback
-     * @return {NullPrivateChannel}
      */
-    whisper(eventName, data): NullPrivateChannel {
+    whisper(eventName: string, data: any): NullPrivateChannel {
         return this;
     }
 }

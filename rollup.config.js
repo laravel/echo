@@ -2,8 +2,8 @@ import typescript from 'rollup-plugin-typescript';
 import babel from 'rollup-plugin-babel';
 
 export default {
-  entry: './src/echo.ts',
-  dest: './dist/echo.js',
+  input: './src/echo.ts',
+  output: [{ file: './dist/echo.js', format: 'esm' }],
   plugins: [
     typescript(),
     babel({
