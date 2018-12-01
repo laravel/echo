@@ -1,4 +1,4 @@
-import { SocketIoChannel } from './';
+import { SocketIoChannel } from './socketio-channel';
 
 /**
  * This class represents a Socket.io presence channel.
@@ -6,12 +6,8 @@ import { SocketIoChannel } from './';
 export class SocketIoPrivateChannel extends SocketIoChannel {
     /**
      * Trigger client event on the channel.
-     *
-     * @param  {string}  eventName
-     * @param  {object}  data
-     * @return {PusherPrivateChannel}
      */
-    whisper(eventName, data) {
+    whisper(eventName: string, data: any): SocketIoChannel {
         this.socket.emit('client event', {
             channel: this.name,
             event: `client-${eventName}`,

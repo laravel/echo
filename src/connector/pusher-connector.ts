@@ -1,4 +1,4 @@
-import { Connector} from './connector';
+import { Connector } from './connector';
 import {
     PusherChannel, PusherPrivateChannel, PusherPresenceChannel, PresenceChannel
 } from './../channel';
@@ -9,22 +9,16 @@ import {
 export class PusherConnector extends Connector {
     /**
      * The Pusher instance.
-     *
-     * @type {object}
      */
     pusher: any;
 
     /**
      * All of the subscribed channel names.
-     *
-     * @type {array}
      */
     channels: any = {};
 
     /**
      * Create a fresh Pusher connection.
-     *
-     * @return void
      */
     connect(): void {
         if (typeof this.options.client !== 'undefined') {
@@ -36,11 +30,6 @@ export class PusherConnector extends Connector {
 
     /**
      * Listen for an event on a channel instance.
-     *
-     * @param  {string} name
-     * @param  {event} string
-     * @param  {Function} callback
-     * @return {PusherChannel}
      */
     listen(name: string, event: string, callback: Function): PusherChannel {
         return this.channel(name).listen(event, callback);
@@ -48,9 +37,6 @@ export class PusherConnector extends Connector {
 
     /**
      * Get a channel instance by name.
-     *
-     * @param  {string} name
-     * @return {PusherChannel}
      */
     channel(name: string): PusherChannel {
         if (!this.channels[name]) {
@@ -66,9 +52,6 @@ export class PusherConnector extends Connector {
 
     /**
      * Get a private channel instance by name.
-     *
-     * @param  {string} name
-     * @return {PusherPrivateChannel}
      */
     privateChannel(name: string): PusherChannel {
         if (!this.channels['private-' + name]) {
@@ -84,9 +67,6 @@ export class PusherConnector extends Connector {
 
     /**
      * Get a presence channel instance by name.
-     *
-     * @param  {string} name
-     * @return {PresenceChannel}
      */
     presenceChannel(name: string): PresenceChannel {
         if (!this.channels['presence-' + name]) {
@@ -102,8 +82,6 @@ export class PusherConnector extends Connector {
 
     /**
      * Leave the given channel.
-     *
-     * @param  {string} channel
      */
     leave(name: string) {
         let channels = [name, 'private-' + name, 'presence-' + name];
@@ -119,8 +97,6 @@ export class PusherConnector extends Connector {
 
     /**
      * Get the socket ID for the connection.
-     *
-     * @return {string}
      */
     socketId(): string {
         return this.pusher.connection.socket_id;
@@ -128,8 +104,6 @@ export class PusherConnector extends Connector {
 
     /**
      * Disconnect Pusher connection.
-     *
-     * @return void
      */
     disconnect(): void {
         this.pusher.disconnect();

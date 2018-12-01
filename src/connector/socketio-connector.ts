@@ -7,22 +7,16 @@ import { SocketIoChannel, SocketIoPrivateChannel, SocketIoPresenceChannel } from
 export class SocketIoConnector extends Connector {
     /**
      * The Socket.io connection instance.
-     *
-     * @type {object}
      */
     socket: any;
 
     /**
      * All of the subscribed channel names.
-     *
-     * @type {any}
      */
     channels: any = {};
 
     /**
      * Create a fresh Socket.io connection.
-     *
-     * @return void
      */
     connect(): void {
         let io = this.getSocketIO();
@@ -34,8 +28,6 @@ export class SocketIoConnector extends Connector {
 
     /**
      * Get socket.io module from global scope or options.
-     *
-     * @type {object}
      */
     getSocketIO(): any {
         if (typeof io !== 'undefined') {
@@ -51,11 +43,6 @@ export class SocketIoConnector extends Connector {
 
     /**
      * Listen for an event on a channel instance.
-     *
-     * @param  {string} name
-     * @param  {string} event
-     * @param  {Function} callback
-     * @return {SocketIoChannel}
      */
     listen(name: string, event: string, callback: Function): SocketIoChannel {
         return this.channel(name).listen(event, callback);
@@ -63,9 +50,6 @@ export class SocketIoConnector extends Connector {
 
     /**
      * Get a channel instance by name.
-     *
-     * @param  {string} name
-     * @return {SocketIoChannel}
      */
     channel(name: string): SocketIoChannel {
         if (!this.channels[name]) {
@@ -81,9 +65,6 @@ export class SocketIoConnector extends Connector {
 
     /**
      * Get a private channel instance by name.
-     *
-     * @param  {string} name
-     * @return {SocketIoChannel}
      */
     privateChannel(name: string): SocketIoPrivateChannel {
         if (!this.channels['private-' + name]) {
@@ -99,9 +80,6 @@ export class SocketIoConnector extends Connector {
 
     /**
      * Get a presence channel instance by name.
-     *
-     * @param  {string} name
-     * @return {SocketIoPresenceChannel}
      */
     presenceChannel(name: string): SocketIoPresenceChannel {
         if (!this.channels['presence-' + name]) {
@@ -117,9 +95,6 @@ export class SocketIoConnector extends Connector {
 
     /**
      * Leave the given channel.
-     *
-     * @param  {string} name
-     * @return {void}
      */
     leave(name: string): void {
         let channels = [name, 'private-' + name, 'presence-' + name];
@@ -135,8 +110,6 @@ export class SocketIoConnector extends Connector {
 
     /**
      * Get the socket ID for the connection.
-     *
-     * @return {string}
      */
     socketId(): string {
         return this.socket.id;
@@ -144,8 +117,6 @@ export class SocketIoConnector extends Connector {
 
     /**
      * Disconnect Socketio connection.
-     *
-     * @return void
      */
     disconnect(): void {
         this.socket.disconnect();

@@ -7,45 +7,31 @@ import { Channel } from './channel';
 export class SocketIoChannel extends Channel {
     /**
      * The Socket.io client instance.
-     *
-     * @type {any}
      */
     socket: any;
 
     /**
      * The name of the channel.
-     *
-     * @type {object}
      */
     name: any;
 
     /**
      * Channel options.
-     *
-     * @type {any}
      */
     options: any;
 
     /**
      * The event formatter.
-     *
-     * @type {EventFormatter}
      */
     eventFormatter: EventFormatter;
 
     /**
      * The event callbacks applied to the channel.
-     *
-     * @type {any}
      */
     events: any = {};
 
     /**
      * Create a new class instance.
-     *
-     * @param  {any} socket
-     * @param  {string} name
-     * @param  {any} options
      */
     constructor(socket: any, name: string, options: any) {
         super();
@@ -56,16 +42,13 @@ export class SocketIoChannel extends Channel {
         this.eventFormatter = new EventFormatter(this.options.namespace);
 
         this.subscribe();
-
         this.configureReconnector();
     }
 
     /**
      * Subscribe to a Socket.io channel.
-     *
-     * @return {object}
      */
-    subscribe(): any {
+    subscribe(): void {
         this.socket.emit('subscribe', {
             channel: this.name,
             auth: this.options.auth || {}
@@ -74,8 +57,6 @@ export class SocketIoChannel extends Channel {
 
     /**
      * Unsubscribe from channel and ubind event callbacks.
-     *
-     * @return {void}
      */
     unsubscribe(): void {
         this.unbind();
@@ -88,10 +69,6 @@ export class SocketIoChannel extends Channel {
 
     /**
      * Listen for an event on the channel instance.
-     *
-     * @param  {string} event
-     * @param  {Function} callback
-     * @return {SocketIoChannel}
      */
     listen(event: string, callback: Function): SocketIoChannel {
         this.on(this.eventFormatter.format(event), callback);
@@ -100,10 +77,18 @@ export class SocketIoChannel extends Channel {
     }
 
     /**
+     * Stop listening for an event on the channel instance.
+     */
+    stopListening(event: string): SocketIoChannel {
+        const name = this.eventFormatter.format(event);
+        this.socket.removeListener(name);
+        delete this.events[name];
+
+        return this;
+    }
+
+    /**
      * Bind the channel's socket to an event and store the callback.
-     *
-     * @param  {string} event
-     * @param  {Function} callback
      */
     on(event: string, callback: Function): void {
         let listener = (channel, data) => {
@@ -120,32 +105,24 @@ export class SocketIoChannel extends Channel {
      * Attach a 'reconnect' listener and bind the event.
      */
     configureReconnector(): void {
-        let listener = () => {
+        const listener = () => {
             this.subscribe();
         };
 
         this.socket.on('reconnect', listener);
-
         this.bind('reconnect', listener);
     }
 
     /**
      * Bind the channel's socket to an event and store the callback.
-     *
-     * @param  {string}   event
-     * @param  {Function} callback
-     * @return {void}
      */
     bind(event: string, callback: Function): void {
         this.events[event] = this.events[event] || [];
-
         this.events[event].push(callback);
     }
 
     /**
      * Unbind the channel's socket from all stored event callbacks.
-     *
-     * @return {void}
      */
     unbind(): void {
         Object.keys(this.events).forEach(event => {

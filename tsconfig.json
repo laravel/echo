@@ -1,33 +1,22 @@
 {
     "compilerOptions": {
+        "declaration": true,
         "module": "es6",
-        "target": "es6",
         "moduleResolution": "node",
-        "removeComments": true,
+        "outDir": "./dist",
+        "sourceMap": false,
+        "target": "es6",
         "isolatedModules": false,
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
-        "declaration": false,
-        "noImplicitAny": false,
-        "noImplicitUseStrict": false,
-        "noLib": false,
-        "preserveConstEnums": true,
-        "suppressImplicitAnyIndexErrors": true,
-        "pretty": true,
-        "outDir": "build"
+        "typeRoots": [
+            "node_modules/@types"
+        ],
+        "lib": [
+            "es2017",
+            "dom"
+        ]
     },
-    "exclude": [
-        "node_modules/*",
-        "typings/browser",
-        "typings/browser.d.ts"
-    ],
-    "files": [
-      "typings/index.d.ts",
-      "src/echo.ts"
-    ],
-    "compileOnSave": false,
-    "buildOnSave": false,
-    "atom": {
-        "rewriteTsconfig": false
-    }
+    "include": [
+        "./typings/*.ts",
+        "./src/*.ts"
+    ]
 }

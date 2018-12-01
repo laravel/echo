@@ -7,11 +7,8 @@ import { PresenceChannel } from './presence-channel';
 export class PusherPresenceChannel extends PusherChannel implements PresenceChannel {
     /**
      * Register a callback to be called anytime the member list changes.
-     *
-     * @param  {Function} callback
-     * @return {object} this
      */
-    here(callback): PusherPresenceChannel {
+    here(callback: Function): PusherPresenceChannel {
         this.on('pusher:subscription_succeeded', (data) => {
             callback(Object.keys(data.members).map(k => data.members[k]));
         });
@@ -21,11 +18,8 @@ export class PusherPresenceChannel extends PusherChannel implements PresenceChan
 
     /**
      * Listen for someone joining the channel.
-     *
-     * @param  {Function} callback
-     * @return {PusherPresenceChannel}
      */
-    joining(callback): PusherPresenceChannel {
+    joining(callback: Function): PusherPresenceChannel {
         this.on('pusher:member_added', (member) => {
             callback(member.info);
         });
@@ -35,11 +29,8 @@ export class PusherPresenceChannel extends PusherChannel implements PresenceChan
 
     /**
      * Listen for someone leaving the channel.
-     *
-     * @param  {Function}  callback
-     * @return {PusherPresenceChannel}
      */
-    leaving(callback): PusherPresenceChannel {
+    leaving(callback: Function): PusherPresenceChannel {
         this.on('pusher:member_removed', (member) => {
             callback(member.info);
         });
@@ -49,12 +40,10 @@ export class PusherPresenceChannel extends PusherChannel implements PresenceChan
 
     /**
      * Trigger client event on the channel.
-     *
-     * @param  {Function}  callback
-     * @return {PusherPresenceChannel}
      */
-    whisper(eventName, data): PusherPresenceChannel {
-        this.pusher.channels.channels[this.name].trigger(`client-${eventName}`, data);
+    whisper(eventName: string, data: any): PusherPresenceChannel {
+        this.pusher.channels.channels[this.name]
+            .trigger(`client-${eventName}`, data);
 
         return this;
     }

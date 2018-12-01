@@ -7,9 +7,6 @@ import { Channel } from './channel';
 export class NullChannel extends Channel {
     /**
      * Subscribe to a channel.
-     *
-     * @param  {string} channel
-     * @return {object}
      */
     subscribe(): any {
         //
@@ -17,8 +14,6 @@ export class NullChannel extends Channel {
 
     /**
      * Unsubscribe from a channel.
-     *
-     * @return {void}
      */
     unsubscribe(): void {
         //
@@ -26,10 +21,6 @@ export class NullChannel extends Channel {
 
     /**
      * Listen for an event on the channel instance.
-     *
-     * @param  {string} event
-     * @param  {Function}   callback
-     * @return {NullChannel}
      */
     listen(event: string, callback: Function): NullChannel {
         return this;
@@ -37,9 +28,6 @@ export class NullChannel extends Channel {
 
     /**
      * Stop listening for an event on the channel instance.
-     *
-     * @param  {string} event
-     * @return {NullChannel}
      */
     stopListening(event: string): NullChannel {
         return this;
@@ -47,10 +35,6 @@ export class NullChannel extends Channel {
 
     /**
      * Bind a channel to an event.
-     *
-     * @param  {string}   event
-     * @param  {Function} callback
-     * @return {NullChannel}
      */
     on(event: string, callback: Function): NullChannel {
         return this;

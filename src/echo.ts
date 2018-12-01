@@ -1,34 +1,96 @@
-import { EventFormatter } from './util';
 import { Channel, PresenceChannel } from './channel'
 import { PusherConnector, SocketIoConnector, NullConnector } from './connector';
 
 /**
  * This class is the primary API for interacting with broadcasting.
  */
-class Echo {
-
+export default class Echo {
     /**
      * The broadcasting connector.
-     *
-     * @type {object}
      */
     connector: any;
 
     /**
      * The Echo options.
-     *
-     * @type {array}
      */
     options: any;
 
     /**
      * Create a new class instance.
-     *
-     * @param  {object} options
      */
     constructor(options: any) {
         this.options = options;
+        this.connect();
+        this.registerInterceptors();
+    }
 
+    /**
+     * Get a channel instance by name.
+     */
+    channel(channel: string): Channel {
+        return this.connector.channel(channel);
+    }
+
+    /**
+     * Create a new connection.
+     */
+    connect(): void {
+        if (this.options.broadcaster == 'pusher') {
+            this.connector = new PusherConnector(this.options);
+        } else if (this.options.broadcaster == 'socket.io') {
+            this.connector = new SocketIoConnector(this.options);
+        } else if (this.options.broadcaster == 'null') {
+            this.connector = new NullConnector(this.options);
+        }
+    }
+
+    /**
+     * Disconnect from the Echo server.
+     */
+    disconnect(): void {
+        this.connector.disconnect();
+    }
+
+    /**
+     * Get a presence channel instance by name.
+     */
+    join(channel: string): PresenceChannel {
+        return this.connector.presenceChannel(channel);
+    }
+
+    /**
+     * Leave the given channel.
+     */
+    leave(channel: string): void {
+        this.connector.leave(channel);
+    }
+
+    /**
+     * Listen for an event on a channel instance.
+     */
+    listen(channel: string, event: string, callback: Function): Channel {
+        return this.connector.listen(channel, event, callback);
+    }
+
+    /**
+     * Get a private channel instance by name.
+     */
+    private(channel: string): Channel {
+        return this.connector.privateChannel(channel);
+    }
+
+    /**
+     * Get the Socket ID for the connection.
+     */
+    socketId(): string {
+        return this.connector.socketId();
+    }
+
+    /**
+     * Register 3rd party request interceptiors. These are used to automatically
+     * send a connections socket id to a Laravel app with a X-Socket-Id header.
+     */
+    registerInterceptors(): void {
         if (typeof Vue === 'function' && Vue.http) {
             this.registerVueRequestInterceptor();
         }
@@ -40,20 +102,12 @@ class Echo {
         if (typeof jQuery === 'function') {
             this.registerjQueryAjaxSetup();
         }
-
-        if (this.options.broadcaster == 'pusher') {
-            this.connector = new PusherConnector(this.options);
-        } else if (this.options.broadcaster == 'socket.io') {
-            this.connector = new SocketIoConnector(this.options);
-        } else if (this.options.broadcaster == 'null') {
-            this.connector = new NullConnector(this.options);
-        }
     }
 
     /**
      * Register a Vue HTTP interceptor to add the X-Socket-ID header.
      */
-    registerVueRequestInterceptor() {
+    registerVueRequestInterceptor(): void {
         Vue.http.interceptors.push((request, next) => {
             if (this.socketId()) {
                 request.headers.set('X-Socket-ID', this.socketId());
@@ -66,7 +120,7 @@ class Echo {
     /**
      * Register an Axios HTTP interceptor to add the X-Socket-ID header.
      */
-    registerAxiosRequestInterceptor() {
+    registerAxiosRequestInterceptor(): any {
         axios.interceptors.request.use((config) => {
             if (this.socketId()) {
                 config.headers['X-Socket-Id'] = this.socketId();
@@ -79,7 +133,7 @@ class Echo {
     /**
      * Register jQuery AjaxSetup to add the X-Socket-ID header.
      */
-    registerjQueryAjaxSetup() {
+    registerjQueryAjaxSetup(): void {
         if (typeof jQuery.ajax != 'undefined') {
             jQuery.ajaxSetup({
                 beforeSend: (xhr) => {
@@ -90,70 +144,4 @@ class Echo {
             });
         }
     }
-
-    /**
-     * Listen for an event on a channel instance.
-     */
-    listen(channel: string, event: string, callback: Function) {
-        return this.connector.listen(channel, event, callback);
-    }
-
-    /**
-     * Get a channel instance by name.
-     *
-     * @param  {string}  channel
-     * @return {object}
-     */
-    channel(channel: string): Channel {
-        return this.connector.channel(channel);
-    }
-
-    /**
-     * Get a private channel instance by name.
-     *
-     * @param  {string} channel
-     * @return {object}
-     */
-    private(channel: string): Channel {
-        return this.connector.privateChannel(channel);
-    }
-
-    /**
-     * Get a presence channel instance by name.
-     *
-     * @param  {string} channel
-     * @return {object}
-     */
-    join(channel: string): PresenceChannel {
-        return this.connector.presenceChannel(channel);
-    }
-
-    /**
-     * Leave the given channel.
-     *
-     * @param  {string} channel
-     */
-    leave(channel: string) {
-        this.connector.leave(channel);
-    }
-
-    /**
-     * Get the Socket ID for the connection.
-     *
-     * @return {string}
-     */
-    socketId(): string {
-        return this.connector.socketId();
-    }
-
-    /**
-     * Disconnect from the Echo server.
-     *
-     * @return void
-     */
-    disconnect(): void {
-        this.connector.disconnect();
-    }
 }
-
-module.exports = Echo;

@@ -7,45 +7,31 @@ import { Channel } from './channel';
 export class PusherChannel extends Channel {
     /**
      * The Pusher client instance.
-     *
-     * @type {any}
      */
     pusher: any;
 
     /**
      * The name of the channel.
-     *
-     * @type {object}
      */
     name: any;
 
     /**
      * Channel options.
-     *
-     * @type {any}
      */
     options: any;
 
     /**
      * The event formatter.
-     *
-     * @type {EventFormatter}
      */
     eventFormatter: EventFormatter;
 
     /**
      * The subsciption of the channel.
-     *
-     * @type {any}
      */
     subscription: any;
 
     /**
      * Create a new class instance.
-     *
-     * @param  {any} pusher
-     * @param  {object} name
-     * @param  {any}  options
      */
     constructor(pusher: any, name: any, options: any) {
         super();
@@ -53,7 +39,6 @@ export class PusherChannel extends Channel {
         this.name = name;
         this.pusher = pusher;
         this.options = options;
-
         this.eventFormatter = new EventFormatter(this.options.namespace);
 
         this.subscribe();
@@ -61,9 +46,6 @@ export class PusherChannel extends Channel {
 
     /**
      * Subscribe to a Pusher channel.
-     *
-     * @param  {string} channel
-     * @return {object}
      */
     subscribe(): any {
         this.subscription = this.pusher.subscribe(this.name);
@@ -71,8 +53,6 @@ export class PusherChannel extends Channel {
 
     /**
      * Unsubscribe from a Pusher channel.
-     *
-     * @return {void}
      */
     unsubscribe(): void {
         this.pusher.unsubscribe(this.name);
@@ -80,10 +60,6 @@ export class PusherChannel extends Channel {
 
     /**
      * Listen for an event on the channel instance.
-     *
-     * @param  {string} event
-     * @param  {Function}   callback
-     * @return {PusherChannel}
      */
     listen(event: string, callback: Function): PusherChannel {
         this.on(this.eventFormatter.format(event), callback);
@@ -93,9 +69,6 @@ export class PusherChannel extends Channel {
 
     /**
      * Stop listening for an event on the channel instance.
-     *
-     * @param  {string} event
-     * @return {PusherChannel}
      */
     stopListening(event: string): PusherChannel {
         this.subscription.unbind(this.eventFormatter.format(event));
@@ -105,10 +78,6 @@ export class PusherChannel extends Channel {
 
     /**
      * Bind a channel to an event.
-     *
-     * @param  {string}   event
-     * @param  {Function} callback
-     * @return {void}
      */
     on(event: string, callback: Function): PusherChannel {
         this.subscription.bind(event, callback);
