@@ -3,7 +3,10 @@ import babel from 'rollup-plugin-babel';
 
 export default {
   input: './src/echo.ts',
-  output: [{ file: './dist/echo.js', format: 'esm' }],
+  output: [
+      { file: './dist/echo.js', format: 'esm' },
+      { file: './dist/echo.common.js', format: 'cjs' },
+  ],
   plugins: [
     typescript(),
     babel({
