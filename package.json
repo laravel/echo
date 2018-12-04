@@ -2,7 +2,8 @@
   "name": "laravel-echo",
   "version": "1.5.0",
   "description": "Laravel Echo library for beautiful Pusher and Socket.IO integration",
-  "main": "dist/echo.js",
+  "main": "dist/echo.common.js",
+  "module": "dist/echo.js",
   "scripts": {
     "build": "npm run compile && npm run declarations",
     "compile": "./node_modules/.bin/rollup -c",
