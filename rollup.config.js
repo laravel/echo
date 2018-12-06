@@ -6,6 +6,7 @@ export default {
   output: [
       { file: './dist/echo.js', format: 'esm' },
       { file: './dist/echo.common.js', format: 'cjs' },
+      { file: './dist/echo.iife.js', format: 'iife', name: 'Echo' },
   ],
   plugins: [
     typescript(),
