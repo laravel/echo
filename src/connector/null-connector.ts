@@ -48,9 +48,16 @@ export class NullConnector extends Connector {
     }
 
     /**
-     * Leave the given channel.
+     * Leave the given channel and its private & presence channels.
      */
     leave(name: string): void {
+        //
+    }
+
+    /**
+     * Leave the given channel.
+     */
+    leaveOne(name: string): void {
         //
     }
 

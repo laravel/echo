@@ -81,18 +81,25 @@ export class PusherConnector extends Connector {
     }
 
     /**
-     * Leave the given channel.
+     * Leave the given channel and its private & presence channels.
      */
     leave(name: string): void {
         let channels = [name, 'private-' + name, 'presence-' + name];
 
         channels.forEach((name: string, index: number) => {
-            if (this.channels[name]) {
-                this.channels[name].unsubscribe();
-
-                delete this.channels[name];
-            }
+            this.leaveOne(name);
         });
+    }
+
+    /**
+     * Leave the given channel.
+     */
+    leaveOne(name: string): void {
+        if (this.channels[name]) {
+            this.channels[name].unsubscribe();
+
+            delete this.channels[name];
+        }
     }
 
     /**
