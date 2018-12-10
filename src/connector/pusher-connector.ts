@@ -83,7 +83,7 @@ export class PusherConnector extends Connector {
     /**
      * Leave the given channel.
      */
-    leave(name: string) {
+    leave(name: string): void {
         let channels = [name, 'private-' + name, 'presence-' + name];
 
         channels.forEach((name: string, index: number) => {

@@ -50,7 +50,7 @@ export class NullConnector extends Connector {
     /**
      * Leave the given channel.
      */
-    leave(name: string) {
+    leave(name: string): void {
         //
     }
 
