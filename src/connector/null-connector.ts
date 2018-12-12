@@ -48,7 +48,7 @@ export class NullConnector extends Connector {
     }
 
     /**
-     * Leave the given channel and its private & presence channels.
+     * Leave the given channel, as well as its private and presence variants.
      */
     leave(name: string): void {
         //
@@ -57,7 +57,7 @@ export class NullConnector extends Connector {
     /**
      * Leave the given channel.
      */
-    leaveOne(name: string): void {
+    leaveChannel(name: string): void {
         //
     }
 

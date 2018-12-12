@@ -81,14 +81,14 @@ export abstract class Connector {
     abstract presenceChannel(channel: string): PresenceChannel;
 
     /**
-     * Leave the given channel and its private & presence channels.
+     * Leave the given channel, as well as its private and presence variants.
      */
     abstract leave(channel: string): void;
 
     /**
      * Leave the given channel.
      */
-    abstract leaveOne(channel: string): void;
+    abstract leaveChannel(channel: string): void;
 
     /**
      * Get the socket_id of the connection.

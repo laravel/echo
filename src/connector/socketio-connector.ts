@@ -94,20 +94,20 @@ export class SocketIoConnector extends Connector {
     }
 
     /**
-     * Leave the given channel and its private & presence channels.
+     * Leave the given channel, as well as its private and presence variants.
      */
     leave(name: string): void {
         let channels = [name, 'private-' + name, 'presence-' + name];
 
         channels.forEach(name => {
-            this.leaveOne(name);
+            this.leaveChannel(name);
         });
     }
 
     /**
      * Leave the given channel.
      */
-    leaveOne(name: string): void {
+    leaveChannel(name: string): void {
         if (this.channels[name]) {
             this.channels[name].unsubscribe();
 
