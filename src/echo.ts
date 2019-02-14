@@ -59,10 +59,17 @@ export default class Echo {
     }
 
     /**
-     * Leave the given channel.
+     * Leave the given channel, as well as its private and presence variants.
      */
     leave(channel: string): void {
         this.connector.leave(channel);
+    }
+
+    /**
+     * Leave the given channel.
+     */
+    leaveChannel(channel: string): void {
+        this.connector.leaveChannel(channel);
     }
 
     /**
