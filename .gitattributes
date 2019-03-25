@@ -1,5 +1,7 @@
 * text=auto
 
+/.github export-ignore
+/tests export-ignore
 .babelrc export-ignore
 .editorconfig export-ignore
 .gitattributes export-ignore
