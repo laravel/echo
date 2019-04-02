@@ -6,7 +6,8 @@ about: 'Report a general library issue. Please ensure your version is still supp
 - Echo Version: #.#.#
 - Laravel Version: #.#.#
 - PHP Version: #.#.#
-- Database Driver & Version:
+- NPM Version: #.#.#
+- Node Version: #.#.#
 
 ### Description:
 
