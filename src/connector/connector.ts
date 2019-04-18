@@ -1,20 +1,19 @@
 import { Channel, PresenceChannel } from './../channel';
 
 export abstract class Connector {
-
     /**
      * Default connector options.
      */
     private _defaultOptions: any = {
         auth: {
-            headers: {}
+            headers: {},
         },
         authEndpoint: '/broadcasting/auth',
         broadcaster: 'pusher',
         csrfToken: null,
         host: null,
         key: null,
-        namespace: 'App.Events'
+        namespace: 'App.Events',
     };
 
     /**

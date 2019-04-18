@@ -51,7 +51,7 @@ export class SocketIoChannel extends Channel {
     subscribe(): void {
         this.socket.emit('subscribe', {
             channel: this.name,
-            auth: this.options.auth || {}
+            auth: this.options.auth || {},
         });
     }
 
@@ -63,7 +63,7 @@ export class SocketIoChannel extends Channel {
 
         this.socket.emit('unsubscribe', {
             channel: this.name,
-            auth: this.options.auth || {}
+            auth: this.options.auth || {},
         });
     }
 

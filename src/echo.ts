@@ -1,4 +1,4 @@
-import { Channel, PresenceChannel } from './channel'
+import { Channel, PresenceChannel } from './channel';
 import { PusherConnector, SocketIoConnector, NullConnector } from './connector';
 
 /**
@@ -128,7 +128,7 @@ export default class Echo {
      * Register an Axios HTTP interceptor to add the X-Socket-ID header.
      */
     registerAxiosRequestInterceptor(): any {
-        axios.interceptors.request.use((config) => {
+        axios.interceptors.request.use(config => {
             if (this.socketId()) {
                 config.headers['X-Socket-Id'] = this.socketId();
             }
@@ -143,11 +143,11 @@ export default class Echo {
     registerjQueryAjaxSetup(): void {
         if (typeof jQuery.ajax != 'undefined') {
             jQuery.ajaxSetup({
-                beforeSend: (xhr) => {
+                beforeSend: xhr => {
                     if (this.socketId()) {
                         xhr.setRequestHeader('X-Socket-Id', this.socketId());
                     }
-                }
+                },
             });
         }
     }

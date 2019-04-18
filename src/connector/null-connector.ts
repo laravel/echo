@@ -1,7 +1,5 @@
 import { Connector } from './connector';
-import {
-    NullChannel, NullPrivateChannel, NullPresenceChannel, PresenceChannel
-} from './../channel';
+import { NullChannel, NullPrivateChannel, NullPresenceChannel, PresenceChannel } from './../channel';
 
 /**
  * This class creates a null connector.
@@ -23,28 +21,28 @@ export class NullConnector extends Connector {
      * Listen for an event on a channel instance.
      */
     listen(name: string, event: string, callback: Function): NullChannel {
-        return new NullChannel;
+        return new NullChannel();
     }
 
     /**
      * Get a channel instance by name.
      */
     channel(name: string): NullChannel {
-        return new NullChannel;
+        return new NullChannel();
     }
 
     /**
      * Get a private channel instance by name.
      */
     privateChannel(name: string): NullPrivateChannel {
-        return new NullPrivateChannel;
+        return new NullPrivateChannel();
     }
 
     /**
      * Get a presence channel instance by name.
      */
     presenceChannel(name: string): PresenceChannel {
-        return new NullPresenceChannel;
+        return new NullPresenceChannel();
     }
 
     /**
