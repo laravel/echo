@@ -24,6 +24,7 @@
   "author": {
     "name": "Taylor Otwell"
   },
+  "license": "MIT",
   "homepage": "https://github.com/laravel/echo",
   "engines": {
     "node": ">6.0.*"
