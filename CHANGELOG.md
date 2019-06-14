@@ -1,8 +1,14 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v1.5.3...master)
+## [Unreleased](https://github.com/laravel/echo/compare/v1.5.4...master)
 
     
+## [v1.5.4 (2019-06-14)](https://github.com/laravel/echo/compare/v1.5.3...v1.5.4)
+
+### Fixed
+- Ensure passed param wins over global ([#235](https://github.com/laravel/echo/pull/235))
+
+
 ## [v1.5.3 (2019-02-14)](https://github.com/laravel/echo/compare/v1.5.2...v1.5.3)
 
 ### Fixed
