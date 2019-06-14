@@ -30,12 +30,12 @@ export class SocketIoConnector extends Connector {
      * Get socket.io module from global scope or options.
      */
     getSocketIO(): any {
-        if (typeof io !== 'undefined') {
-            return io;
-        }
-
         if (typeof this.options.client !== 'undefined') {
             return this.options.client;
+        }
+
+        if (typeof io !== 'undefined') {
+            return io;
         }
 
         throw new Error('Socket.io client not found. Should be globally available or passed via options.client');
