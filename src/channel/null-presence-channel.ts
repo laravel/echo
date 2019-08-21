@@ -32,4 +32,12 @@ export class NullPresenceChannel extends NullChannel implements PresenceChannel 
     whisper(eventName: string, data: any): NullPresenceChannel {
         return this;
     }
+
+    /**
+     * Listen for an event on the channel instance.
+     */
+    listen(event: string, callback: Function): NullPresenceChannel {
+        return this;
+    }
+
 }

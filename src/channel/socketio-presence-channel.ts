@@ -33,4 +33,11 @@ export class SocketIoPresenceChannel extends SocketIoPrivateChannel implements P
 
         return this;
     }
+
+    /**
+     * Listen for an event on the channel instance.
+     */
+    listen(event: string, callback: Function): SocketIoPresenceChannel {
+        return this;
+    }
 }

@@ -1,3 +1,4 @@
+
 /**
  * This interface represents a presence channel.
  */
@@ -16,4 +17,6 @@ export interface PresenceChannel {
      * Listen for someone leaving the channel.
      */
     leaving(callback: Function): PresenceChannel;
+
+    listen(event: string, callback: Function): PresenceChannel;
 }
