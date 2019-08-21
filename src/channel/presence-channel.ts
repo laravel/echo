@@ -1,4 +1,3 @@
-
 /**
  * This interface represents a presence channel.
  */

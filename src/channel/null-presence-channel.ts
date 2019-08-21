@@ -39,5 +39,4 @@ export class NullPresenceChannel extends NullChannel implements PresenceChannel 
     listen(event: string, callback: Function): NullPresenceChannel {
         return this;
     }
-
 }
