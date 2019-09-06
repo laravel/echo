@@ -47,6 +47,12 @@ export abstract class Connector {
      */
     protected csrfToken(): string {
         let selector;
+        let cookie;
+
+        const readCookie = function(name) {
+          var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
+          return (match ? decodeURIComponent(match[3]) : null);
+        },
 
         if (typeof window !== 'undefined' && window['Laravel'] && window['Laravel'].csrfToken) {
             return window['Laravel'].csrfToken;
@@ -54,6 +60,8 @@ export abstract class Connector {
             return this.options.csrfToken;
         } else if (typeof document !== 'undefined' && (selector = document.querySelector('meta[name="csrf-token"]'))) {
             return selector.getAttribute('content');
+        } else if (typeof document !== 'undefined' && typeof document.cookie !== 'undefined' && (cookie = readCookie('XSRF-TOKEN'))) {
+            return cookie;
         }
 
         return null;
