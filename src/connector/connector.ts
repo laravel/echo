@@ -11,6 +11,7 @@ export abstract class Connector {
         authEndpoint: '/broadcasting/auth',
         broadcaster: 'pusher',
         csrfToken: null,
+        csrfCookie: 'X-CSRF-TOKEN',
         host: null,
         key: null,
         namespace: 'App.Events',
@@ -36,7 +37,7 @@ export abstract class Connector {
         this.options = Object.assign(this._defaultOptions, options);
 
         if (this.csrfToken()) {
-            this.options.auth.headers['X-CSRF-TOKEN'] = this.csrfToken();
+            this.options.auth.headers[this.options.csrfCookie] = this.csrfToken();
         }
 
         return options;
@@ -65,6 +66,7 @@ export abstract class Connector {
             typeof document.cookie !== 'undefined' &&
             (cookie = readCookie('XSRF-TOKEN'))
         ) {
+            this.options.csrfCookie = 'X-XSRF-TOKEN';
             return cookie;
         }
 
