@@ -18,7 +18,7 @@ export abstract class Channel {
     listenForWhisper(event: string, callback: Function): Channel {
         return this.listen('.client-' + event, callback);
     }
-    
+
     /**
      * Stop listening a whisper event on the channel instance.
      */
