@@ -20,13 +20,6 @@ export abstract class Channel {
     }
 
     /**
-     * Stop listening a whisper event on the channel instance.
-     */
-    stopWhisper(event: string): Channel {
-        return this.stopListening('.client-' + event);
-    }
-
-    /**
      * Listen for an event on the channel instance.
      */
     notification(callback: Function): Channel {
@@ -37,4 +30,11 @@ export abstract class Channel {
      * Stop listening to an event on the channel instance.
      */
     abstract stopListening(event: string): Channel;
+
+    /**
+     * Stop listening for a whispser event on the channel instance.
+     */
+    stopListeningForWhisper(event: string): Channel {
+        return this.stopListening('.client-' + event);
+    }
 }
