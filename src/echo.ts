@@ -138,16 +138,14 @@ export default class Echo {
     }
 
     /**
-     * Register jQuery AjaxSetup to add the X-Socket-ID header.
+     * Register jQuery AjaxPrefilter to add the X-Socket-ID header.
      */
     registerjQueryAjaxSetup(): void {
         if (typeof jQuery.ajax != 'undefined') {
-            jQuery.ajaxSetup({
-                beforeSend: xhr => {
-                    if (this.socketId()) {
-                        xhr.setRequestHeader('X-Socket-Id', this.socketId());
-                    }
-                },
+            jQuery.ajaxPrefilter((options, originalOptions, xhr) => {
+                if (this.socketId()) {
+                    xhr.setRequestHeader('X-Socket-Id', this.socketId());
+                }
             });
         }
     }
