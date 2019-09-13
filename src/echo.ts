@@ -142,12 +142,10 @@ export default class Echo {
      */
     registerjQueryAjaxSetup(): void {
         if (typeof jQuery.ajax != 'undefined') {
-            jQuery.ajaxSetup({
-                beforeSend: xhr => {
-                    if (this.socketId()) {
-                        xhr.setRequestHeader('X-Socket-Id', this.socketId());
-                    }
-                },
+            jQuery.ajaxPrefilter((options, originalOptions, xhr) => {
+                if (this.socketId()) {
+                    xhr.setRequestHeader('X-Socket-Id', this.socketId());
+                }
             });
         }
     }
