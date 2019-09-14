@@ -22,7 +22,7 @@ export default class Echo {
         this.options = options;
         this.connect();
 
-        if (!this.options.disableAutoRegisterInterceptors) {
+        if (! this.options.withoutInterceptors) {
             this.registerInterceptors();
         }
     }
