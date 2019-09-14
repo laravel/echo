@@ -44,6 +44,8 @@ export default class Echo {
             this.connector = new SocketIoConnector(this.options);
         } else if (this.options.broadcaster == 'null') {
             this.connector = new NullConnector(this.options);
+        } else if (typeof this.options.broadcaster == 'function') {
+            this.connector = new this.options.broadcaster(this.options);
         }
     }
 
