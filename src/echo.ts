@@ -21,7 +21,10 @@ export default class Echo {
     constructor(options: any) {
         this.options = options;
         this.connect();
-        this.registerInterceptors();
+
+        if (! this.options.withoutInterceptors) {
+            this.registerInterceptors();
+        }
     }
 
     /**
