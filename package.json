@@ -2,61 +2,47 @@
   "name": "laravel-echo",
   "version": "1.5.4",
   "description": "Laravel Echo library for beautiful Pusher and Socket.IO integration",
-  "main": "dist/echo.common.js",
-  "types": "dist/echo.d.ts",
-  "module": "dist/echo.js",
-  "scripts": {
-    "build": "npm run compile && npm run declarations",
-    "compile": "./node_modules/.bin/rollup -c",
-    "declarations": "./node_modules/.bin/tsc --emitDeclarationOnly",
-    "prepublish": "npm run build",
-    "test": "jest"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/laravel/echo"
-  },
   "keywords": [
     "laravel",
     "pusher",
     "socket.io"
   ],
+  "homepage": "https://github.com/laravel/echo",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/laravel/echo"
+  },
+  "license": "MIT",
   "author": {
     "name": "Taylor Otwell"
   },
-  "license": "MIT",
-  "homepage": "https://github.com/laravel/echo",
-  "engines": {
-    "node": ">6.0.*"
+  "main": "dist/echo.common.js",
+  "module": "dist/echo.js",
+  "types": "dist/echo.d.ts",
+  "scripts": {
+    "build": "npm run compile && npm run declarations",
+    "compile": "./node_modules/.bin/rollup -c",
+    "declarations": "./node_modules/.bin/tsc --emitDeclarationOnly",
+    "prepublish": "npm run build",
+    "release": "npm run test && standard-version && git push --follow-tags && npm publish",
+    "test": "jest"
   },
   "devDependencies": {
-    "@types/jest": "^22.1.0",
-    "@types/node": "^6.0.85",
-    "babel-plugin-transform-object-assign": "^6.8.0",
+    "@types/jest": "^24.0.18",
+    "@types/node": "^12.7.5",
+    "babel-plugin-transform-object-assign": "^6.22.0",
     "babel-preset-es2015-rollup": "^3.0.0",
-    "babel-preset-stage-2": "^6.5.0",
-    "jest": "^22.1.0",
-    "pusher-js": "^3.2.1",
-    "rollup": "^0.67.3",
-    "rollup-plugin-babel": "^2.4.0",
-    "rollup-plugin-typescript": "^1.0.0",
-    "ts-jest": "^22.0.0",
-    "tslib": "^1.9.3",
-    "typescript": "^3.2.1"
+    "babel-preset-stage-2": "^6.24.1",
+    "jest": "^24.9.0",
+    "rollup": "^1.21.2",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-typescript": "^1.0.1",
+    "standard-version": "^7.0.0",
+    "ts-jest": "^24.1.0",
+    "tslib": "^1.10.0",
+    "typescript": "^3.6.3"
   },
-  "jest": {
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
-    },
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "testURL": "http://localhost",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json",
-      "node"
-    ]
+  "engines": {
+    "node": ">=8"
   }
 }
