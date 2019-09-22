@@ -53,10 +53,10 @@ export abstract class Connector {
         } else if (this.options.csrfToken) {
             return this.options.csrfToken;
         } else if (
-+            typeof document !== 'undefined' &&
-+            document.hasOwnProperty('querySelector') &&
-+            (selector = document.querySelector('meta[name="csrf-token"]'))
-+        ) {
+            typeof document !== 'undefined' &&
+            document.hasOwnProperty('querySelector') &&
+            (selector = document.querySelector('meta[name="csrf-token"]'))
+        ) {
             return selector.getAttribute('content');
         }
 
