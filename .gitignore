@@ -1,9 +1,5 @@
-node_modules
-*.iml
-.idea
-*.log*
-.vscode
-.DS_Store
-coverage
-dist
+node_modules/
+dist/
 build/
+npm-debug.log
+package-lock.json
