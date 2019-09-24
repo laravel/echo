@@ -54,7 +54,7 @@ export abstract class Connector {
             return this.options.csrfToken;
         } else if (
             typeof document !== 'undefined' &&
-            document.hasOwnProperty('querySelector') &&
+            typeof document.querySelector === 'function' &&
             (selector = document.querySelector('meta[name="csrf-token"]'))
         ) {
             return selector.getAttribute('content');
