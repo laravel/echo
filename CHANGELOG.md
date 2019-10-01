@@ -1,8 +1,14 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v1.6.0...master)
+## [Unreleased](https://github.com/laravel/echo/compare/v1.6.1...master)
 
-    
+
+## [v1.6.1 (2019-10-01)](https://github.com/laravel/echo/compare/v1.6.0...v1.6.1)
+
+### Fixed
+- Change check for 'querySelector' method for browser compatibility ([#253](https://github.com/laravel/echo/pull/253))
+
+
 ## [v1.6.0 (2019-09-24)](https://github.com/laravel/echo/compare/v1.5.4...v1.6.0)
 
 ### Added
