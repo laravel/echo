@@ -63,33 +63,31 @@ export class SocketIoConnector extends Connector {
      * Get a private channel instance by name.
      */
     privateChannel(name: string): SocketIoPrivateChannel {
-        if (!this.channels['private-' + name]) {
-            this.channels['private-' + name] = new SocketIoPrivateChannel(this.socket, 'private-' + name, this.options);
+        name = this.privatify(name);
+        if (!this.channels[name]) {
+            this.channels[name] = new SocketIoPrivateChannel(this.socket, name, this.options);
         }
 
-        return this.channels['private-' + name];
+        return this.channels[name];
     }
 
     /**
      * Get a presence channel instance by name.
      */
     presenceChannel(name: string): SocketIoPresenceChannel {
-        if (!this.channels['presence-' + name]) {
-            this.channels['presence-' + name] = new SocketIoPresenceChannel(
-                this.socket,
-                'presence-' + name,
-                this.options
-            );
+        name = this.presencify(name);
+        if (!this.channels[name]) {
+            this.channels[name] = new SocketIoPresenceChannel(this.socket, name, this.options);
         }
 
-        return this.channels['presence-' + name];
+        return this.channels[name];
     }
 
     /**
      * Leave the given channel, as well as its private and presence variants.
      */
     leave(name: string): void {
-        let channels = [name, 'private-' + name, 'presence-' + name];
+        let channels = [name, this.privatify(name), this.presencify(name)];
 
         channels.forEach(name => {
             this.leaveChannel(name);

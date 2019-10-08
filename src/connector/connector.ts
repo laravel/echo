@@ -64,6 +64,22 @@ export abstract class Connector {
     }
 
     /**
+     * Prepend private prefix
+     * @param string
+     */
+    protected privatify(name: string): string {
+        return 'private-' + name;
+    }
+
+    /**
+     * Prepend presence prefix
+     * @param string
+     */
+    protected presencify(name: string): string {
+        return 'presence-' + name;
+    }
+
+    /**
      * Create a fresh connection.
      */
     abstract connect(): void;

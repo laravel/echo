@@ -48,33 +48,31 @@ export class PusherConnector extends Connector {
      * Get a private channel instance by name.
      */
     privateChannel(name: string): PusherChannel {
-        if (!this.channels['private-' + name]) {
-            this.channels['private-' + name] = new PusherPrivateChannel(this.pusher, 'private-' + name, this.options);
+        name = this.privatify(name);
+        if (!this.channels[name]) {
+            this.channels[name] = new PusherPrivateChannel(this.pusher, name, this.options);
         }
 
-        return this.channels['private-' + name];
+        return this.channels[name];
     }
 
     /**
      * Get a presence channel instance by name.
      */
     presenceChannel(name: string): PresenceChannel {
-        if (!this.channels['presence-' + name]) {
-            this.channels['presence-' + name] = new PusherPresenceChannel(
-                this.pusher,
-                'presence-' + name,
-                this.options
-            );
+        name = this.presencify(name);
+        if (!this.channels[name]) {
+            this.channels[name] = new PusherPresenceChannel(this.pusher, name, this.options);
         }
 
-        return this.channels['presence-' + name];
+        return this.channels[name];
     }
 
     /**
      * Leave the given channel, as well as its private and presence variants.
      */
     leave(name: string): void {
-        let channels = [name, 'private-' + name, 'presence-' + name];
+        let channels = [name, this.privatify(name), this.presencify(name)];
 
         channels.forEach((name: string, index: number) => {
             this.leaveChannel(name);
