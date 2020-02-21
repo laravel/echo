@@ -1,7 +1,8 @@
 <p align="center"><img src="https://laravel.com/assets/img/components/logo-echo.svg"></p>
 
 <p align="center">
-<a href="https://travis-ci.org/laravel/echo"><img src="https://travis-ci.org/laravel/echo.svg" alt="Build Status"></a>
+
+<a href="https://github.com/laravel/echo/actions"><img src="https://github.com/laravel/echo/workflows/tests/badge.svg" alt="Build Status"></a>
 <a href="https://www.npmjs.com/package/laravel-echo"><img src="https://img.shields.io/npm/dt/laravel-echo" alt="Total Downloads"></a>
 <a href="https://www.npmjs.com/package/laravel-echo"><img src="https://img.shields.io/npm/v/laravel-echo" alt="Latest Stable Version"></a>
 <a href="https://www.npmjs.com/package/laravel-echo"><img src="https://img.shields.io/npm/l/laravel-echo" alt="License"></a>
