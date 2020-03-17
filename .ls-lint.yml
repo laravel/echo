@@ -1,0 +1,14 @@
+ls:
+  ts: kebab-case
+  .js: kebab-case
+  .json: kebab-case
+  .ts: kebab-case
+  .d.ts: kebab-case
+  .test.ts: kebab-case
+  .config.js: kebab-case
+
+ignore:
+  - dist
+  - node_modules
+  - .git
+  - .github
