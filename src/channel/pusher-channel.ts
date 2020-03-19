@@ -36,7 +36,7 @@ export class PusherChannel extends Channel {
     constructor(pusher: any, name: any, options: any) {
         super();
 
-        this.name = name;
+        this.name = (options.channelPrefix || '') + name;
         this.pusher = pusher;
         this.options = options;
         this.eventFormatter = new EventFormatter(this.options.namespace);
