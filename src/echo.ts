@@ -92,6 +92,13 @@ export default class Echo {
     }
 
     /**
+     * Get a private encrypted channel instance by name.
+     */
+    privateEncrypted(channel: string): Channel {
+        return this.connector.privateEncryptedChannel(channel);
+    }
+
+    /**
      * Get the Socket ID for the connection.
      */
     socketId(): string {
