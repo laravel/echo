@@ -94,8 +94,8 @@ export default class Echo {
     /**
      * Get a private encrypted channel instance by name.
      */
-    privateEncrypted(channel: string): Channel {
-        return this.connector.privateEncryptedChannel(channel);
+    encryptedPrivate(channel: string): Channel {
+        return this.connector.encryptedPrivateChannel(channel);
     }
 
     /**
