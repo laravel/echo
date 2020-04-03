@@ -1,5 +1,11 @@
 import { Connector } from './connector';
-import { PusherChannel, PusherPrivateChannel, PusherPresenceChannel, PresenceChannel } from './../channel';
+import {
+    PusherChannel,
+    PusherPrivateChannel,
+    PusherEncryptedPrivateChannel,
+    PusherPresenceChannel,
+    PresenceChannel,
+} from './../channel';
 
 /**
  * This class creates a connector to Pusher.
@@ -53,6 +59,21 @@ export class PusherConnector extends Connector {
         }
 
         return this.channels['private-' + name];
+    }
+
+    /**
+     * Get a private encrypted channel instance by name.
+     */
+    encryptedPrivateChannel(name: string): PusherChannel {
+        if (!this.channels['private-encrypted-' + name]) {
+            this.channels['private-encrypted-' + name] = new PusherEncryptedPrivateChannel(
+                this.pusher,
+                'private-encrypted-' + name,
+                this.options
+            );
+        }
+
+        return this.channels['private-encrypted-' + name];
     }
 
     /**

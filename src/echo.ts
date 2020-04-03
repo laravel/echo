@@ -92,6 +92,13 @@ export default class Echo {
     }
 
     /**
+     * Get a private encrypted channel instance by name.
+     */
+    encryptedPrivate(channel: string): Channel {
+        return this.connector.encryptedPrivateChannel(channel);
+    }
+
+    /**
      * Get the Socket ID for the connection.
      */
     socketId(): string {
@@ -133,7 +140,7 @@ export default class Echo {
      * Register an Axios HTTP interceptor to add the X-Socket-ID header.
      */
     registerAxiosRequestInterceptor(): any {
-        axios.interceptors.request.use(config => {
+        axios.interceptors.request.use((config) => {
             if (this.socketId()) {
                 config.headers['X-Socket-Id'] = this.socketId();
             }
