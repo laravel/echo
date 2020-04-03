@@ -91,7 +91,7 @@ export class SocketIoConnector extends Connector {
     leave(name: string): void {
         let channels = [name, 'private-' + name, 'presence-' + name];
 
-        channels.forEach(name => {
+        channels.forEach((name) => {
             this.leaveChannel(name);
         });
     }
