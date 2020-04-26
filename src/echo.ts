@@ -106,8 +106,8 @@ export default class Echo {
     }
 
     /**
-     * Register 3rd party request interceptiors. These are used to automatically
-     * send a connections socket id to a Laravel app with a X-Socket-Id header.
+     * Register 3rd party request interceptors. These are used to automatically
+     * send a connections socket id to a Laravel app with a X-Socket-ID header.
      */
     registerInterceptors(): void {
         if (typeof Vue === 'function' && Vue.http) {
