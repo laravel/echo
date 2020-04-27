@@ -142,7 +142,7 @@ export default class Echo {
     registerAxiosRequestInterceptor(): any {
         axios.interceptors.request.use((config) => {
             if (this.socketId()) {
-                config.headers['X-Socket-Id'] = this.socketId();
+                config.headers['X-Socket-ID'] = this.socketId();
             }
 
             return config;
@@ -156,7 +156,7 @@ export default class Echo {
         if (typeof jQuery.ajax != 'undefined') {
             jQuery.ajaxPrefilter((options, originalOptions, xhr) => {
                 if (this.socketId()) {
-                    xhr.setRequestHeader('X-Socket-Id', this.socketId());
+                    xhr.setRequestHeader('X-Socket-ID', this.socketId());
                 }
             });
         }
