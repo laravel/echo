@@ -1,5 +1,5 @@
-import typescript from 'rollup-plugin-typescript';
-import babel from 'rollup-plugin-babel';
+import babel from '@rollup/plugin-babel';
+import typescript from 'rollup-plugin-typescript2';
 
 export default {
     input: './src/echo.ts',
@@ -11,9 +11,18 @@ export default {
     plugins: [
         typescript(),
         babel({
+            babelHelpers: 'bundled',
             exclude: 'node_modules/**',
-            presets: ['es2015-rollup', 'stage-2'],
-            plugins: ['transform-object-assign'],
+            extensions: ['.ts'],
+            presets: ['@babel/preset-env'],
+            plugins: [
+                ['@babel/plugin-proposal-decorators', { legacy: true }],
+                '@babel/plugin-proposal-function-sent',
+                '@babel/plugin-proposal-export-namespace-from',
+                '@babel/plugin-proposal-numeric-separator',
+                '@babel/plugin-proposal-throw-expressions',
+                '@babel/plugin-transform-object-assign',
+            ],
         }),
     ],
 };
