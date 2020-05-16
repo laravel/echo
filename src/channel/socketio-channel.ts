@@ -125,8 +125,8 @@ export class SocketIoChannel extends Channel {
      * Unbind the channel's socket from all stored event callbacks.
      */
     unbind(): void {
-        Object.keys(this.events).forEach(event => {
-            this.events[event].forEach(callback => {
+        Object.keys(this.events).forEach((event) => {
+            this.events[event].forEach((callback) => {
                 this.socket.removeListener(event, callback);
             });
 

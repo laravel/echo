@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v1.6.1...master)
+## [Unreleased](https://github.com/laravel/echo/compare/v1.7.0...master)
+
+
+## [v1.7.0 (2020-04-03)](https://github.com/laravel/echo/compare/v1.6.1...v1.7.0)
+
+### Added
+- Add pusher private-encrypted ([#264](https://github.com/laravel/echo/pull/264))
 
 
 ## [v1.6.1 (2019-10-01)](https://github.com/laravel/echo/compare/v1.6.0...v1.6.1)
