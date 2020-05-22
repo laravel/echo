@@ -26,7 +26,7 @@ export class PusherChannel extends Channel {
     eventFormatter: EventFormatter;
 
     /**
-     * The subsciption of the channel.
+     * The subscription of the channel.
      */
     subscription: any;
 
