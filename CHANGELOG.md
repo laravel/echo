@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v1.7.0...master)
+## [Unreleased](https://github.com/laravel/echo/compare/v1.8.0...master)
+
+
+## [v1.8.0 (2020-05-16)](https://github.com/laravel/echo/compare/v1.7.0...v1.8.0)
+
+### Fixed
+- IE11 fix for dist/echo.js not being transpiled to ES5 ([#270](https://github.com/laravel/echo/pull/270))
 
 
 ## [v1.7.0 (2020-04-03)](https://github.com/laravel/echo/compare/v1.6.1...v1.7.0)
