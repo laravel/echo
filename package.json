@@ -1,52 +1,52 @@
 {
-  "name": "laravel-echo",
-  "version": "1.8.0",
-  "description": "Laravel Echo library for beautiful Pusher and Socket.IO integration",
-  "keywords": [
-    "laravel",
-    "pusher",
-    "socket.io"
-  ],
-  "homepage": "https://github.com/laravel/echo",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/laravel/echo"
-  },
-  "license": "MIT",
-  "author": {
-    "name": "Taylor Otwell"
-  },
-  "main": "dist/echo.common.js",
-  "module": "dist/echo.js",
-  "types": "dist/echo.d.ts",
-  "scripts": {
-    "build": "npm run compile && npm run declarations",
-    "compile": "./node_modules/.bin/rollup -c",
-    "declarations": "./node_modules/.bin/tsc --emitDeclarationOnly",
-    "prepublish": "npm run build",
-    "release": "npm run test && standard-version && git push --follow-tags && npm publish",
-    "test": "jest"
-  },
-  "devDependencies": {
-    "@babel/plugin-proposal-decorators": "^7.8.3",
-    "@babel/plugin-proposal-export-namespace-from": "^7.8.3",
-    "@babel/plugin-proposal-function-sent": "^7.8.3",
-    "@babel/plugin-proposal-numeric-separator": "^7.8.3",
-    "@babel/plugin-proposal-throw-expressions": "^7.8.3",
-    "@babel/plugin-transform-object-assign": "^7.8.3",
-    "@babel/preset-env": "^7.9.6",
-    "@rollup/plugin-babel": "^5.0.0",
-    "@types/jest": "^24.0.18",
-    "@types/node": "^12.7.5",
-    "jest": "^24.9.0",
-    "rollup": "^2.10.2",
-    "rollup-plugin-typescript2": "^0.27.1",
-    "standard-version": "^7.0.0",
-    "ts-jest": "^24.1.0",
-    "tslib": "^1.10.0",
-    "typescript": "^3.6.3"
-  },
-  "engines": {
-    "node": ">=10"
-  }
+    "name": "laravel-echo",
+    "version": "1.8.0",
+    "description": "Laravel Echo library for beautiful Pusher and Socket.IO integration",
+    "keywords": [
+        "laravel",
+        "pusher",
+        "socket.io"
+    ],
+    "homepage": "https://github.com/laravel/echo",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/laravel/echo"
+    },
+    "license": "MIT",
+    "author": {
+        "name": "Taylor Otwell"
+    },
+    "main": "dist/echo.common.js",
+    "module": "dist/echo.js",
+    "types": "dist/echo.d.ts",
+    "scripts": {
+        "build": "npm run compile && npm run declarations",
+        "compile": "./node_modules/.bin/rollup -c",
+        "declarations": "./node_modules/.bin/tsc --emitDeclarationOnly",
+        "prepublish": "npm run build",
+        "release": "npm run test && standard-version && git push --follow-tags && npm publish",
+        "test": "jest"
+    },
+    "devDependencies": {
+        "@babel/plugin-proposal-decorators": "^7.8.3",
+        "@babel/plugin-proposal-export-namespace-from": "^7.8.3",
+        "@babel/plugin-proposal-function-sent": "^7.8.3",
+        "@babel/plugin-proposal-numeric-separator": "^7.8.3",
+        "@babel/plugin-proposal-throw-expressions": "^7.8.3",
+        "@babel/plugin-transform-object-assign": "^7.8.3",
+        "@babel/preset-env": "^7.9.6",
+        "@rollup/plugin-babel": "^5.0.0",
+        "@types/jest": "^24.0.18",
+        "@types/node": "^12.7.5",
+        "jest": "^24.9.0",
+        "rollup": "^2.10.2",
+        "rollup-plugin-typescript2": "^0.27.1",
+        "standard-version": "^7.0.0",
+        "ts-jest": "^24.1.0",
+        "tslib": "^1.10.0",
+        "typescript": "^3.6.3"
+    },
+    "engines": {
+        "node": ">=10"
+    }
 }
