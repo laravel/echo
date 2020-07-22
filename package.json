@@ -23,6 +23,7 @@
         "build": "npm run compile && npm run declarations",
         "compile": "./node_modules/.bin/rollup -c",
         "declarations": "./node_modules/.bin/tsc --emitDeclarationOnly",
+        "lint": "eslint --ext .js,.ts ./src ./tests",
         "prepublish": "npm run build",
         "release": "npm run test && standard-version && git push --follow-tags && npm publish",
         "test": "jest"
@@ -38,6 +39,9 @@
         "@rollup/plugin-babel": "^5.0.0",
         "@types/jest": "^24.0.18",
         "@types/node": "^12.7.5",
+        "@typescript-eslint/eslint-plugin": "^3.7.0",
+        "@typescript-eslint/parser": "^3.7.0",
+        "eslint": "^7.5.0",
         "jest": "^24.9.0",
         "rollup": "^2.10.2",
         "rollup-plugin-typescript2": "^0.27.1",
