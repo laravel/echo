@@ -19,7 +19,7 @@ export class SocketIoConnector extends Connector {
      * Create a fresh Socket.io connection.
      */
     connect(): void {
-        let io = this.getSocketIO();
+        const io = this.getSocketIO();
 
         this.socket = io(this.options.host, this.options);
 
@@ -89,7 +89,7 @@ export class SocketIoConnector extends Connector {
      * Leave the given channel, as well as its private and presence variants.
      */
     leave(name: string): void {
-        let channels = [name, 'private-' + name, 'presence-' + name];
+        const channels = [name, 'private-' + name, 'presence-' + name];
 
         channels.forEach((name) => {
             this.leaveChannel(name);

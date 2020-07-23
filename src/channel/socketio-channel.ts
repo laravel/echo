@@ -91,7 +91,7 @@ export class SocketIoChannel extends Channel {
      * Bind the channel's socket to an event and store the callback.
      */
     on(event: string, callback: Function): void {
-        let listener = (channel, data) => {
+        const listener = (channel, data) => {
             if (this.name == channel) {
                 callback(data);
             }
