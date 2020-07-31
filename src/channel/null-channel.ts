@@ -33,6 +33,13 @@ export class NullChannel extends Channel {
     }
 
     /**
+     * Register a callback to be called anytime an error occurs.
+     */
+    error(callback: Function): NullChannel {
+        return this;
+    }
+
+    /**
      * Bind a channel to an event.
      */
     on(event: string, callback: Function): NullChannel {

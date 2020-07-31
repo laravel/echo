@@ -1,4 +1,4 @@
-import { EventFormatter } from './../util';
+import { EventFormatter } from '../util';
 import { Channel } from './channel';
 
 /**
@@ -84,6 +84,13 @@ export class SocketIoChannel extends Channel {
         this.socket.removeListener(name);
         delete this.events[name];
 
+        return this;
+    }
+
+    /**
+     * Register a callback to be called anytime an error occurs.
+     */
+    error(callback: Function): SocketIoChannel {
         return this;
     }
 

@@ -1,4 +1,4 @@
-import { EventFormatter } from './../util';
+import { EventFormatter } from '../util';
 import { Channel } from './channel';
 
 /**
@@ -72,6 +72,17 @@ export class PusherChannel extends Channel {
      */
     stopListening(event: string): PusherChannel {
         this.subscription.unbind(this.eventFormatter.format(event));
+
+        return this;
+    }
+
+    /**
+     * Register a callback to be called anytime a subscription error occurs.
+     */
+    error(callback: Function): PusherChannel {
+        this.on('pusher:subscription_error', (status) => {
+            callback(status);
+        });
 
         return this;
     }
