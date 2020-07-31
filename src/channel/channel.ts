@@ -37,4 +37,9 @@ export abstract class Channel {
     stopListeningForWhisper(event: string): Channel {
         return this.stopListening('.client-' + event);
     }
+
+    /**
+     * Register a callback to be called anytime an error occurs.
+     */
+    abstract error(callback: Function): Channel;
 }

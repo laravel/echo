@@ -88,6 +88,13 @@ export class SocketIoChannel extends Channel {
     }
 
     /**
+     * Register a callback to be called anytime an error occurs.
+     */
+    error(callback: Function): SocketIoChannel {
+        return this;
+    }
+
+    /**
      * Bind the channel's socket to an event and store the callback.
      */
     on(event: string, callback: Function): void {

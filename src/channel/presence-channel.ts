@@ -8,11 +8,6 @@ export interface PresenceChannel {
     here(callback: Function): PresenceChannel;
 
     /**
-     * Register a callback to be called anytime an error occurs.
-     */
-    error(callback: Function): PresenceChannel;
-
-    /**
      * Listen for someone joining the channel.
      */
     joining(callback: Function): PresenceChannel;

@@ -17,13 +17,6 @@ export class SocketIoPresenceChannel extends SocketIoPrivateChannel implements P
     }
 
     /**
-     * Register a callback to be called anytime an error occurs.
-     */
-    error(callback: Function): SocketIoPresenceChannel {
-        return this;
-    }
-
-    /**
      * Listen for someone joining the channel.
      */
     joining(callback: Function): SocketIoPresenceChannel {
