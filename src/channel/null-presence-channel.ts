@@ -13,6 +13,13 @@ export class NullPresenceChannel extends NullChannel implements PresenceChannel 
     }
 
     /**
+     * Register a callback to be called anytime an error occurs.
+     */
+    error(callback: Function): NullPresenceChannel {
+        return this;
+    }
+
+    /**
      * Listen for someone joining the channel.
      */
     joining(callback: Function): NullPresenceChannel {

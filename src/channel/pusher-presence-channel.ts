@@ -17,6 +17,17 @@ export class PusherPresenceChannel extends PusherChannel implements PresenceChan
     }
 
     /**
+     * Register a callback to be called anytime a subscription error occurs.
+     */
+    error(callback: Function): PusherPresenceChannel {
+        this.on('pusher:subscription_error', (status) => {
+            callback(status);
+        });
+
+        return this;
+    }
+
+    /**
      * Listen for someone joining the channel.
      */
     joining(callback: Function): PusherPresenceChannel {

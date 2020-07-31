@@ -32,7 +32,7 @@ export abstract class Channel {
     abstract stopListening(event: string): Channel;
 
     /**
-     * Stop listening for a whispser event on the channel instance.
+     * Stop listening for a whisper event on the channel instance.
      */
     stopListeningForWhisper(event: string): Channel {
         return this.stopListening('.client-' + event);
