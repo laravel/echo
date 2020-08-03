@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v1.8.0...master)
+## [Unreleased](https://github.com/laravel/echo/compare/v1.8.1...master)
+
+
+## [v1.8.1 (2020-07-31)](https://github.com/laravel/echo/compare/v1.8.0...v1.8.1)
+
+### Added
+- Implement error handling with support for Pusher ([#284](https://github.com/laravel/echo/pull/284))
 
 
 ## [v1.8.0 (2020-05-16)](https://github.com/laravel/echo/compare/v1.7.0...v1.8.0)
