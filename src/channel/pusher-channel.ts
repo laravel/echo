@@ -81,7 +81,7 @@ export class PusherChannel extends Channel {
      */
     subscriptionSucceeded(callback: Function): PusherChannel {
         this.on('pusher:subscription_succeeded', () => {
-            callback()
+            callback();
         });
 
         return this;

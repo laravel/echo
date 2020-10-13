@@ -93,7 +93,7 @@ export class SocketIoChannel extends Channel {
     subscriptionSucceeded(callback: Function): SocketIoChannel {
         this.on('connect', (socket) => {
             callback(socket);
-        })
+        });
 
         return this;
     }
