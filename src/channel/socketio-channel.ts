@@ -91,7 +91,7 @@ export class SocketIoChannel extends Channel {
      * Register a callback to be called anytime a subscription succeeds.
      */
     subscriptionSucceeded(callback: Function): SocketIoChannel {
-        this.on('connection', (socket) => {
+        this.on('connect', (socket) => {
             callback(socket);
         })
 
