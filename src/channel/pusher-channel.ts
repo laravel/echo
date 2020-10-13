@@ -77,6 +77,17 @@ export class PusherChannel extends Channel {
     }
 
     /**
+     * Register a callback to be called anytime a subscription succeeds.
+     */
+    subscriptionSucceeded(callback: Function): PusherChannel {
+        this.on('pusher:subscription_succeeded', () => {
+            callback()
+        });
+
+        return this;
+    }
+
+    /**
      * Register a callback to be called anytime a subscription error occurs.
      */
     error(callback: Function): PusherChannel {
