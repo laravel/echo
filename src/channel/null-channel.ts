@@ -35,7 +35,7 @@ export class NullChannel extends Channel {
     /**
      * Register a callback to be called anytime a subscription succeeds.
      */
-    subscriptionSucceeded(callback: Function): NullChannel {
+    subscribed(callback: Function): NullChannel {
         return this;
     }
 
