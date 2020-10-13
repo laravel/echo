@@ -39,6 +39,11 @@ export abstract class Channel {
     }
 
     /**
+     * Register a callback to be called anytime a subscription succeeds.
+     */
+    abstract subscriptionSucceeded(callback: Function): Channel;
+
+    /**
      * Register a callback to be called anytime an error occurs.
      */
     abstract error(callback: Function): Channel;
