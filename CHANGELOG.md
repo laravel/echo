@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v1.8.1...master)
+## [Unreleased](https://github.com/laravel/echo/compare/v1.9.0...master)
+
+
+## [v1.9.0 (2020-10-13)](https://github.com/laravel/echo/compare/v1.8.1...v1.9.0)
+
+### Added
+- Register subscription succeeded callbacks ([#288](https://github.com/laravel/echo/pull/288))
 
 
 ## [v1.8.1 (2020-07-31)](https://github.com/laravel/echo/compare/v1.8.0...v1.8.1)
