@@ -79,10 +79,18 @@ export class SocketIoChannel extends Channel {
     /**
      * Stop listening for an event on the channel instance.
      */
-    stopListening(event: string): SocketIoChannel {
+    stopListening(event: string, callback?: Function): SocketIoChannel {
         const name = this.eventFormatter.format(event);
-        this.socket.removeListener(name);
-        delete this.events[name];
+
+        if (callback && this.events[name]) {
+            this.socket.removeListener(name, callback);
+            this.events[name] = this.events[name].filter((cb) => cb !== callback);
+        }
+
+        if (!callback || (this.events[name] && this.events[name].length === 0)) {
+            this.socket.removeListener(name);
+            delete this.events[name];
+        }
 
         return this;
     }

@@ -29,13 +29,13 @@ export abstract class Channel {
     /**
      * Stop listening to an event on the channel instance.
      */
-    abstract stopListening(event: string): Channel;
+    abstract stopListening(event: string, callback?: Function): Channel;
 
     /**
      * Stop listening for a whisper event on the channel instance.
      */
-    stopListeningForWhisper(event: string): Channel {
-        return this.stopListening('.client-' + event);
+    stopListeningForWhisper(event: string, callback?: Function): Channel {
+        return this.stopListening('.client-' + event, callback);
     }
 
     /**
