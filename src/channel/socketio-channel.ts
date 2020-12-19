@@ -113,7 +113,7 @@ export class SocketIoChannel extends Channel {
     on(event: string, callback: Function): SocketIoChannel {
         this.listeners[event] = this.listeners[event] || [];
 
-        if (! this.events[event]) {
+        if (!this.events[event]) {
             this.events[event] = (channel, data) => {
                 if (this.name === channel && this.listeners[event]) {
                     this.listeners[event].forEach((cb) => cb(data));
