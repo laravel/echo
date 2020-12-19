@@ -113,7 +113,7 @@ export class SocketIoChannel extends Channel {
     on(event: string, callback: Function): SocketIoChannel {
         this.listeners[event] = this.listeners[event] || [];
 
-        if (!this.events[event]) {
+        if (! this.events[event]) {
             this.events[event] = (channel, data) => {
                 if (this.name === channel && this.listeners[event]) {
                     this.listeners[event].forEach((cb) => cb(data));
@@ -137,6 +137,9 @@ export class SocketIoChannel extends Channel {
         });
     }
 
+    /**
+     * Unbind the listeners for the given event.
+     */
     protected unbindEvent(event: string, callback?: Function): void {
         this.listeners[event] = this.listeners[event] || [];
 
@@ -147,6 +150,7 @@ export class SocketIoChannel extends Channel {
         if (!callback || this.listeners[event].length === 0) {
             if (this.events[event]) {
                 this.socket.removeListener(event, this.events[event]);
+
                 delete this.events[event];
             }
 
