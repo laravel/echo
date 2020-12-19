@@ -42,7 +42,6 @@ export class SocketIoChannel extends Channel {
         this.eventFormatter = new EventFormatter(this.options.namespace);
 
         this.subscribe();
-        this.configureReconnector();
     }
 
     /**
@@ -117,18 +116,6 @@ export class SocketIoChannel extends Channel {
 
         this.socket.on(event, listener);
         this.bind(event, listener);
-    }
-
-    /**
-     * Attach a 'reconnect' listener and bind the event.
-     */
-    configureReconnector(): void {
-        const listener = () => {
-            this.subscribe();
-        };
-
-        this.socket.on('reconnect', listener);
-        this.bind('reconnect', listener);
     }
 
     /**
