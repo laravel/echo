@@ -26,9 +26,14 @@ export class SocketIoChannel extends Channel {
     eventFormatter: EventFormatter;
 
     /**
-     * The event callbacks applied to the channel.
+     * The event callbacks applied to the socket.
      */
     events: any = {};
+
+    /**
+     * User supplied callbacks for events on this channel.
+     */
+    private listeners: any = {};
 
     /**
      * Create a new class instance.
@@ -78,10 +83,8 @@ export class SocketIoChannel extends Channel {
     /**
      * Stop listening for an event on the channel instance.
      */
-    stopListening(event: string): SocketIoChannel {
-        const name = this.eventFormatter.format(event);
-        this.socket.removeListener(name);
-        delete this.events[name];
+    stopListening(event: string, callback?: Function): SocketIoChannel {
+        this.unbindEvent(this.eventFormatter.format(event), callback);
 
         return this;
     }
@@ -107,23 +110,22 @@ export class SocketIoChannel extends Channel {
     /**
      * Bind the channel's socket to an event and store the callback.
      */
-    on(event: string, callback: Function): void {
-        let listener = (channel, data) => {
-            if (this.name == channel) {
-                callback(data);
-            }
-        };
+    on(event: string, callback: Function): SocketIoChannel {
+        this.listeners[event] = this.listeners[event] || [];
 
-        this.socket.on(event, listener);
-        this.bind(event, listener);
-    }
+        if (!this.events[event]) {
+            this.events[event] = (channel, data) => {
+                if (this.name === channel && this.listeners[event]) {
+                    this.listeners[event].forEach((cb) => cb(data));
+                }
+            };
 
-    /**
-     * Bind the channel's socket to an event and store the callback.
-     */
-    bind(event: string, callback: Function): void {
-        this.events[event] = this.events[event] || [];
-        this.events[event].push(callback);
+            this.socket.on(event, this.events[event]);
+        }
+
+        this.listeners[event].push(callback);
+
+        return this;
     }
 
     /**
@@ -131,11 +133,24 @@ export class SocketIoChannel extends Channel {
      */
     unbind(): void {
         Object.keys(this.events).forEach((event) => {
-            this.events[event].forEach((callback) => {
-                this.socket.removeListener(event, callback);
-            });
-
-            delete this.events[event];
+            this.unbindEvent(event);
         });
+    }
+
+    protected unbindEvent(event: string, callback?: Function): void {
+        this.listeners[event] = this.listeners[event] || [];
+
+        if (callback) {
+            this.listeners[event] = this.listeners[event].filter((cb) => cb !== callback);
+        }
+
+        if (!callback || this.listeners[event].length === 0) {
+            if (this.events[event]) {
+                this.socket.removeListener(event, this.events[event]);
+                delete this.events[event];
+            }
+
+            delete this.listeners[event];
+        }
     }
 }
