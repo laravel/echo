@@ -13,7 +13,7 @@ export class SocketIoConnector extends Connector {
     /**
      * All of the subscribed channel names.
      */
-    channels: any = {};
+    channels: { [name: string]: SocketIoChannel } = {};
 
     /**
      * Create a fresh Socket.io connection.
@@ -22,6 +22,12 @@ export class SocketIoConnector extends Connector {
         let io = this.getSocketIO();
 
         this.socket = io(this.options.host, this.options);
+
+        this.socket.on('reconnect', () => {
+            Object.values(this.channels).forEach((channel) => {
+                channel.subscribe();
+            });
+        });
 
         return this.socket;
     }
@@ -67,7 +73,7 @@ export class SocketIoConnector extends Connector {
             this.channels['private-' + name] = new SocketIoPrivateChannel(this.socket, 'private-' + name, this.options);
         }
 
-        return this.channels['private-' + name];
+        return this.channels['private-' + name] as SocketIoPrivateChannel;
     }
 
     /**
@@ -82,7 +88,7 @@ export class SocketIoConnector extends Connector {
             );
         }
 
-        return this.channels['presence-' + name];
+        return this.channels['presence-' + name] as SocketIoPresenceChannel;
     }
 
     /**

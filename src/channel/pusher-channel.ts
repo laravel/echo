@@ -70,8 +70,12 @@ export class PusherChannel extends Channel {
     /**
      * Stop listening for an event on the channel instance.
      */
-    stopListening(event: string): PusherChannel {
-        this.subscription.unbind(this.eventFormatter.format(event));
+    stopListening(event: string, callback?: Function): PusherChannel {
+        if (callback) {
+            this.subscription.unbind(this.eventFormatter.format(event), callback);
+        } else {
+            this.subscription.unbind(this.eventFormatter.format(event));
+        }
 
         return this;
     }
