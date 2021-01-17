@@ -110,4 +110,13 @@ export class PusherChannel extends Channel {
 
         return this;
     }
+
+    /**
+     * Trigger client event on the channel.
+     */
+    whisper(eventName: string, data: any): PusherPresenceChannel {
+        this.pusher.channels.channels[this.name].trigger(`client-${eventName}`, data);
+
+        return this;
+    }
 }
