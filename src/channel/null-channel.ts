@@ -52,4 +52,11 @@ export class NullChannel extends Channel {
     on(event: string, callback: Function): NullChannel {
         return this;
     }
+
+    /**
+     * Trigger client event on the channel.
+     */
+    whisper(eventName: string, data: any): NullPresenceChannel {
+        return this;
+    }
 }

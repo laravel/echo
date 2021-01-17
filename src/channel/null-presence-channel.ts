@@ -25,11 +25,4 @@ export class NullPresenceChannel extends NullChannel implements PresenceChannel 
     leaving(callback: Function): NullPresenceChannel {
         return this;
     }
-
-    /**
-     * Trigger client event on the channel.
-     */
-    whisper(eventName: string, data: any): NullPresenceChannel {
-        return this;
-    }
 }
