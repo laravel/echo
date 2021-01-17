@@ -129,6 +129,19 @@ export class SocketIoChannel extends Channel {
     }
 
     /**
+     * Trigger client event on the channel.
+     */
+    whisper(eventName: string, data: any): SocketIoChannel {
+        this.socket.emit('client event', {
+            channel: this.name,
+            event: `client-${eventName}`,
+            data: data,
+        });
+
+        return this;
+    }
+
+    /**
      * Unbind the channel's socket from all stored event callbacks.
      */
     unbind(): void {
