@@ -106,6 +106,17 @@ export default class Echo {
     }
 
     /**
+     * Check if Socket ID header should be applied to a request.
+     */
+    shouldApplySocketIdHeader(url: string): boolean {
+        const origin = new URL(url).origin;
+
+        return this.socketId()
+            && (!('interceptorUrls' in this.options)
+            || this.options.interceptorUrls.includes(origin));
+    }
+
+    /**
      * Register 3rd party request interceptiors. These are used to automatically
      * send a connections socket id to a Laravel app with a X-Socket-Id header.
      */
@@ -128,7 +139,7 @@ export default class Echo {
      */
     registerVueRequestInterceptor(): void {
         Vue.http.interceptors.push((request, next) => {
-            if (this.socketId()) {
+            if (this.shouldApplySocketIdHeader(request.url)) {
                 request.headers.set('X-Socket-ID', this.socketId());
             }
 
@@ -141,7 +152,7 @@ export default class Echo {
      */
     registerAxiosRequestInterceptor(): void {
         axios.interceptors.request.use((config) => {
-            if (this.socketId()) {
+            if (this.shouldApplySocketIdHeader(config.url)) {
                 config.headers['X-Socket-Id'] = this.socketId();
             }
 
@@ -155,7 +166,7 @@ export default class Echo {
     registerjQueryAjaxSetup(): void {
         if (typeof jQuery.ajax != 'undefined') {
             jQuery.ajaxPrefilter((options, originalOptions, xhr) => {
-                if (this.socketId()) {
+                if (this.shouldApplySocketIdHeader(options.url)) {
                     xhr.setRequestHeader('X-Socket-Id', this.socketId());
                 }
             });
