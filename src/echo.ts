@@ -111,9 +111,9 @@ export default class Echo {
     shouldApplySocketIdHeader(url: string): boolean {
         const origin = new URL(url).origin;
 
-        return this.socketId()
-            && (!('interceptorUrls' in this.options)
-            || this.options.interceptorUrls.includes(origin));
+        return (
+            this.socketId() && (!('interceptorUrls' in this.options) || this.options.interceptorUrls.includes(origin))
+        );
     }
 
     /**
