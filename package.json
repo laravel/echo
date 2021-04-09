@@ -1,11 +1,11 @@
 {
     "name": "laravel-echo",
     "version": "1.9.0",
-    "description": "Laravel Echo library for beautiful Pusher and Socket.IO integration",
+    "description": "Laravel Echo library for beautiful Pusher and Ably integration",
     "keywords": [
         "laravel",
         "pusher",
-        "socket.io"
+        "ably"
     ],
     "homepage": "https://github.com/laravel/echo",
     "repository": {
