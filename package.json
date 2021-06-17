@@ -5,7 +5,7 @@
     "keywords": [
         "laravel",
         "pusher",
-        "socket.io"
+        "ably"
     ],
     "homepage": "https://github.com/laravel/echo",
     "repository": {
