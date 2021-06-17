@@ -81,6 +81,40 @@ export class PusherChannel extends Channel {
     }
 
     /**
+     * Listen for all events on the channel instance.
+     */
+    listenToAll(callback: Function): PusherChannel {
+        this.subscription.bind_global((event, data) => {
+            if (event.startsWith('pusher:')){
+                return;
+            }
+
+            let namespace = this.options.namespace.replace(/\./g, '\\');
+
+            let formattedEvent = event.startsWith(namespace)
+                ? event.substring(namespace.length + 1)
+                : '.' + event;
+
+            callback(formattedEvent, data);
+        });
+
+        return this;
+    }
+
+    /**
+     * Stop listening for all events on the channel instance.
+     */
+    stopListeningToAll(callback?: Function): PusherChannel {
+        if (callback) {
+            this.subscription.unbind_global(callback);
+        } else {
+            this.subscription.unbind_global();
+        }
+
+        return this;
+    }
+
+    /**
      * Register a callback to be called anytime a subscription succeeds.
      */
     subscribed(callback: Function): PusherChannel {
