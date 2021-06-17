@@ -85,15 +85,13 @@ export class PusherChannel extends Channel {
      */
     listenToAll(callback: Function): PusherChannel {
         this.subscription.bind_global((event, data) => {
-            if (event.startsWith('pusher:')){
+            if (event.startsWith('pusher:')) {
                 return;
             }
 
             let namespace = this.options.namespace.replace(/\./g, '\\');
 
-            let formattedEvent = event.startsWith(namespace)
-                ? event.substring(namespace.length + 1)
-                : '.' + event;
+            let formattedEvent = event.startsWith(namespace) ? event.substring(namespace.length + 1) : '.' + event;
 
             callback(formattedEvent, data);
         });
