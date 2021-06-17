@@ -68,19 +68,6 @@ export class PusherChannel extends Channel {
     }
 
     /**
-     * Stop listening for an event on the channel instance.
-     */
-    stopListening(event: string, callback?: Function): PusherChannel {
-        if (callback) {
-            this.subscription.unbind(this.eventFormatter.format(event), callback);
-        } else {
-            this.subscription.unbind(this.eventFormatter.format(event));
-        }
-
-        return this;
-    }
-
-    /**
      * Listen for all events on the channel instance.
      */
     listenToAll(callback: Function): PusherChannel {
@@ -95,6 +82,19 @@ export class PusherChannel extends Channel {
 
             callback(formattedEvent, data);
         });
+
+        return this;
+    }
+
+    /**
+     * Stop listening for an event on the channel instance.
+     */
+    stopListening(event: string, callback?: Function): PusherChannel {
+        if (callback) {
+            this.subscription.unbind(this.eventFormatter.format(event), callback);
+        } else {
+            this.subscription.unbind(this.eventFormatter.format(event));
+        }
 
         return this;
     }
