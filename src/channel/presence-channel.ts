@@ -1,4 +1,4 @@
-import { Channel } from "./channel";
+import { Channel } from './channel';
 
 /**
  * This interface represents a presence channel.
