@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v1.11.0...master)
+## [Unreleased](https://github.com/laravel/echo/compare/v1.11.1...master)
+
+
+## [v1.11.1 (2021-08-03)](https://github.com/laravel/echo/compare/v1.11.0...v1.11.1)
+
+### Changed
+- Extend presence channel by channel class ([#318](https://github.com/laravel/echo/pull/318))
 
 
 ## [v1.11.0 (2021-06-17)](https://github.com/laravel/echo/compare/v1.10.0...v1.11.0)
