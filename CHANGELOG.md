@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v1.10.0...master)
+## [Unreleased](https://github.com/laravel/echo/compare/v1.11.0...master)
+
+
+## [v1.11.0 (2021-06-17)](https://github.com/laravel/echo/compare/v1.10.0...v1.11.0)
+
+### Added
+- Add `listenToAll` and `stopListeningToAll` ([#315](https://github.com/laravel/echo/pull/315))
 
 
 ## [v1.10.0 (2020-12-19)](https://github.com/laravel/echo/compare/v1.9.0...v1.10.0)

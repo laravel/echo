@@ -1,7 +1,9 @@
+import { Channel } from './channel';
+
 /**
  * This interface represents a presence channel.
  */
-export interface PresenceChannel {
+export interface PresenceChannel extends Channel {
     /**
      * Register a callback to be called anytime the member list changes.
      */
