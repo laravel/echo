@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v1.11.1...master)
+## [Unreleased](https://github.com/laravel/echo/compare/v1.11.2...master)
+
+
+## [v1.11.2 (2021-08-31)](https://github.com/laravel/echo/compare/v1.11.1...v1.11.2)
+
+### Changed
+- Package build
 
 
 ## [v1.11.1 (2021-08-03)](https://github.com/laravel/echo/compare/v1.11.0...v1.11.1)
