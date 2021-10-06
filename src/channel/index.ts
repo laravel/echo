@@ -4,6 +4,8 @@ export * from './pusher-channel';
 export * from './pusher-private-channel';
 export * from './pusher-encrypted-private-channel';
 export * from './pusher-presence-channel';
+export * from './piesocket-channel';
+export * from './piesocket-private-channel';
 export * from './socketio-channel';
 export * from './socketio-private-channel';
 export * from './socketio-presence-channel';
