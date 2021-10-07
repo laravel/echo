@@ -2,6 +2,7 @@ import { Connector } from './connector';
 import {
     PieSocketChannel,
     PieSocketPrivateChannel,
+    PieSocketPresenceChannel,
     PresenceChannel,
 } from './../channel';
 
@@ -26,10 +27,12 @@ export class PieSocketConnector extends Connector {
         if (typeof this.options.client !== 'undefined') {
             this.piesocket = this.options.client;
         } else {
-            this.piesocket = new PieSocket({
+            const requiredOptions = {
                 clusterId: this.options.cluster,
                 apiKey: this.options.key
-            });
+            };
+            const options = {...requiredOptions, ...this.options};
+            this.piesocket = new PieSocket(options);
         }
     }
 
@@ -44,11 +47,11 @@ export class PieSocketConnector extends Connector {
      * Get a channel instance by name.
      */
     channel(name: string): PieSocketChannel {
-        if (!this.channels[name]) {
-            this.channels[name] = new PieSocketChannel(this.piesocket, name, this.options);
+        if (!this.channels['public-' + name]) {
+            this.channels['public-' + name] = new PieSocketChannel(this.piesocket, 'public-' + name, this.options);
         }
 
-        return this.channels[name];
+        return this.channels['public-' + name];
     }
 
     /**
@@ -62,12 +65,23 @@ export class PieSocketConnector extends Connector {
         return this.channels['private-' + name];
     }
 
+    presenceChannel(channel: string): PresenceChannel {
+        if (!this.channels['presence-' + channel]) {
+            this.channels['presence-' + channel] = new PieSocketPresenceChannel(
+                this.piesocket,
+                'presence-' + channel,
+                this.options
+            );
+        }
+
+        return this.channels['presence-' + channel];
+    }
 
     /**
      * Leave the given channel, as well as its private and presence variants.
      */
     leave(name: string): void {
-        let channels = [name, 'private-' + name, 'presence-' + name];
+        let channels = ['public-' + name, 'private-' + name, 'presence-' + name];
 
         channels.forEach((name: string, index: number) => {
             this.leaveChannel(name);

@@ -68,13 +68,17 @@ export class PieSocketChannel extends Channel {
         try{
             const message = JSON.parse(payload);
             const event = message.event;
-            const data = message.data;
+            let data = message.data;
+            try{
+                data = JSON.parse(data);
+            }catch(e){}
 
             if(event){
                 //Fire event callbacks
                 if(typeof this.events['*'] == "function"){
                     this.events['*'](this.getEventName(event), data);
                 }
+
 
                 if(typeof this.events[event] == "function"){
                     this.events[event](data);
@@ -103,7 +107,10 @@ export class PieSocketChannel extends Channel {
      * Listen for an event on the channel instance.
      */
     listen(event: string, callback: Function): PieSocketChannel {
-        const eventName = this.eventFormatter.format(event);
+        let eventName = event;
+        if(!eventName.startsWith("system:")){
+            eventName = this.eventFormatter.format(event);
+        }
         this.events[eventName] = callback;
 
         return this;
