@@ -7,7 +7,7 @@ export class PieSocketPrivateChannel extends PieSocketChannel {
     /**
      * Trigger client event on the channel.
      */
-     whisper(eventName: string, data: any): PieSocketChannel {
+    whisper(eventName: string, data: any): PieSocketChannel {
         this.publish(`client-${eventName}`, data);
 
         return this;

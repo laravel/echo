@@ -1,10 +1,5 @@
 import { Connector } from './connector';
-import {
-    PieSocketChannel,
-    PieSocketPrivateChannel,
-    PieSocketPresenceChannel,
-    PresenceChannel,
-} from './../channel';
+import { PieSocketChannel, PieSocketPrivateChannel, PieSocketPresenceChannel, PresenceChannel } from './../channel';
 
 /**
  * This class creates a connector to PieSocket.
@@ -29,9 +24,9 @@ export class PieSocketConnector extends Connector {
         } else {
             const requiredOptions = {
                 clusterId: this.options.cluster,
-                apiKey: this.options.key
+                apiKey: this.options.key,
             };
-            const options = {...requiredOptions, ...this.options};
+            const options = { ...requiredOptions, ...this.options };
             this.piesocket = new PieSocket(options);
         }
     }
@@ -59,7 +54,11 @@ export class PieSocketConnector extends Connector {
      */
     privateChannel(name: string): PieSocketPrivateChannel {
         if (!this.channels['private-' + name]) {
-            this.channels['private-' + name] = new PieSocketPrivateChannel(this.piesocket, 'private-' + name, this.options);
+            this.channels['private-' + name] = new PieSocketPrivateChannel(
+                this.piesocket,
+                'private-' + name,
+                this.options
+            );
         }
 
         return this.channels['private-' + name];
@@ -103,7 +102,7 @@ export class PieSocketConnector extends Connector {
      * Get the socket ID for the connection.
      */
     socketId(): string {
-        return "none";
+        return 'none';
     }
 
     /**

@@ -10,12 +10,10 @@ export class PieSocketChannel extends Channel {
      */
     piesocket: any;
 
-
     /**
      * Events to listen for
      */
     events: object;
-
 
     /**
      * The name of the channel.
@@ -50,7 +48,7 @@ export class PieSocketChannel extends Channel {
         this.events = {};
 
         this.subscribe();
-        this.on("message", this.handleMessages)
+        this.on("message", this.handleMessages);
     }
 
     /**
@@ -65,36 +63,36 @@ export class PieSocketChannel extends Channel {
      */
     handleMessages(messageEvent): void {
         const payload = messageEvent.data;
-        try{
+        try {
             const message = JSON.parse(payload);
             const event = message.event;
             let data;
-            try{
+            try {
                 data = JSON.parse(data);
-            }catch(e){
+            } catch (e) {
                 data = message.data;
             }
 
-            if(event){
+            if (event) {
                 //Fire event callbacks
-                if(typeof this.events['*'] == "function"){
+                if (typeof this.events['*'] == "function") {
                     this.events['*'](this.getEventName(event), data);
                 }
 
 
-                if(typeof this.events[event] == "function"){
+                if (typeof this.events[event] == "function") {
                     this.events[event](data);
                 }
             }
-        }catch(e){
+        } catch(e) {
             console.error(e);
         }
     }
 
     //Remove null values from payload
-    getEventName(formattedEvent){
+    getEventName(formattedEvent) {
         const parts = formattedEvent.split("\\");
-        return parts[parts.length-1];
+        return parts[parts.length - 1];
     }
 
 
@@ -110,7 +108,7 @@ export class PieSocketChannel extends Channel {
      */
     listen(event: string, callback: Function): PieSocketChannel {
         let eventName = event;
-        if(!eventName.startsWith("system:")){
+        if (!eventName.startsWith('system:')) {
             eventName = this.eventFormatter.format(event);
         }
         this.events[eventName] = callback;
@@ -133,7 +131,6 @@ export class PieSocketChannel extends Channel {
     stopListening(event: string, callback?: Function): PieSocketChannel {
         const eventName = this.eventFormatter.format(event);
         delete this.events[eventName];
-        console.log("Listen", this.events);
 
         return this;
     }
@@ -143,7 +140,6 @@ export class PieSocketChannel extends Channel {
      */
     stopListeningToAll(callback?: Function): PieSocketChannel {
         this.events = {};
-        console.log("Listen", this.events);
         return this;
     }
 
@@ -151,7 +147,7 @@ export class PieSocketChannel extends Channel {
      * Register a callback to be called anytime a subscription succeeds.
      */
     subscribed(callback: Function): PieSocketChannel {
-        this.on("open", ()=>{
+        this.on('open', ()=> {
             callback();
         });
 
@@ -172,7 +168,7 @@ export class PieSocketChannel extends Channel {
     /**
      * Register a callback to be called anytime a subscription is closed.
      */
-     closed(callback: Function): PieSocketChannel {
+    closed(callback: Function): PieSocketChannel {
         this.on('close', (status) => {
             callback(status);
         });
@@ -185,10 +181,12 @@ export class PieSocketChannel extends Channel {
      * C2C communication must be enable from PieSocket API settings
      */
     publish(eventName: string, data: any): PieSocketChannel {
-        this.subscription.send(JSON.stringify({
-            event: eventName,
-            data: data
-        }));
+        this.subscription.send(
+            JSON.stringify({
+                event: eventName,
+                data: data,
+            })
+        );
 
         return this;
     }
