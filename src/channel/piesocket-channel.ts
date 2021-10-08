@@ -79,7 +79,6 @@ export class PieSocketChannel extends Channel {
                     this.events['*'](this.getEventName(event), data);
                 }
 
-
                 if (typeof this.events[event] == 'function') {
                     this.events[event](data);
                 }
@@ -94,7 +93,6 @@ export class PieSocketChannel extends Channel {
         const parts = formattedEvent.split('\\');
         return parts[parts.length - 1];
     }
-
 
     /**
      * Unsubscribe from a PieSocket channel.
