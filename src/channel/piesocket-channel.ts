@@ -68,10 +68,12 @@ export class PieSocketChannel extends Channel {
         try{
             const message = JSON.parse(payload);
             const event = message.event;
-            let data = message.data;
+            let data;
             try{
                 data = JSON.parse(data);
-            }catch(e){}
+            }catch(e){
+                data = message.data;
+            }
 
             if(event){
                 //Fire event callbacks
