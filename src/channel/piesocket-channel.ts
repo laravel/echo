@@ -150,7 +150,6 @@ export class PieSocketChannel extends Channel {
      */
     subscribed(callback: Function): PieSocketChannel {
         this.on("open", ()=>{
-            console.log("PieSocket Channel Connected!");
             callback();
         });
 
