@@ -48,7 +48,7 @@ export class PieSocketChannel extends Channel {
         this.events = {};
 
         this.subscribe();
-        this.on("message", this.handleMessages);
+        this.on('message', this.handleMessages);
     }
 
     /**
@@ -75,23 +75,23 @@ export class PieSocketChannel extends Channel {
 
             if (event) {
                 //Fire event callbacks
-                if (typeof this.events['*'] == "function") {
+                if (typeof this.events['*'] == 'function') {
                     this.events['*'](this.getEventName(event), data);
                 }
 
 
-                if (typeof this.events[event] == "function") {
+                if (typeof this.events[event] == 'function') {
                     this.events[event](data);
                 }
             }
-        } catch(e) {
+        } catch (e) {
             console.error(e);
         }
     }
 
     //Remove null values from payload
     getEventName(formattedEvent) {
-        const parts = formattedEvent.split("\\");
+        const parts = formattedEvent.split('\\');
         return parts[parts.length - 1];
     }
 
@@ -147,7 +147,7 @@ export class PieSocketChannel extends Channel {
      * Register a callback to be called anytime a subscription succeeds.
      */
     subscribed(callback: Function): PieSocketChannel {
-        this.on('open', ()=> {
+        this.on('open', () => {
             callback();
         });
 

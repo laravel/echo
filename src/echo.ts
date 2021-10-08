@@ -40,7 +40,7 @@ export default class Echo {
     connect(): void {
         if (this.options.broadcaster == 'piesocket') {
             this.connector = new PieSocketConnector(this.options);
-        }else if (this.options.broadcaster == 'pusher') {
+        } else if (this.options.broadcaster == 'pusher') {
             this.connector = new PusherConnector(this.options);
         } else if (this.options.broadcaster == 'socket.io') {
             this.connector = new SocketIoConnector(this.options);

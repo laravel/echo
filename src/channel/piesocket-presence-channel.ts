@@ -20,7 +20,7 @@ export class PieSocketPresenceChannel extends PieSocketChannel implements Presen
                 Object.keys(data.members).map((k) => {
                     try {
                         return JSON.parse(data.members[k]);
-                    } catch(e) {
+                    } catch (e) {
                         //Handle json exception i.e. strings
                         return data.members[k];
                     }
@@ -38,7 +38,7 @@ export class PieSocketPresenceChannel extends PieSocketChannel implements Presen
         this.listen('system:member_joined', (data) => {
             try {
                 callback(JSON.parse(data.member));
-            } catch(e) {
+            } catch (e) {
                 //Handle json exception i.e. strings
                 callback(data.member);
             }
@@ -54,7 +54,7 @@ export class PieSocketPresenceChannel extends PieSocketChannel implements Presen
         this.listen('system:member_left', (data) => {
             try {
                 callback(JSON.parse(data.member));
-            } catch(e) {
+            } catch (e) {
                 //Handle json exception i.e. strings
                 callback(data.member);
             }
