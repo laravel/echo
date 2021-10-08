@@ -5,7 +5,6 @@ import { PresenceChannel } from './presence-channel';
  * This class represents a PieSocket presence channel.
  */
 export class PieSocketPresenceChannel extends PieSocketChannel implements PresenceChannel {
-
     /**
      * Members present in the channel
      */
