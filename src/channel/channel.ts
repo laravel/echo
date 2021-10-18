@@ -20,7 +20,7 @@ export abstract class Channel {
 
         // Now the chunked variation. Allows arbitrarily long messages.
         let events = {};
-        return this.listen(`${chunkPrefix}-${event}`, data => {
+        return this.listen(`${chunkPrefix}-${event}`, (data) => {
             if (!Object.prototype.hasOwnProperty.call(events, data.id)) {
                 events[data.id] = { chunks: [], receivedFinal: false };
             }
@@ -28,7 +28,7 @@ export abstract class Channel {
             ev.chunks[data.index] = data.chunk;
             if (data.final) ev.receivedFinal = true;
             if (ev.receivedFinal && ev.chunks.length === Object.keys(ev.chunks).length) {
-                callback(JSON.parse(ev.chunks.join("")));
+                callback(JSON.parse(ev.chunks.join('')));
                 delete events[data.id];
             }
         });
