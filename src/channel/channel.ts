@@ -13,10 +13,30 @@ export abstract class Channel {
     abstract listen(event: string, callback: Function): Channel;
 
     /**
-     * Listen for a whisper event on the channel instance.
+     * Listen for an event on the channel instance.
      */
-    listenForWhisper(event: string, callback: Function): Channel {
-        return this.listen('.client-' + event, callback);
+    abstract listen(event: string, callback: Function): Channel;
+
+    /**
+     * Listen for an chunked event on the channel instance.
+     */
+    listenChunked(event: string, callback: Function): Channel {
+        this.listen(event, callback); // Allow normal un-chunked events.
+
+        // Now the chunked variation. Allows arbitrarily long messages.
+        let events = {};
+        return this.listen(`chunked-${event}`, data => {
+            if (!Object.prototype.hasOwnProperty.call(events, data.id)) {
+                events[data.id] = { chunks: [], receivedFinal: false };
+            }
+            let ev = events[data.id];
+            ev.chunks[data.index] = data.chunk;
+            if (data.final) ev.receivedFinal = true;
+            if (ev.receivedFinal && ev.chunks.length === Object.keys(ev.chunks).length) {
+                callback(JSON.parse(ev.chunks.join("")));
+                delete events[data.id];
+            }
+        });
     }
 
     /**
