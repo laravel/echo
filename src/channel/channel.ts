@@ -13,11 +13,6 @@ export abstract class Channel {
     abstract listen(event: string, callback: Function): Channel;
 
     /**
-     * Listen for an event on the channel instance.
-     */
-    abstract listen(event: string, callback: Function): Channel;
-
-    /**
      * Listen for an chunked event on the channel instance.
      */
     listenChunked(event: string, callback: Function, chunkPrefix = 'chunked'): Channel {
@@ -37,6 +32,13 @@ export abstract class Channel {
                 delete events[data.id];
             }
         });
+    }
+
+    /**
+     * Listen for a whisper event on the channel instance.
+     */
+    listenForWhisper(event: string, callback: Function): Channel {
+        return this.listen('.client-' + event, callback);
     }
 
     /**
