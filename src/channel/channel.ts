@@ -20,12 +20,12 @@ export abstract class Channel {
     /**
      * Listen for an chunked event on the channel instance.
      */
-    listenChunked(event: string, callback: Function): Channel {
+    listenChunked(event: string, callback: Function, chunkPrefix = 'chunked'): Channel {
         this.listen(event, callback); // Allow normal un-chunked events.
 
         // Now the chunked variation. Allows arbitrarily long messages.
         let events = {};
-        return this.listen(`chunked-${event}`, data => {
+        return this.listen(`${chunkPrefix}-${event}`, data => {
             if (!Object.prototype.hasOwnProperty.call(events, data.id)) {
                 events[data.id] = { chunks: [], receivedFinal: false };
             }
