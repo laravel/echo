@@ -45,7 +45,7 @@ export abstract class Connector {
     /**
      * Extract the CSRF token from the page.
      */
-    protected csrfToken(): string {
+    protected csrfToken(): null | string {
         let selector;
 
         if (typeof window !== 'undefined' && window['Laravel'] && window['Laravel'].csrfToken) {
