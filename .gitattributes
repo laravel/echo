@@ -9,3 +9,4 @@
 .npmignore export-ignore
 .styleci.yml export-ignore
 CHANGELOG.md export-ignore
+RELEASE.md export-ignore
