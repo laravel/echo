@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v1.11.2...master)
+## [Unreleased](https://github.com/laravel/echo/compare/v1.11.3...master)
+
+
+## [v1.11.3 (2021-10-26)](https://github.com/laravel/echo/compare/v1.11.2...v1.11.3)
+
+### Fixed
+- Fix types in connector.ts ([#327](https://github.com/laravel/echo/pull/327))
 
 
 ## [v1.11.2 (2021-08-31)](https://github.com/laravel/echo/compare/v1.11.1...v1.11.2)
