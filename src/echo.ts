@@ -164,6 +164,6 @@ export default class Echo {
 }
 
 /**
- * Also export channel classes for TypeScript.
+ * Export channel classes for TypeScript.
  */
 export { Channel, PresenceChannel };
