@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v1.11.4...master)
+## [Unreleased](https://github.com/laravel/echo/compare/v1.11.5...master)
+
+## [v1.11.5](https://github.com/laravel/echo/compare/v1.11.4...v1.11.5) - 2022-04-12
+
+### Changed
+
+- Add Channel, PresenceChannel class to typescript definition exports by @steve3d in https://github.com/laravel/echo/pull/333
 
 ## [v1.11.4](https://github.com/laravel/echo/compare/v1.11.3...v1.11.4) - 2022-03-15
 
