@@ -4,8 +4,6 @@ import * as AblyImport from 'ably';
 import { PresenceChannel } from '../channel';
 import { AblyPresenceChannel } from '../channel/ably-presence-channel';
 
-declare let Ably: typeof AblyImport;
-
 /**
  * This class creates a connector to Ably.
  */
