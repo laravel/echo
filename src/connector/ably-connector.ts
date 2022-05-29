@@ -29,17 +29,7 @@ export class AblyConnector extends Connector {
         }
     }
 
-    /**
-     * Listen for an event on a channel instance.
-     */
-    listen(name: string, event: string, callback: Function): AblyChannel {
-        return this.channel(name).listen(event, callback);
-    }
-
-    /**
-     * Get a channel instance by name.
-     */
-    channel(name: string): AblyChannel {
+    _channel(name: string): AblyChannel {
         if (!this.channels[name]) {
             this.channels[name] = new AblyChannel(this.ably, name, this.options);
         }
@@ -48,15 +38,31 @@ export class AblyConnector extends Connector {
     }
 
     /**
+     * Listen for an event on a channel instance.
+     */
+    listen(name: string, event: string, callback: Function): AblyChannel {
+        return this._channel(name).listen(event, callback);
+    }
+
+    /**
+     * Get a channel instance by name.
+     */
+    channel(name: string): AblyChannel {
+        return this._channel(`public:${name}`);
+    }
+
+    /**
      * Get a private channel instance by name.
      */
     privateChannel(name: string): AblyChannel {
-        // if (!this.channels['private-' + name]) {
-        //     this.channels['private-' + name] = new AblyPrivateChannel(this.ably, 'private-' + name, this.options);
-        // }
-        //
-        // return this.channels['private-' + name];
-        return this.channel(name);
+        return this._channel(`private:${name}`);
+    }
+
+    /**
+    * Get a presence channel instance by name.
+    */
+    presenceChannel(name: string): PresenceChannel {
+        return this._channel(`presence:${name}`) as AblyPresenceChannel;
     }
 
     /**
@@ -76,25 +82,10 @@ export class AblyConnector extends Connector {
     }
 
     /**
-     * Get a presence channel instance by name.
-     */
-    presenceChannel(name: string): PresenceChannel {
-        if (!this.channels['presence-' + name]) {
-            this.channels['presence-' + name] = new AblyPresenceChannel(
-                this.ably,
-                'presence-' + name,
-                this.options
-            );
-        }
-
-        return this.channels['presence-' + name] as AblyPresenceChannel;
-    }
-
-    /**
      * Leave the given channel, as well as its private and presence variants.
      */
     leave(name: string): void {
-        let channels = [name, 'private-' + name, 'presence-' + name];
+        let channels = [name, 'private:' + name, 'presence:' + name];
 
         channels.forEach((name: string, index: number) => {
             this.leaveChannel(name);
