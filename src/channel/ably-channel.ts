@@ -61,7 +61,7 @@ export class AblyChannel extends Channel {
      */
     subscribe(): any {
         this.channel = this.ably.channels.get(this.name);
-        this.channel.on(({current, reason}) => {
+        this.channel.on(({ current, reason }) => {
             if (current == 'attached') {
                 this.subscribedListeners.forEach(listener => listener());
             } else if (reason) {
@@ -92,7 +92,7 @@ export class AblyChannel extends Channel {
      * Listen for all events on the channel instance.
      */
     listenToAll(callback: Function): AblyChannel {
-        this.channel.subscribe(({name, data}) => {
+        this.channel.subscribe(({ name, data }) => {
             let namespace = this.options.namespace.replace(/\./g, '\\');
 
             let formattedEvent = name.startsWith(namespace) ? name.substring(namespace.length + 1) : '.' + event;
@@ -142,8 +142,8 @@ export class AblyChannel extends Channel {
      * Register a callback to be called anytime a subscription error occurs.
      */
     error(callback: Function): AblyChannel {
-      this.errorListeners.push(callback);
+        this.errorListeners.push(callback);
 
-      return this;
+        return this;
     }
 }
