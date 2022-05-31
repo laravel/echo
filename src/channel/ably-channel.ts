@@ -53,7 +53,7 @@ export class AblyChannel extends Channel {
         this.eventFormatter = new EventFormatter(this.options.namespace);
         this.subscribedListeners = [];
         this.errorListeners = [];
-        
+
         this.subscribe();
     }
 
@@ -66,7 +66,7 @@ export class AblyChannel extends Channel {
             if (current == 'attached') {
                 this.subscribedListeners.forEach(listener => listener());
             } else if (reason) {
-                this.errorListeners.forEach(listener => listener(reason));
+                this._publishErrors(reason);
             }
         });
         this.channel.attach();
@@ -146,5 +146,9 @@ export class AblyChannel extends Channel {
         this.errorListeners.push(callback);
 
         return this;
+    }
+
+    _publishErrors = (err) => {
+        this.errorListeners.forEach(listener => listener(err));
     }
 }
