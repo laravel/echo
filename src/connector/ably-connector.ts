@@ -42,7 +42,7 @@ export class AblyConnector extends Connector {
     channel(name: string): AblyChannel {
         const prefixedName = `public:${name}`; // adding public as a ably namespace prefix
         if (!this.channels[prefixedName]) {
-            this.channels[prefixedName] = new AblyChannel(this.ably, name, this.options);
+            this.channels[prefixedName] = new AblyChannel(this.ably, prefixedName, this.options);
         }
 
         return this.channels[prefixedName];
@@ -54,7 +54,7 @@ export class AblyConnector extends Connector {
     privateChannel(name: string): AblyPrivateChannel {
         const prefixedName = `private:${name}`; // adding private as a ably namespace prefix
         if (!this.channels[prefixedName]) {
-            this.channels[prefixedName] = new AblyPrivateChannel(this.ably, name, this.options);
+            this.channels[prefixedName] = new AblyPrivateChannel(this.ably, prefixedName, this.options);
         }
 
         return this.channels[prefixedName] as AblyPrivateChannel;
@@ -66,7 +66,7 @@ export class AblyConnector extends Connector {
     presenceChannel(name: string): AblyPresenceChannel {
         const prefixedName = `presence:${name}`; // adding presence as a ably namespace prefix
         if (!this.channels[prefixedName]) {
-            this.channels[prefixedName] = new AblyPresenceChannel(this.ably, name, this.options);
+            this.channels[prefixedName] = new AblyPresenceChannel(this.ably, prefixedName, this.options);
         }
 
         return this.channels[prefixedName] as AblyPresenceChannel;
