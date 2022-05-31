@@ -52,7 +52,8 @@ export class AblyChannel extends Channel {
         this.options = options;
         this.eventFormatter = new EventFormatter(this.options.namespace);
         this.subscribedListeners = [];
-
+        this.errorListeners = [];
+        
         this.subscribe();
     }
 
