@@ -5,6 +5,8 @@ import {
     AblyChannel,
     AblyPrivateChannel,
     AblyPresenceChannel,
+    authOptions,
+    applyAuthorizeBeforeChannelAttach
 } from './../channel';
 /**
  * This class creates a connector to Ably.
@@ -27,7 +29,8 @@ export class AblyConnector extends Connector {
         if (typeof this.options.client !== 'undefined') {
             this.ably = this.options.client;
         } else {
-            this.ably = new Ably.Realtime(this.options);
+            this.ably = new Ably.Realtime({...this.options, ...authOptions});
+            applyAuthorizeBeforeChannelAttach(this.ably);
         }
     }
 
