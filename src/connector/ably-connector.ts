@@ -1,9 +1,11 @@
 import { Connector } from './connector';
-import { AblyChannel } from '../channel/ably-channel';
-import { AblyPrivateChannel } from '../channel/ably-private-channel';
-import * as AblyImport from 'ably';
-import { AblyPresenceChannel } from '../channel/ably-presence-channel';
+import * as Ably from 'ably';
 
+import {
+    AblyChannel,
+    AblyPrivateChannel,
+    AblyPresenceChannel,
+} from './../channel';
 /**
  * This class creates a connector to Ably.
  */
@@ -11,7 +13,7 @@ export class AblyConnector extends Connector {
     /**
      * The Ably instance.
      */
-    ably: AblyImport.Types.RealtimeCallbacks;
+    ably: Ably.Types.RealtimeCallbacks;
 
     /**
      * All of the subscribed channel names.
