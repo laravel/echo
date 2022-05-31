@@ -44,6 +44,7 @@ export class AblyPresenceChannel extends AblyChannel implements PresenceChannel 
         return this;
     }
 
+    // TODO - Need to check for whisper implementation for presence channels
     /**
      * Trigger client event on the channel.
      */
