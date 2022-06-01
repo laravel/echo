@@ -5,9 +5,9 @@ import {
     AblyChannel,
     AblyPrivateChannel,
     AblyPresenceChannel,
-    authOptions,
-    applyAuthorizeBeforeChannelAttach
+    AblyAuth,
 } from './../channel';
+import { SequentialAuthTokenRequestExecuter } from '../channel/ably/token-request';
 /**
  * This class creates a connector to Ably.
  */
@@ -23,14 +23,26 @@ export class AblyConnector extends Connector {
     channels: Record<string, AblyChannel> = {};
 
     /**
+     * Auth instance containing all explicit channel authz ops.
+     */
+    ablyAuth: AblyAuth;
+
+    /**
+     * Create a new class instance.
+     */
+    constructor(options: any) {
+        super(options);
+    }
+    /**
      * Create a fresh Ably connection.
      */
     connect(): void {
         if (typeof this.options.client !== 'undefined') {
             this.ably = this.options.client;
         } else {
-            this.ably = new Ably.Realtime({...this.options, ...authOptions});
-            applyAuthorizeBeforeChannelAttach(this.ably);
+            this.ablyAuth = new AblyAuth(this.options);
+            this.ably = new Ably.Realtime({ ...this.ablyAuth.authOptions, ...this.options });
+            this.ablyAuth.enableAuthorizeBeforeChannelAttach(this.ably);
         }
     }
 
@@ -59,7 +71,7 @@ export class AblyConnector extends Connector {
     privateChannel(name: string): AblyPrivateChannel {
         const prefixedName = `private:${name}`; // adding private as a ably namespace prefix
         if (!this.channels[prefixedName]) {
-            this.channels[prefixedName] = new AblyPrivateChannel(this.ably, prefixedName, this.options);
+            this.channels[prefixedName] = new AblyPrivateChannel(this.ably, prefixedName, this.options, this.ablyAuth);
         }
 
         return this.channels[prefixedName] as AblyPrivateChannel;
@@ -71,7 +83,7 @@ export class AblyConnector extends Connector {
     presenceChannel(name: string): AblyPresenceChannel {
         const prefixedName = `presence:${name}`; // adding presence as a ably namespace prefix
         if (!this.channels[prefixedName]) {
-            this.channels[prefixedName] = new AblyPresenceChannel(this.ably, prefixedName, this.options);
+            this.channels[prefixedName] = new AblyPresenceChannel(this.ably, prefixedName, this.options, this.ablyAuth);
         }
 
         return this.channels[prefixedName] as AblyPresenceChannel;
