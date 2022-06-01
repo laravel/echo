@@ -9,12 +9,12 @@ export const parseJwt = (jwtToken: string) => {
     // Get Token Header
     const base64HeaderUrl = jwtToken.split('.')[0];
     const base64Header = base64HeaderUrl.replace('-', '+').replace('_', '/');
-    const headerData = JSON.parse(asciiToBase64(base64Header));
+    const headerData = JSON.parse(toText(base64Header));
 
     // Get Token payload and date's
     const base64Url = jwtToken.split('.')[1];
     const base64 = base64Url.replace('-', '+').replace('_', '/');
-    const dataJWT = JSON.parse(asciiToBase64(base64));
+    const dataJWT = JSON.parse(toText(base64));
     dataJWT.header = headerData;
 
     return dataJWT;
@@ -31,15 +31,18 @@ export const toTokenDetails = (jwtToken: string) => {
     }
 }
 
-let base64toAscii = (text: string) => {
+const isBrowser = typeof window === 'object';
+
+let toBase64 = (text: string) => {
+    if (isBrowser) {
+        return btoa(text);
+    }
     return Buffer.from(text, 'binary').toString('base64');
 };
 
-let asciiToBase64 = (base64: string) => {
+let toText = (base64: string) => {
+    if (isBrowser) {
+        return atob(base64);
+    }
     return Buffer.from(base64, 'base64').toString('binary');
 };
-
-if (window) {
-    base64toAscii = btoa;
-    asciiToBase64 = atob;
-}
