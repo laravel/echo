@@ -7,7 +7,7 @@ import {
     AblyPresenceChannel,
     AblyAuth,
 } from './../channel';
-import { SequentialAuthTokenRequestExecuter } from '../channel/ably/token-request';
+
 /**
  * This class creates a connector to Ably.
  */

@@ -59,7 +59,7 @@ export class AblyAuth {
                         errorCallback(null);
                     }
                 });
-            })
+            }).catch(err => errorCallback(err)); // TODO : Check if errors/exceptions are properly handled
         });
     }
 
@@ -79,7 +79,7 @@ export class AblyAuth {
                     ablyChannel.channel.attach();
                 }
             });
-        });
+        }).catch(err => ablyChannel._publishErrors(err));
     }
 }
 

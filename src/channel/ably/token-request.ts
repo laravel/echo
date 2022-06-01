@@ -9,7 +9,7 @@ export class SequentialAuthTokenRequestExecuter {
         this.queue = new TaskQueue();
     }
 
-    execute = (tokenRequestFn) => new Promise(async (resolve, reject) => {
+    execute = (tokenRequestFn): Promise<string> => new Promise(async (resolve, reject) => {
         await this.queue.run(async () => {
             try {
                 const token = await tokenRequestFn(this.cachedToken);
@@ -21,7 +21,7 @@ export class SequentialAuthTokenRequestExecuter {
         })
     })
 
-    request = channelName => this.execute(token => this.requestTokenFn(channelName, token));
+    request = (channelName):Promise<string> => this.execute(token => this.requestTokenFn(channelName, token));
 }
 
 class TaskQueue {
