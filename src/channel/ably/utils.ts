@@ -1,5 +1,5 @@
 export const isNullOrUndefined = (obj) => obj == null || obj === undefined;
-export let isEmptyString = (stringToCheck, ignoreSpaces = true) => (ignoreSpaces ? stringToCheck.trim() : stringToCheck) === '';
+export const isEmptyString = (stringToCheck, ignoreSpaces = true) => (ignoreSpaces ? stringToCheck.trim() : stringToCheck) === '';
 export const isNullOrUndefinedOrEmpty = (obj) => obj == null || obj === undefined || isEmptyString(obj);
 
 /**
@@ -33,14 +33,14 @@ export const toTokenDetails = (jwtToken: string) => {
 
 const isBrowser = typeof window === 'object';
 
-let toBase64 = (text: string) => {
+const toBase64 = (text: string) => {
     if (isBrowser) {
         return btoa(text);
     }
     return Buffer.from(text, 'binary').toString('base64');
 };
 
-let toText = (base64: string) => {
+const toText = (base64: string) => {
     if (isBrowser) {
         return atob(base64);
     }
