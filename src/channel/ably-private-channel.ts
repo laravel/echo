@@ -1,10 +1,11 @@
 import { AblyChannel } from './ably-channel';
-import { onChannelFailed } from './ably';
+import { AblyAuth } from './ably/auth';
+
 export class AblyPrivateChannel extends AblyChannel {
 
-    constructor(ably: any, name: string, options: any) {
+    constructor(ably: any, name: string, options: any, auth: AblyAuth) {
         super(ably, name, options);
-        this.channel.on("failed", onChannelFailed(this));
+        this.channel.on("failed", auth.onChannelFailed(this));
     }
     /**
      * Trigger client event on the channel.

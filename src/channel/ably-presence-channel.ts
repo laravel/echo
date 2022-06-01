@@ -1,15 +1,15 @@
 import { AblyChannel } from './ably-channel';
+import { AblyAuth } from './ably/auth';
 import { PresenceChannel } from './presence-channel';
-import { onChannelFailed } from './ably';
 
 /**
  * This class represents an Ably presence channel.
  */
 export class AblyPresenceChannel extends AblyChannel implements PresenceChannel {
 
-  constructor(ably: any, name: string, options: any) {
+  constructor(ably: any, name: string, options: any, auth: AblyAuth) {
     super(ably, name, options);
-    this.channel.on("failed", onChannelFailed(this));
+    this.channel.on("failed", auth.onChannelFailed(this));
   }
   /**
    * Register a callback to be called anytime the member list changes.
