@@ -1,11 +1,11 @@
-import { getSignedToken } from './mock-auth-server';
-
 export class SequentialAuthTokenRequestExecuter {
-    cachedToken = null;
+    cachedToken: string;
     queue: TaskQueue;
+    requestTokenFn: Function;
 
-    constructor(token : string = null) {
+    constructor(token: string = null, requestTokenFn: Function) {
         this.cachedToken = token;
+        this.requestTokenFn = requestTokenFn;
         this.queue = new TaskQueue();
     }
 
@@ -21,7 +21,7 @@ export class SequentialAuthTokenRequestExecuter {
         })
     })
 
-    request = channelName => this.execute(token => getSignedToken(channelName, token));
+    request = channelName => this.execute(token => this.requestTokenFn(channelName, token));
 }
 
 class TaskQueue {
