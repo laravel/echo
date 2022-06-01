@@ -1,4 +1,4 @@
-import { isNullOrUndefinedOrEmpty, parseJwt } from '../../src/channel/ably/utils';
+import { isNullOrUndefinedOrEmpty, parseJwt } from '../../../src/channel/ably/utils';
 import * as Ably from "ably/promises";
 import * as jwt from "jsonwebtoken";
 

@@ -1,13 +1,14 @@
-const http = require('http');
-const https = require('https');
-const fs = require('fs');
+import path from "path";
+import http from 'http';
+import https from 'https';
+import fs from 'fs';
 
 let restHost = 'sandbox-rest.ably.io';
 const tlsPort = 443;
 const toBase64 = (text: string) => Buffer.from(text, 'binary').toString('base64');
 
 const loadJsonData = (dataPath, callback) => {
-    fs.readFile(dataPath, (err, data: Buffer) => {
+    fs.readFile(path.join(__dirname, dataPath), (err, data: Buffer) => {
         if (err) {
             callback(err);
             return;
@@ -95,18 +96,36 @@ const creatNewApp = (callback) => {
 
 const deleteApp = (app, callback) => {
     var authKey = app.keys[0].keyStr,
-      authHeader = toBase64(authKey);
+        authHeader = toBase64(authKey);
 
     var delOptions = {
-      host: restHost,
-      port: tlsPort,
-      method: 'DELETE',
-      path: '/apps/' + app.appId,
-      scheme: 'https',
-      headers: { Authorization: 'Basic ' + authHeader },
+        host: restHost,
+        port: tlsPort,
+        method: 'DELETE',
+        path: '/apps/' + app.appId,
+        scheme: 'https',
+        headers: { Authorization: 'Basic ' + authHeader },
     };
 
     httpReq(delOptions, function (err) {
-      callback(err);
+        callback(err);
     });
 }
+
+// creatNewApp((err, testApp) => {
+//     if (err) {
+//         console.error('error creating the app');
+//     } else {
+//         console.log('created app')
+//         console.log(testApp);
+//         deleteApp(testApp, (err) => {
+//             if (err) {
+//                 console.error(err)
+//             } else {
+//                 console.log('deleted test app successfully')
+//             }
+//         })
+//     }
+// });
+
+export { creatNewApp as setup, deleteApp as tearDown }
