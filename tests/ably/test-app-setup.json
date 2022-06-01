@@ -1,0 +1,48 @@
+{
+    "_post_apps": "/* JSON body using in POST sandbox-rest.ably.io/apps request to set up the Test app */",
+    "post_apps": {
+      "limits": { "presence": { "maxMembers": 250 } },
+      "keys": [
+        {},
+        {
+          "capability": "{ \"cansubscribe:*\":[\"subscribe\"], \"canpublish:*\":[\"publish\"], \"canpublish:andpresence\":[\"presence\",\"publish\"], \"pushenabled:*\":[\"publish\",\"subscribe\",\"push-subscribe\"], \"pushenabled:admin:*\":[\"publish\",\"subscribe\",\"push-admin\"] }"
+        },
+        {
+          "capability": "{ \"channel0\":[\"publish\"], \"channel1\":[\"publish\"], \"channel2\":[\"publish\", \"subscribe\"], \"channel3\":[\"subscribe\"], \"channel4\":[\"presence\", \"publish\", \"subscribe\"], \"channel5\":[\"presence\"], \"channel6\":[\"*\"] }"
+        },
+        {
+          "capability": "{ \"*\":[\"subscribe\"] }"
+        }
+      ],
+      "namespaces": [
+        { "id": "persisted", "persisted": true },
+        { "id": "pushenabled", "pushEnabled": true }
+      ],
+      "channels": [
+        {
+          "name": "persisted:presence_fixtures",
+          "presence": [
+            { "clientId": "client_bool",    "data": "true" },
+            { "clientId": "client_int",     "data": "24" },
+            { "clientId": "client_string",  "data": "This is a string clientData payload" },
+            { "clientId": "client_json",    "data": "{ \"test\": \"This is a JSONObject clientData payload\"}" },
+            { "clientId": "client_decoded", "data": "{\"example\":{\"json\":\"Object\"}}", "encoding": "json" },
+            {
+              "clientId": "client_encoded",
+              "data": "HO4cYSP8LybPYBPZPHQOtuD53yrD3YV3NBoTEYBh4U0N1QXHbtkfsDfTspKeLQFt",
+              "encoding": "json/utf-8/cipher+aes-128-cbc/base64"
+            }
+          ]
+        }
+      ]
+    },
+  
+    "_cipher": "/* Cipher configuration for client_encoded presence fixture data used in REST tests */",
+    "cipher": {
+      "algorithm": "aes",
+      "mode": "cbc",
+      "keylength": 128,
+      "key": "WUP6u0K7MXI5Zeo0VppPwg==",
+      "iv": "HO4cYSP8LybPYBPZPHQOtg=="
+    }
+  }
