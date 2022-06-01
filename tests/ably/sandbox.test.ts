@@ -1,7 +1,7 @@
 import { setup, tearDown } from './setup/sandbox';
 import * as Ably from 'ably';
 
-jest.setTimeout(300000);
+jest.setTimeout(20000);
 describe('AblySandbox', () => {
     let testApp;
 
@@ -31,6 +31,7 @@ describe('AblySandbox', () => {
                 return;
             }
             expect(typeof time).toBe('number');
+            done()
         });
     })
 
