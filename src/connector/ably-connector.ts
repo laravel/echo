@@ -28,12 +28,6 @@ export class AblyConnector extends Connector {
     ablyAuth: AblyAuth;
 
     /**
-     * Create a new class instance.
-     */
-    constructor(options: any) {
-        super(options);
-    }
-    /**
      * Create a fresh Ably connection.
      */
     connect(): void {
