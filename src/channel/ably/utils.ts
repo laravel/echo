@@ -7,12 +7,12 @@ export const parseJwt = (token) => {
         // Get Token Header
         const base64HeaderUrl = token.split('.')[0];
         const base64Header = base64HeaderUrl.replace('-', '+').replace('_', '/');
-        const headerData = JSON.parse(atob(base64Header));
+        const headerData = JSON.parse(asciiToBase64(base64Header));
 
         // Get Token payload and date's
         const base64Url = token.split('.')[1];
         const base64 = base64Url.replace('-', '+').replace('_', '/');
-        const dataJWT = JSON.parse(atob(base64));
+        const dataJWT = JSON.parse(asciiToBase64(base64));
         dataJWT.header = headerData;
 
         // TODO: add expiration at check ...
@@ -34,10 +34,15 @@ export const toTokenDetails = (jwtTokenString) => {
     }
 }
 
-const btoa = (text) => {
+let base64toAscii = (text: string) => {
     return Buffer.from(text, 'binary').toString('base64');
 };
 
-const atob = (base64) => {
+let asciiToBase64 = (base64: string) => {
     return Buffer.from(base64, 'base64').toString('binary');
 };
+
+if (window) {
+    base64toAscii = btoa;
+    asciiToBase64 = atob;
+}
