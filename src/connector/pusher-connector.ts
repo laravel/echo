@@ -114,6 +114,13 @@ export class PusherConnector extends Connector {
     }
 
     /**
+     * Sign in the user.
+     */
+    signin(): void {
+        this.pusher.signin();
+    }
+
+    /**
      * Get the socket ID for the connection.
      */
     socketId(): string {
