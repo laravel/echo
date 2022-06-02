@@ -43,7 +43,7 @@ export class AblyAuth {
             // Use cached token if has channel capability and is not expired
             const token = ablyClient.auth.tokenDetails;
             if (token) {
-                const tokenHasChannelCapability = token.capability.includes(channelName);
+                const tokenHasChannelCapability = token.capability.includes(`${channelName}"`);
                 if (tokenHasChannelCapability && token.expires >= Date.now()) { // TODO : Replace with server time
                     errorCallback(null);
                     return;
