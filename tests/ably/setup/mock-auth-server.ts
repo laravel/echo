@@ -28,7 +28,7 @@ export class MockAuthServer {
             "kid": this.keyName
         }
         // Set capabilities for public channel as per https://ably.com/docs/core-features/authentication#capability-operations
-        let channelClaims = new Set(['"public:*":["subscribe", "history", "channel-metadata"]']);
+        let capabilities = {"public:*":["subscribe", "history", "channel-metadata"]};
         let iat = 0;
         let exp = 0;
         let serverTime = await this.ablyClient.time();
@@ -36,20 +36,19 @@ export class MockAuthServer {
             const parsedJwt = parseJwt(token);
             iat = parsedJwt.iat;
             exp = parsedJwt.exp;
-            channelClaims = new Set(parsedJwt['x-ably-capability'].slice(1, -1).split(','));
+            capabilities = parsedJwt['x-ably-capability'];
         } else {
             iat = Math.round(serverTime / 1000);
             exp = iat + 60; /* time of expiration in seconds */
         }
         if (!isNullOrUndefinedOrEmpty(channelName)) {
-            channelClaims.add(`"${channelName}":["*"]`)
+            capabilities[channelName] = ["*"]
         }
-        const capabilities = Array.from(channelClaims).join(',');
         const claims = {
             iat,
             exp,
             "x-ably-clientId": this.clientId,
-            "x-ably-capability": `{${capabilities}}`
+            "x-ably-capability": capabilities
         }
         return jwt.sign(claims, this.keySecret, { header });
     }
