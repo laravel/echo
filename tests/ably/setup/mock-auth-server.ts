@@ -12,13 +12,13 @@ export class MockAuthServer {
         const keys = apiKey.split(':');
         this.keyName = keys[0];
         this.keySecret = keys[1];
-        this.ablyClient = new Ably.Rest(apiKey); 
+        this.ablyClient = new Ably.Rest(apiKey);
     }
 
     tokenInvalidOrExpired = (serverTime, token) => {
         const tokenInvalid = false;
-        const parsedJwt = parseJwt(token);
-        return tokenInvalid || parsedJwt.exp * 1000 <= serverTime;
+        const { payload } = parseJwt(token, true);
+        return tokenInvalid || payload.exp * 1000 <= serverTime;
     };
 
     getSignedToken = async (channelName = null, token = null) => {
@@ -28,15 +28,15 @@ export class MockAuthServer {
             "kid": this.keyName
         }
         // Set capabilities for public channel as per https://ably.com/docs/core-features/authentication#capability-operations
-        let capabilities = {"public:*":["subscribe", "history", "channel-metadata"]};
+        let capabilities = { "public:*": ["subscribe", "history", "channel-metadata"] };
         let iat = 0;
         let exp = 0;
         let serverTime = await this.ablyClient.time();
         if (!isNullOrUndefinedOrEmpty(token) && !this.tokenInvalidOrExpired(serverTime, token)) {
-            const parsedJwt = parseJwt(token);
-            iat = parsedJwt.iat;
-            exp = parsedJwt.exp;
-            capabilities = parsedJwt['x-ably-capability'];
+            const { payload } = parseJwt(token, true);
+            iat = payload.iat;
+            exp = payload.exp;
+            capabilities = payload['x-ably-capability'];
         } else {
             iat = Math.round(serverTime / 1000);
             exp = iat + 60; /* time of expiration in seconds */
