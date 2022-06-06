@@ -3,7 +3,7 @@ import Echo from '../../src/echo';
 import { MockAuthServer } from './setup/mock-auth-server';
 
 jest.setTimeout(20000);
-describe('AblyConnection', () => {
+describe.skip('AblyConnection', () => {
     let testApp;
     let mockAuthServer;
 
