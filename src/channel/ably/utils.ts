@@ -5,30 +5,39 @@ export const isNullOrUndefinedOrEmpty = (obj) => obj == null || obj === undefine
 /**
  * @throws Exception if parsing error
  */
-export const parseJwt = (jwtToken: string) => {
+export const parseJwt = (jwtToken: string, forceParseJson = false): { header: any, payload: any} => {
     // Get Token Header
     const base64HeaderUrl = jwtToken.split('.')[0];
     const base64Header = base64HeaderUrl.replace('-', '+').replace('_', '/');
-    const headerData = JSON.parse(toText(base64Header));
-
-    // Get Token payload and date's
+    let header = toText(base64Header);
+    if (forceParseJson) {
+        header = JSON.parse(header);
+    }
+    // Get Token payload
     const base64Url = jwtToken.split('.')[1];
     const base64 = base64Url.replace('-', '+').replace('_', '/');
-    const dataJWT = JSON.parse(toText(base64));
-    dataJWT.header = headerData;
-
-    return dataJWT;
+    let payload = toText(base64);
+    if (forceParseJson) {
+        payload = JSON.parse(payload);
+    }
+    return {header, payload};
 }
 
 export const toTokenDetails = (jwtToken: string) => {
-    const parsedJwt = parseJwt(jwtToken);
+    const {payload} = parseJwt(jwtToken);
+    const parsedJwt = JSON.parse(payload, (key, value)=> {
+        if (key === 'x-ably-capability') { // exclude capability since tokenDetails becomes bloated
+            return undefined;
+        }
+        return value;
+    });
     return {
-        capability: parsedJwt['x-ably-capability'],
+        // capability: parsedJwt['x-ably-capability'], // RSA4f - tokenDetails size should't exceed 128kb
         clientId: parsedJwt['x-ably-clientId'],
         expires: parsedJwt.exp * 1000, // Convert Seconds to ms
         issued: parsedJwt.iat * 1000,
         token: jwtToken
-    }
+    };
 }
 
 const isBrowser = typeof window === 'object';
