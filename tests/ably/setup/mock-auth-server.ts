@@ -36,7 +36,7 @@ export class MockAuthServer {
             const { payload } = parseJwt(token, true);
             iat = payload.iat;
             exp = payload.exp;
-            capabilities = payload['x-ably-capability'];
+            capabilities = JSON.parse(payload['x-ably-capability']);
         } else {
             iat = Math.round(serverTime / 1000);
             exp = iat + 60; /* time of expiration in seconds */
@@ -48,7 +48,7 @@ export class MockAuthServer {
             iat,
             exp,
             "x-ably-clientId": this.clientId,
-            "x-ably-capability": capabilities
+            "x-ably-capability": JSON.stringify(capabilities)
         }
         return jwt.sign(claims, this.keySecret, { header });
     }
