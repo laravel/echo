@@ -5,7 +5,7 @@ export const isNullOrUndefinedOrEmpty = (obj) => obj == null || obj === undefine
 /**
  * @throws Exception if parsing error
  */
-export const parseJwt = (jwtToken: string, forceParseJson = false): { header: any, payload: any} => {
+export const parseJwt = (jwtToken: string, forceParseJson = false): { header: any, payload: any } => {
     // Get Token Header
     const base64HeaderUrl = jwtToken.split('.')[0];
     const base64Header = base64HeaderUrl.replace('-', '+').replace('_', '/');
@@ -20,12 +20,12 @@ export const parseJwt = (jwtToken: string, forceParseJson = false): { header: an
     if (forceParseJson) {
         payload = JSON.parse(payload);
     }
-    return {header, payload};
+    return { header, payload };
 }
 
 export const toTokenDetails = (jwtToken: string) => {
-    const {payload} = parseJwt(jwtToken);
-    const parsedJwt = JSON.parse(payload, (key, value)=> {
+    const { payload } = parseJwt(jwtToken);
+    const parsedJwt = JSON.parse(payload, (key, value) => {
         if (key === 'x-ably-capability') { // exclude capability since tokenDetails becomes bloated
             return undefined;
         }

@@ -72,7 +72,7 @@ export class AblyAuth {
     handleChannelAuthError = (ablyChannel: AblyChannel) => {
         const channelName = ablyChannel.name;
         this.authRequestExecuter.request(channelName).then(jwtToken => { // get upgraded token with channel access
-            ablyChannel.ably.auth.authorize(null, { ...this.authOptions, token: toTokenDetails(jwtToken) }, (err, _tokenDetails) => {
+            ablyChannel.ably.auth.authorize(null, { ...this.authOptions, token: toTokenDetails(jwtToken) as any}, (err, _tokenDetails) => {
                 if (err) {
                     ablyChannel._publishErrors(err);
                 } else {
