@@ -33,6 +33,13 @@ export class PusherConnector extends Connector {
     }
 
     /**
+     * Sign in the user via Pusher user authentication (https://pusher.com/docs/channels/using_channels/user-authentication/).
+     */
+    signin(): void {
+        this.pusher.signin();
+    }    
+
+    /**
      * Listen for an event on a channel instance.
      */
     listen(name: string, event: string, callback: Function): PusherChannel {
