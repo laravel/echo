@@ -37,7 +37,7 @@ export class PusherConnector extends Connector {
      */
     signin(): void {
         this.pusher.signin();
-    }    
+    }
 
     /**
      * Listen for an event on a channel instance.
