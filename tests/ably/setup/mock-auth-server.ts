@@ -17,7 +17,7 @@ export class MockAuthServer {
 
     tokenInvalidOrExpired = (serverTime, token) => {
         const tokenInvalid = false;
-        const { payload } = parseJwt(token, true);
+        const { payload } = parseJwt(token);
         return tokenInvalid || payload.exp * 1000 <= serverTime;
     };
 
@@ -33,7 +33,7 @@ export class MockAuthServer {
         let exp = 0;
         let serverTime = await this.ablyClient.time();
         if (!isNullOrUndefinedOrEmpty(token) && !this.tokenInvalidOrExpired(serverTime, token)) {
-            const { payload } = parseJwt(token, true);
+            const { payload } = parseJwt(token);
             iat = payload.iat;
             exp = payload.exp;
             capabilities = JSON.parse(payload['x-ably-capability']);
