@@ -84,7 +84,7 @@ export class AblyChannel extends Channel {
      * Listen for an event on the channel instance.
      */
     listen(event: string, callback: Function): AblyChannel {
-        this.channel.subscribe(this.eventFormatter.format(event), callback as any);
+        this.channel.subscribe(this.eventFormatter.format(event), ({data}) => callback(data));
 
         return this;
     }
@@ -96,7 +96,7 @@ export class AblyChannel extends Channel {
         this.channel.subscribe(({ name, data }) => {
             let namespace = this.options.namespace.replace(/\./g, '\\');
 
-            let formattedEvent = name.startsWith(namespace) ? name.substring(namespace.length + 1) : '.' + event;
+            let formattedEvent = name.startsWith(namespace) ? name.substring(namespace.length + 1) : '.' + name;
 
             callback(formattedEvent, data);
         });
