@@ -62,11 +62,12 @@ export class AblyChannel extends Channel {
      */
     subscribe(): any {
         this.channel = this.ably.channels.get(this.name);
-        this.channel.on(({ current, reason }) => {
+        this.channel.on(stateChange => {
+            const {current, reason} = stateChange;
             if (current == 'attached') {
                 this.subscribedListeners.forEach(listener => listener());
             } else if (reason) {
-                this._publishErrors(reason);
+                this._publishErrors(stateChange);
             }
         });
         this.channel.attach();
