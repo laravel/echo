@@ -1,5 +1,6 @@
 import { setup, tearDown } from './setup/sandbox';
 import * as Ably from 'ably';
+import safeAssert from './setup/utils';
 
 jest.setTimeout(20000);
 describe('AblySandbox', () => {
@@ -31,8 +32,7 @@ describe('AblySandbox', () => {
                 done(err);
                 return;
             }
-            expect(typeof time).toBe('number');
-            done();
+            safeAssert(() => expect(typeof time).toBe('number'), done);
         });
     })
 
