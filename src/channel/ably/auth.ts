@@ -1,5 +1,5 @@
 import { beforeChannelAttach } from './attach';
-import { toTokenDetails } from './utils';
+import { parseJwt, toTokenDetails } from './utils';
 import { SequentialAuthTokenRequestExecuter } from './token-request';
 import { AblyChannel } from '../ably-channel';
 
@@ -41,10 +41,11 @@ export class AblyAuth {
             }
 
             // Use cached token if has channel capability and is not expired
-            const token = ablyClient.auth.tokenDetails;
-            if (token) {
-                const tokenHasChannelCapability = token.capability.includes(`${channelName}"`);
-                if (tokenHasChannelCapability && token.expires >= Date.now()) { // TODO : Replace with server time
+            const tokenDetails = ablyClient.auth.tokenDetails;
+            if (tokenDetails) {
+                const capability = parseJwt(tokenDetails.token).payload['x-ably-capability'];
+                const tokenHasChannelCapability = capability.includes(`${channelName}"`);
+                if (tokenHasChannelCapability && tokenDetails.expires > Date.now()) { // TODO : Replace with server time
                     errorCallback(null);
                     return;
                 }
@@ -76,7 +77,7 @@ export class AblyAuth {
                 if (err) {
                     ablyChannel._publishErrors(err);
                 } else {
-                    ablyChannel.channel.attach();
+                    ablyChannel.channel.attach(ablyChannel._publishErrors);
                 }
             });
         }).catch(err => ablyChannel._publishErrors(err));
