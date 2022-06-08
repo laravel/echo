@@ -85,7 +85,7 @@ describe('AblyChannel', () => {
             });
     })
 
-    
+
     test('Listen to a notification', done => {
         const publicChannel = echo.channel('test') as AblyChannel;
         publicChannel
@@ -109,6 +109,13 @@ describe('AblyChannel', () => {
                     expect(data).toBe('Hello there');
                 }, done, true);
             });
+    });
+
+    test.skip('stop listening to a event', ()=> {
+   
     })
+
+    test.skip('stop listening to a client event', ()=> {
     
+    })
 });
