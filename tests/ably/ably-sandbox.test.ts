@@ -32,7 +32,7 @@ describe('AblySandbox', () => {
                 done(err);
                 return;
             }
-            safeAssert(() => expect(typeof time).toBe('number'), done);
+            safeAssert(() => expect(typeof time).toBe('number'), done, true);
         });
     })
 

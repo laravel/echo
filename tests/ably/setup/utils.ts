@@ -1,8 +1,10 @@
-const safeAssert = ((assertions : Function, done : Function) => {
+const safeAssert = ((assertions: Function, done: Function, finalAssertion = false) => {
     try {
         assertions();
-        done();
-    } catch(err) {
+        if (finalAssertion) {
+            done();
+        }
+    } catch (err) {
         done(err);
     }
 });

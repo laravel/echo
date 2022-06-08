@@ -58,7 +58,7 @@ describe('AblyChannel', () => {
                 mockAuthServer.broadcast('public:test', 'App\\Events\\testEvent', 'Hello there');
             })
             .listen('testEvent', data => {
-                safeAssert(() => expect(data).toBe('Hello there'), done);
+                safeAssert(() => expect(data).toBe('Hello there'), done, true);
             });
     });
 
@@ -70,7 +70,7 @@ describe('AblyChannel', () => {
                 mockAuthServer.broadcast('public:test', 'testEvent', 'Hello there');
             })
             .listen('.testEvent', data => {
-                safeAssert(() => expect(data).toBe('Hello there'), done);
+                safeAssert(() => expect(data).toBe('Hello there'), done, true);
             });
     });
 
@@ -84,7 +84,7 @@ describe('AblyChannel', () => {
                 safeAssert(() => {
                     expect(eventName).toBe('.testEvent');
                     expect(data).toBe('Hello there');
-                }, done);
+                }, done, true);
             });
     })
 

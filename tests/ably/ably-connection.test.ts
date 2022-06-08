@@ -1,23 +1,24 @@
 import { setup, tearDown } from './setup/sandbox';
 import Echo from '../../src/echo';
 import { MockAuthServer } from './setup/mock-auth-server';
+import safeAssert from './setup/utils';
 
 jest.setTimeout(20000);
 describe('AblyConnection', () => {
-    let testApp;
-    let mockAuthServer;
-    let echo;
+    let testApp: any;
+    let mockAuthServer: MockAuthServer;
+    let echo: Echo;
 
     beforeAll(done => {
-        setup((err, app) => {
-            if (err) {
-                done(err);
-                return;
-            }
-            testApp = app;
-            mockAuthServer = new MockAuthServer(testApp.keys[0].keyStr);
-            done();
-        })
+            setup((err, app) => {
+                if (err) {
+                    done(err);
+                    return;
+                }
+                testApp = app;
+                mockAuthServer = new MockAuthServer(testApp.keys[0].keyStr);
+                done();
+            })
     })
 
     afterAll((done) => {
@@ -44,13 +45,16 @@ describe('AblyConnection', () => {
     });
 
     test('should be able to connect to server', (done) => {
-        expect.assertions(2);
+        expect.assertions(3);
         echo.connector.ably.connection.on(({ current, previous, reason }) => {
             if (current == 'connecting') {
-                expect(previous).toBe('initialized');
+                safeAssert(() => expect(previous).toBe('initialized'), done);
             }
             else if (current == 'connected') {
-                expect(previous).toBe('connecting');
+                safeAssert(()=> {
+                    expect(previous).toBe('connecting');
+                    expect(typeof echo.socketId()).toBe('string');
+                }, done);
                 setTimeout(() => { // Added timeout to make sure connection stays active
                     echo.connector.ably.connection.off();
                     done();
@@ -67,17 +71,17 @@ describe('AblyConnection', () => {
         expect.assertions(4);
         echo.connector.ably.connection.on(({ current, previous, reason }) => {
             if (current == 'connecting') {
-                expect(previous).toBe('initialized');
+                safeAssert(() => expect(previous).toBe('initialized'), done);
             }
             else if (current == 'connected') {
-                expect(previous).toBe('connecting');
+                safeAssert(() => expect(previous).toBe('connecting'), done);
                 echo.disconnect();
             }
             else if (current == 'closing') {
-                expect(previous).toBe('connected');
+                safeAssert(() => expect(previous).toBe('connected'), done);
             }
             else if (current == 'closed') {
-                expect(previous).toBe('closing');
+                safeAssert(() => expect(previous).toBe('closing'), done);
                 echo.connector.ably.connection.off();
                 done();
             }
