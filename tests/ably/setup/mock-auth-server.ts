@@ -8,11 +8,11 @@ export class MockAuthServer {
     ablyClient: Ably.Rest;
     clientId = 'sacOO7@github.com'
 
-    constructor(apiKey: string) {
+    constructor(apiKey: string, environment = "sandbox") {
         const keys = apiKey.split(':');
         this.keyName = keys[0];
         this.keySecret = keys[1];
-        this.ablyClient = new Ably.Rest(apiKey);
+        this.ablyClient = new Ably.Rest({key: apiKey, environment});
     }
 
     tokenInvalidOrExpired = (serverTime, token) => {
@@ -20,6 +20,10 @@ export class MockAuthServer {
         const { payload } = parseJwt(token);
         return tokenInvalid || payload.exp * 1000 <= serverTime;
     };
+
+    broadcast = async (channelName: string, eventName : string, message : string) => {
+        await this.ablyClient.channels.get(channelName).publish(eventName, message);
+    }
 
     getSignedToken = async (channelName = null, token = null) => {
         const header = {
