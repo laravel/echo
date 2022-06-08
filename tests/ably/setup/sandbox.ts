@@ -112,20 +112,4 @@ const deleteApp = (app, callback) => {
     });
 }
 
-// creatNewApp((err, testApp) => {
-//     if (err) {
-//         console.error('error creating the app');
-//     } else {
-//         console.log('created app')
-//         console.log(testApp);
-//         deleteApp(testApp, (err) => {
-//             if (err) {
-//                 console.error(err)
-//             } else {
-//                 console.log('deleted test app successfully')
-//             }
-//         })
-//     }
-// });
-
 export { creatNewApp as setup, deleteApp as tearDown }
