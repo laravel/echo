@@ -51,7 +51,7 @@ describe('AblyChannel', () => {
         });
     });
 
-    test('Listen for a default broadcaster event', (done) => {
+    test('Listen to a default broadcaster event', (done) => {
         const publicChannel = echo.channel('test') as AblyChannel;
         publicChannel
             .subscribed(() => {
@@ -63,7 +63,7 @@ describe('AblyChannel', () => {
     });
 
     // https://laravel.com/docs/9.x/broadcasting#broadcast-name
-    test('Listen for a broadcast as event', (done) => {
+    test('Listen to a broadcast as event', (done) => {
         const publicChannel = echo.channel('test') as AblyChannel;
         publicChannel
             .subscribed(() => {
@@ -74,7 +74,30 @@ describe('AblyChannel', () => {
             });
     });
 
-    test('Listen for all events', (done) => {
+    test('Listen to a whisper', done => {
+        const publicChannel = echo.channel('test') as AblyChannel;
+        publicChannel
+            .subscribed(() => {
+                mockAuthServer.broadcast('public:test', 'client-msg', 'Hello there');
+            })
+            .listenForWhisper('msg', data => {
+                safeAssert(() => expect(data).toBe('Hello there'), done, true);
+            });
+    })
+
+    
+    test('Listen to a notification', done => {
+        const publicChannel = echo.channel('test') as AblyChannel;
+        publicChannel
+            .subscribed(() => {
+                mockAuthServer.broadcast('public:test', 'Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', 'Hello there');
+            })
+            .notification(data => {
+                safeAssert(() => expect(data).toBe('Hello there'), done, true);
+            });
+    })
+
+    test('Listen to all events', (done) => {
         const publicChannel = echo.channel('test1') as AblyChannel;
         publicChannel
             .subscribed(() => {
@@ -87,5 +110,5 @@ describe('AblyChannel', () => {
                 }, done, true);
             });
     })
-
+    
 });
