@@ -2,11 +2,16 @@ import { isNullOrUndefinedOrEmpty, parseJwt } from '../../../src/channel/ably/ut
 import * as Ably from "ably/promises";
 import * as jwt from "jsonwebtoken";
 
+type channels = Array<string>;
+
 export class MockAuthServer {
     keyName: string;
     keySecret: string;
     ablyClient: Ably.Rest;
     clientId = 'sacOO7@github.com'
+
+    shortLived: channels;
+    banned: channels;
 
     constructor(apiKey: string, environment = "sandbox") {
         const keys = apiKey.split(':');
@@ -15,15 +20,15 @@ export class MockAuthServer {
         this.ablyClient = new Ably.Rest({key: apiKey, environment});
     }
 
+    broadcast = async (channelName: string, eventName : string, message : string) => {
+        await this.ablyClient.channels.get(channelName).publish(eventName, message);
+    }
+
     tokenInvalidOrExpired = (serverTime, token) => {
         const tokenInvalid = false;
         const { payload } = parseJwt(token);
         return tokenInvalid || payload.exp * 1000 <= serverTime;
     };
-
-    broadcast = async (channelName: string, eventName : string, message : string) => {
-        await this.ablyClient.channels.get(channelName).publish(eventName, message);
-    }
 
     getSignedToken = async (channelName = null, token = null) => {
         const header = {
@@ -48,13 +53,30 @@ export class MockAuthServer {
         if (!isNullOrUndefinedOrEmpty(channelName)) {
             capabilities[channelName] = ["*"]
         }
-        const claims = {
+        let claims = {
             iat,
             exp,
             "x-ably-clientId": this.clientId,
             "x-ably-capability": JSON.stringify(capabilities)
         }
+        claims = this.validateShortLivedOrBannedChannels(channelName, claims);
         return jwt.sign(claims, this.keySecret, { header });
+    }
+
+    setAuthExceptions = (shortLived : channels = [], banned : channels = []) => {
+        this.shortLived = shortLived;
+        this.banned = banned;
+    }
+
+    validateShortLivedOrBannedChannels = (channelName : string, claims : any) => {
+        if (this.shortLived?.includes(channelName)) {
+            const exp = claims.iat + 3; // if channel is shortlived, token expiry set to 3 seconds 
+            return {...claims, exp }; 
+        }
+        if (this.banned?.includes(channelName)) {
+            throw new Error(`User can't be authenticated for ${channelName}`);
+        }
+        return claims;
     }
 }
 
