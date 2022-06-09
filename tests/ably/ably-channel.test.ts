@@ -2,7 +2,7 @@ import { setup, tearDown } from './setup/sandbox';
 import Echo from '../../src/echo';
 import { MockAuthServer } from './setup/mock-auth-server';
 import { AblyChannel } from '../../src/channel';
-import safeAssert from './setup/utils';
+import safeAssert, { execute, sleep } from './setup/utils';
 
 jest.setTimeout(20000);
 describe('AblyChannel', () => {
@@ -43,7 +43,7 @@ describe('AblyChannel', () => {
 
     afterEach(done => {
         echo.disconnect();
-        echo.connector.ably.connection.once('closed', ()=> {
+        echo.connector.ably.connection.once('closed', () => {
             done();
         });
     });
@@ -60,7 +60,7 @@ describe('AblyChannel', () => {
             .subscribed(() => {
                 mockAuthServer.broadcast('public:test', 'App\\Events\\testEvent', 'Hello there');
             })
-            .listen('testEvent', data => {
+            .listen('testEvent', ({ data }) => {
                 safeAssert(() => expect(data).toBe('Hello there'), done, true);
             });
     });
@@ -72,7 +72,7 @@ describe('AblyChannel', () => {
             .subscribed(() => {
                 mockAuthServer.broadcast('public:test', 'testEvent', 'Hello there');
             })
-            .listen('.testEvent', data => {
+            .listen('.testEvent', ({ data }) => {
                 safeAssert(() => expect(data).toBe('Hello there'), done, true);
             });
     });
@@ -83,7 +83,7 @@ describe('AblyChannel', () => {
             .subscribed(() => {
                 mockAuthServer.broadcast('public:test', 'client-msg', 'Hello there');
             })
-            .listenForWhisper('msg', data => {
+            .listenForWhisper('msg', ({ data }) => {
                 safeAssert(() => expect(data).toBe('Hello there'), done, true);
             });
     })
@@ -95,7 +95,7 @@ describe('AblyChannel', () => {
             .subscribed(() => {
                 mockAuthServer.broadcast('public:test', 'Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', 'Hello there');
             })
-            .notification(data => {
+            .notification(({ data }) => {
                 safeAssert(() => expect(data).toBe('Hello there'), done, true);
             });
     })
@@ -114,11 +114,76 @@ describe('AblyChannel', () => {
             });
     });
 
-    test.skip('stop listening to a event', ()=> {
-   
+    test('stop listening to a event', async () => {
+        const publicChannel = echo.channel('test') as AblyChannel;
+        const eventHandler1 = jest.fn();
+        const eventHandler2 = jest.fn();
+        const eventHandler3 = jest.fn();
+
+
+        await new Promise(resolve => {
+            publicChannel
+                .subscribed(resolve)
+                .listen('.testEvent', eventHandler1)
+                .listen('.testEvent', eventHandler2)
+                .listen('.testEvent', eventHandler3)
+        });
+
+        execute(() => mockAuthServer.broadcast('public:test', 'testEvent', 'Hello there'), 4);
+        await sleep(3000);
+        expect(eventHandler1).toBeCalledTimes(4);
+        expect(eventHandler2).toBeCalledTimes(4);
+        expect(eventHandler3).toBeCalledTimes(4);
+        jest.clearAllMocks();
+        publicChannel.stopListening('.testEvent', eventHandler1);
+
+        execute(() => mockAuthServer.broadcast('public:test', 'testEvent', 'Hello there'), 3);
+        await sleep(3000);
+        expect(eventHandler1).toBeCalledTimes(0);
+        expect(eventHandler2).toBeCalledTimes(3);
+        expect(eventHandler3).toBeCalledTimes(3);
+        jest.clearAllMocks();
+        publicChannel.stopListening('.testEvent');
+
+        execute(() => mockAuthServer.broadcast('public:test', 'testEvent', 'Hello there'), 3);
+        await sleep(3000);
+        expect(eventHandler1).toBeCalledTimes(0);
+        expect(eventHandler2).toBeCalledTimes(0);
+        expect(eventHandler3).toBeCalledTimes(0);
+
     })
 
-    test.skip('stop listening to a client event', ()=> {
-    
+    // internally calls stop listening to a event
+    test('stop listening to a whisper/client-event', async () => {
+        const publicChannel = echo.channel('test') as AblyChannel;
+        const eventHandler1 = jest.fn();
+        const eventHandler2 = jest.fn();
+        const eventHandler3 = jest.fn();
+
+        await new Promise(resolve => {
+            publicChannel
+                .subscribed(resolve)
+                .listenForWhisper('msg', eventHandler1)
+                .listenForWhisper('msg', eventHandler2)
+                .listenForWhisper('msg2', eventHandler3)
+
+        });
+
+        execute(() => mockAuthServer.broadcast('public:test', 'client-msg', 'Hello there'), 4);
+        execute(() => mockAuthServer.broadcast('public:test', 'client-msg2', 'Hello there'), 1);
+        await sleep(3000);
+        expect(eventHandler1).toBeCalledTimes(4);
+        expect(eventHandler2).toBeCalledTimes(4);
+        expect(eventHandler3).toBeCalledTimes(1);
+        jest.clearAllMocks();
+        publicChannel.stopListeningForWhisper('msg', eventHandler1);
+
+        execute(() => mockAuthServer.broadcast('public:test', 'client-msg', 'Hello there'), 3);
+        execute(() => mockAuthServer.broadcast('public:test', 'client-msg2', 'Hello there'), 2);
+        await sleep(3000);
+        expect(eventHandler1).toBeCalledTimes(0);
+        expect(eventHandler2).toBeCalledTimes(3);
+        expect(eventHandler3).toBeCalledTimes(2);
+
     })
 });

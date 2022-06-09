@@ -84,8 +84,8 @@ export class AblyChannel extends Channel {
     /**
      * Listen for an event on the channel instance.
      */
-    listen(event: string, callback: Function): AblyChannel {
-        this.channel.subscribe(this.eventFormatter.format(event), ({ data }) => callback(data));
+    listen(event: string, callback: Function | any): AblyChannel {
+        this.channel.subscribe(this.eventFormatter.format(event), callback);
 
         return this;
     }
