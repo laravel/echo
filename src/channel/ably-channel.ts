@@ -78,6 +78,7 @@ export class AblyChannel extends Channel {
      */
     unsubscribe(): void {
         this.channel.unsubscribe();
+        this.channel.off();
         this.channel.detach();
     }
 

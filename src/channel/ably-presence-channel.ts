@@ -57,6 +57,7 @@ export class AblyPresenceChannel extends AblyChannel implements PresenceChannel 
    */
   enter(data: any, callback: Function): AblyPresenceChannel {
     this.channel.presence.enter(data, callback as any);
+    
     return this;
   }
 
