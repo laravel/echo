@@ -11,6 +11,12 @@ export class AblyPresenceChannel extends AblyChannel implements PresenceChannel 
     super(ably, name, options);
     this.channel.on("failed", auth.onChannelFailed(this));
   }
+
+  unsubscribe(): void {
+    this.channel.presence.unsubscribe();
+    super.unsubscribe();
+  }
+  
   /**
    * Register a callback to be called anytime the member list changes.
    */
