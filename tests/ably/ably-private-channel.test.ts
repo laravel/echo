@@ -2,10 +2,10 @@ import { setup, tearDown } from './setup/sandbox';
 import Echo from '../../src/echo';
 import { MockAuthServer } from './setup/mock-auth-server';
 import safeAssert from './setup/utils';
-import { AblyChannel } from '../../src/channel';
+import { AblyChannel, AblyPrivateChannel } from '../../src/channel';
 
 jest.setTimeout(20000);
-describe('AblyChannel', () => {
+describe('AblyPrivateChannel', () => {
     let testApp: any;
     let mockAuthServer: MockAuthServer;
     let echo: Echo;
@@ -49,30 +49,41 @@ describe('AblyChannel', () => {
     });
 
     test('channel subscription', (done) => {
-        const channel = echo.private('test') as AblyChannel;
-        channel.subscribed(() => {
-            channel._removeSubscribed();
+        const privateChannel = echo.private('test') as AblyChannel;
+        privateChannel.subscribed(() => {
+            privateChannel._removeSubscribed();
             done();
         });
     });
 
+    test('Whisper and listen to it', done => {
+        const privateChannel = echo.private('test') as AblyPrivateChannel;
+        privateChannel
+            .subscribed(() => {
+                privateChannel.whisper('msg', 'Hello there jonny!');
+            })
+            .listenForWhisper('msg', ({ data }) => {
+                safeAssert(() => expect(data).toBe('Hello there jonny!'), done, true);
+            });
+    })
+
     // TODO - fix recursived attach when connection is closed, reproduce using API_KEY instead of sandbox
     test('channel subscription error, token expired', done => {
         mockAuthServer.setAuthExceptions(['private:shortLivedChannel']);
-        const channel = echo.private('shortLivedChannel') as AblyChannel;
-        channel
+        const privateChannel = echo.private('shortLivedChannel') as AblyChannel;
+        privateChannel
             .error(stateChangeError => {
-                channel._removeError();
+                privateChannel._removeError();
                 safeAssert(() => expect(stateChangeError).toBeTruthy(), done, true)
             });
     });
 
     test('channel subscription error, access denied', done => {
         mockAuthServer.setAuthExceptions([], ['private:bannedChannel']);
-        const channel = echo.private('bannedChannel') as AblyChannel;
-        channel
+        const privateChannel = echo.private('bannedChannel') as AblyChannel;
+        privateChannel
             .error(stateChangeError => {
-                channel._removeError();
+                privateChannel._removeError();
                 safeAssert(() => expect(stateChangeError).toBeTruthy(), done, true)
             });
     });
