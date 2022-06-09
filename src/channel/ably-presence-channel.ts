@@ -7,12 +7,29 @@ import { PresenceChannel } from './presence-channel';
  */
 export class AblyPresenceChannel extends AblyChannel implements PresenceChannel {
 
+  presenceData : any;
+
+  hereListeners: Function[];
+
   constructor(ably: any, name: string, options: any, auth: AblyAuth) {
     super(ably, name, options);
+    this.hereListeners = [];
     this.channel.on("failed", auth.onChannelFailed(this));
+    this.channel.on("attached", () => {
+      this.enter(this.presenceData, (err : any) => {
+        if (err) {
+          this._alertErrorListeners(err);
+        } else {
+          this.channel.presence.get((err, members) => {
+            this.hereListeners.forEach(listener => listener(members, err));
+          });
+        }
+      });
+    });
   }
 
   unsubscribe(): void {
+    this.channel.presence.leave();
     this.channel.presence.unsubscribe();
     super.unsubscribe();
   }
@@ -21,15 +38,7 @@ export class AblyPresenceChannel extends AblyChannel implements PresenceChannel 
    * Register a callback to be called anytime the member list changes.
    */
   here(callback: Function): AblyPresenceChannel {
-    this.channel.presence.get((err, members) => {
-      if (err) {
-        callback(null, err);
-        return;
-      }
-
-      callback(members, null);
-    })
-
+    this.hereListeners.push(callback); 
     return this;
   }
 
