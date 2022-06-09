@@ -78,6 +78,8 @@ export class AblyChannel extends Channel {
      */
     unsubscribe(): void {
         this.channel.unsubscribe();
+        this.unregisterError();
+        this.unregisterSubscribed();
         this.channel.off();
         this.channel.detach();
     }
@@ -155,7 +157,7 @@ export class AblyChannel extends Channel {
      * @param callback 
      * @returns AblyChannel
      */
-    _removeSubscribed(callback?: Function): AblyChannel {
+    unregisterSubscribed(callback?: Function): AblyChannel {
         if (callback) {
             this.subscribedListeners = this.subscribedListeners.filter(s => s != callback);
         } else {
@@ -170,7 +172,7 @@ export class AblyChannel extends Channel {
      * @param callback 
      * @returns AblyChannel
      */
-    _removeError(callback?: Function): AblyChannel {
+    unregisterError(callback?: Function): AblyChannel {
         if (callback) {
             this.errorListeners = this.errorListeners.filter(e => e != callback);
         } else {

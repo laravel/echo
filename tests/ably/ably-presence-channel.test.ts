@@ -50,8 +50,20 @@ describe('AblyPresenceChannel', () => {
     test('channel subscription', (done) => {
         const presenceChannel = echo.join('test') as AblyPresenceChannel;
         presenceChannel.subscribed(() => {
-            presenceChannel._removeSubscribed();
+            presenceChannel.unregisterSubscribed();
             done();
         });
     });
+
+    test.skip('channel member list change', done => {
+
+    });
+
+    test.skip('member joined', done=> {
+
+    })
+
+    test.skip('member left', done => {
+
+    })
 });

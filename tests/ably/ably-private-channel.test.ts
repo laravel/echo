@@ -51,7 +51,7 @@ describe('AblyPrivateChannel', () => {
     test('channel subscription', (done) => {
         const privateChannel = echo.private('test') as AblyChannel;
         privateChannel.subscribed(() => {
-            privateChannel._removeSubscribed();
+            privateChannel.unregisterSubscribed();
             done();
         });
     });
@@ -73,7 +73,7 @@ describe('AblyPrivateChannel', () => {
         const privateChannel = echo.private('shortLivedChannel') as AblyChannel;
         privateChannel
             .error(stateChangeError => {
-                privateChannel._removeError();
+                privateChannel.unregisterError();
                 safeAssert(() => expect(stateChangeError).toBeTruthy(), done, true)
             });
     });
@@ -83,7 +83,7 @@ describe('AblyPrivateChannel', () => {
         const privateChannel = echo.private('bannedChannel') as AblyChannel;
         privateChannel
             .error(stateChangeError => {
-                privateChannel._removeError();
+                privateChannel.unregisterError();
                 safeAssert(() => expect(stateChangeError).toBeTruthy(), done, true)
             });
     });
