@@ -2,6 +2,7 @@ import { setup, tearDown } from './setup/sandbox';
 import Echo from '../../src/echo';
 import { MockAuthServer } from './setup/mock-auth-server';
 import safeAssert from './setup/utils';
+import { AblyChannel } from '../../src/channel';
 
 jest.setTimeout(20000);
 describe('AblyChannel', () => {
@@ -40,29 +41,39 @@ describe('AblyChannel', () => {
         });
     });
 
-    afterEach(() => {
+    afterEach(done => {
         echo.disconnect();
-    });
-
-    test.skip('channel subscription', (done) => {
-        echo.channel('test').subscribed(() => {
+        echo.connector.ably.connection.once('closed', ()=> {
             done();
         });
     });
 
-    test('channel subscription error', done => {
-        mockAuthServer.setAuthExceptions(['private:shortLivedChannel'])
-        echo.private('shortLivedChannel')
+    test('channel subscription', (done) => {
+        const channel = echo.private('test') as AblyChannel;
+        channel.subscribed(() => {
+            channel._removeSubscribed();
+            done();
+        });
+    });
+
+    // TODO - fix recursived attach when connection is closed, reproduce using API_KEY instead of sandbox
+    test('channel subscription error, token expired', done => {
+        mockAuthServer.setAuthExceptions(['private:shortLivedChannel']);
+        const channel = echo.private('shortLivedChannel') as AblyChannel;
+        channel
             .error(stateChangeError => {
-                safeAssert(()=> expect(stateChangeError).toBeTruthy(), done, true)
+                channel._removeError();
+                safeAssert(() => expect(stateChangeError).toBeTruthy(), done, true)
             });
     });
 
-    test.skip('channel subscription error', done => {
-        mockAuthServer.setAuthExceptions([], ['private:bannedChannel'])
-        echo.private('bannedChannel')
+    test('channel subscription error, access denied', done => {
+        mockAuthServer.setAuthExceptions([], ['private:bannedChannel']);
+        const channel = echo.private('bannedChannel') as AblyChannel;
+        channel
             .error(stateChangeError => {
-                safeAssert(()=> expect(stateChangeError).toBeTruthy(), done, true)
+                channel._removeError();
+                safeAssert(() => expect(stateChangeError).toBeTruthy(), done, true)
             });
     });
 });

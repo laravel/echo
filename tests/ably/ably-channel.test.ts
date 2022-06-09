@@ -41,8 +41,11 @@ describe('AblyChannel', () => {
         });
     });
 
-    afterEach(() => {
+    afterEach(done => {
         echo.disconnect();
+        echo.connector.ably.connection.once('closed', ()=> {
+            done();
+        });
     });
 
     test('channel subscription', (done) => {

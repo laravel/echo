@@ -10,15 +10,15 @@ describe('AblyConnection', () => {
     let echo: Echo;
 
     beforeAll(done => {
-            setup((err, app) => {
-                if (err) {
-                    done(err);
-                    return;
-                }
-                testApp = app;
-                mockAuthServer = new MockAuthServer(testApp.keys[0].keyStr);
-                done();
-            })
+        setup((err, app) => {
+            if (err) {
+                done(err);
+                return;
+            }
+            testApp = app;
+            mockAuthServer = new MockAuthServer(testApp.keys[0].keyStr);
+            done();
+        })
     })
 
     afterAll((done) => {
@@ -40,8 +40,15 @@ describe('AblyConnection', () => {
         });
     });
 
-    afterEach(() => {
-        echo.disconnect();
+    afterEach(done => {
+        if (echo.connector.ably.connection.state === 'closed') {
+            done();
+        } else {
+            echo.disconnect();
+            echo.connector.ably.connection.once('closed', ()=> {
+                done();
+            });
+        }
     });
 
     test('should be able to connect to server', (done) => {
@@ -51,7 +58,7 @@ describe('AblyConnection', () => {
                 safeAssert(() => expect(previous).toBe('initialized'), done);
             }
             else if (current == 'connected') {
-                safeAssert(()=> {
+                safeAssert(() => {
                     expect(previous).toBe('connecting');
                     expect(typeof echo.socketId()).toBe('string');
                 }, done);
