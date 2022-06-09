@@ -75,12 +75,12 @@ export class AblyAuth {
         this.authRequestExecuter.request(channelName).then(jwtToken => { // get upgraded token with channel access
             ablyChannel.ably.auth.authorize(null, { ...this.authOptions, token: toTokenDetails(jwtToken) as any}, (err, _tokenDetails) => {
                 if (err) {
-                    ablyChannel._publishErrors(err);
+                    ablyChannel._publishError(err);
                 } else {
-                    ablyChannel.channel.attach(ablyChannel._publishErrors);
+                    ablyChannel.channel.attach(ablyChannel._publishError);
                 }
             });
-        }).catch(err => ablyChannel._publishErrors(err));
+        }).catch(err => ablyChannel._publishError(err));
     }
 }
 

@@ -67,10 +67,10 @@ export class AblyChannel extends Channel {
             if (current == 'attached') {
                 this.subscribedListeners.forEach(listener => listener());
             } else if (reason) {
-                this._publishErrors(stateChange);
+                this._publishError(stateChange);
             }
         });
-        this.channel.attach(this._publishErrors);
+        this.channel.attach(this._publishError);
     }
 
     /**
@@ -149,7 +149,37 @@ export class AblyChannel extends Channel {
         return this;
     }
 
-    _publishErrors = (err) => {
+    /**
+     * Unregisters given error callback from the listeners.
+     * @param callback 
+     * @returns AblyChannel
+     */
+    _removeSubscribed(callback?: Function): AblyChannel {
+        if (callback) {
+            this.subscribedListeners = this.subscribedListeners.filter(s => s != callback);
+        } else {
+            this.subscribedListeners = [];
+        }
+
+        return this;
+    }
+
+    /**
+     * Unregisters given error callback from the listeners.
+     * @param callback 
+     * @returns AblyChannel
+     */
+    _removeError(callback?: Function): AblyChannel {
+        if (callback) {
+            this.errorListeners = this.errorListeners.filter(e => e != callback);
+        } else {
+            this.errorListeners = [];
+        }
+
+        return this;
+    }
+
+    _publishError = (err: any) => {
         if (err) {
             this.errorListeners.forEach(listener => listener(err));
         }
