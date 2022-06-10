@@ -7,16 +7,16 @@ import { PresenceChannel } from './presence-channel';
  */
 export class AblyPresenceChannel extends AblyChannel implements PresenceChannel {
 
-  presenceData : any;
+  presenceData: any;
 
   hereListeners: Function[];
 
   constructor(ably: any, name: string, options: any, auth: AblyAuth) {
-    super(ably, name, options);
+    super(ably, name, options, false);
     this.hereListeners = [];
     this.channel.on("failed", auth.onChannelFailed(this));
     this.channel.on("attached", () => {
-      this.enter(this.presenceData, (err : any) => {
+      this.enter(this.presenceData, (err: any) => {
         if (err) {
           this._alertErrorListeners(err);
         } else {
@@ -26,19 +26,21 @@ export class AblyPresenceChannel extends AblyChannel implements PresenceChannel 
         }
       });
     });
+    this.subscribe();
   }
 
   unsubscribe(): void {
-    this.channel.presence.leave();
+    this.leave(this.presenceData);
+    this.unregisterHere();
     this.channel.presence.unsubscribe();
     super.unsubscribe();
   }
-  
+
   /**
    * Register a callback to be called anytime the member list changes.
    */
   here(callback: Function): AblyPresenceChannel {
-    this.hereListeners.push(callback); 
+    this.hereListeners.push(callback);
     return this;
   }
 
@@ -72,7 +74,7 @@ export class AblyPresenceChannel extends AblyChannel implements PresenceChannel 
    */
   enter(data: any, callback: Function): AblyPresenceChannel {
     this.channel.presence.enter(data, callback as any);
-    
+
     return this;
   }
 
@@ -82,7 +84,7 @@ export class AblyPresenceChannel extends AblyChannel implements PresenceChannel 
    * @param callback - success/error callback (err) => {}
    * @returns AblyPresenceChannel
    */
-  leave(data: any, callback: Function): AblyPresenceChannel {
+  leave(data: any, callback?: Function): AblyPresenceChannel {
     this.channel.presence.leave(data, callback as any);
 
     return this;
@@ -96,6 +98,16 @@ export class AblyPresenceChannel extends AblyChannel implements PresenceChannel 
  */
   update(data: any, callback: Function): AblyPresenceChannel {
     this.channel.presence.update(data, callback as any);
+
+    return this;
+  }
+
+  unregisterHere(callback?: Function) {
+    if (callback) {
+      this.errorListeners = this.hereListeners.filter(e => e != callback);
+    } else {
+      this.errorListeners = [];
+    }
 
     return this;
   }

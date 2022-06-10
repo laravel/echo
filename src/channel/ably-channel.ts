@@ -44,7 +44,7 @@ export class AblyChannel extends Channel {
     /**
      * Create a new class instance.
      */
-    constructor(ably: any, name: string, options: any) {
+    constructor(ably: any, name: string, options: any, autoSubscribe = true) {
         super();
 
         this.name = name;
@@ -53,15 +53,17 @@ export class AblyChannel extends Channel {
         this.eventFormatter = new EventFormatter(this.options.namespace);
         this.subscribedListeners = [];
         this.errorListeners = [];
+        this.channel = ably.channels.get(name);
 
-        this.subscribe();
+        if (autoSubscribe) {
+            this.subscribe();
+        }
     }
 
     /**
      * Subscribe to an Ably channel.
      */
     subscribe(): any {
-        this.channel = this.ably.channels.get(this.name);
         this.channel.on(stateChange => {
             const { current, reason } = stateChange;
             if (current == 'attached') {

@@ -2,6 +2,8 @@ import { beforeChannelAttach } from './attach';
 import { parseJwt, toTokenDetails } from './utils';
 import { SequentialAuthTokenRequestExecuter } from './token-request';
 import { AblyChannel } from '../ably-channel';
+import { AblyConnector } from '../../connector/ably-connector';
+import { AblyPresenceChannel } from '../ably-presence-channel';
 
 export class AblyAuth {
 
@@ -13,8 +15,8 @@ export class AblyAuth {
         useTokenAuth: true,
         authCallback: async (_, callback) => { // get token from tokenParams
             try {
-                const jwtToken = await this.authRequestExecuter.request(null); // Replace this by network request to PHP server
-                const tokenDetails = toTokenDetails(jwtToken);
+                const { token } = await this.authRequestExecuter.request(null); // Replace this by network request to PHP server
+                const tokenDetails = toTokenDetails(token);
                 callback(null, tokenDetails);
             } catch (error) {
                 callback(error, null);
@@ -32,7 +34,8 @@ export class AblyAuth {
         this.authRequestExecuter = new SequentialAuthTokenRequestExecuter(token, requestTokenFn ?? this.requestToken);
     }
 
-    enableAuthorizeBeforeChannelAttach = (ablyClient) => {
+    enableAuthorizeBeforeChannelAttach = (ablyConnector: AblyConnector) => {
+        const ablyClient: any = ablyConnector.ably;
         beforeChannelAttach(ablyClient, (realtimeChannel, errorCallback) => {
             const channelName = realtimeChannel.name;
             if (channelName.startsWith("public:")) {
@@ -52,8 +55,10 @@ export class AblyAuth {
             }
 
             // explicitly request token for given channel name
-            this.authRequestExecuter.request(channelName).then(jwtToken => { // get upgraded token with channel access
-                ablyClient.auth.authorize(null, { ...this.authOptions, token: toTokenDetails(jwtToken) }, (err, tokenDetails) => {
+            this.authRequestExecuter.request(channelName).then(({ token: jwtToken, info }) => { // get upgraded token with channel access
+                const echoChannel = ablyConnector.channels[channelName];
+                this.setPresenceInfo(echoChannel, info);
+                ablyClient.auth.authorize(null, { ...this.authOptions, token: toTokenDetails(jwtToken) }, (err, _tokenDetails) => {
                     if (err) {
                         errorCallback(err);
                     } else {
@@ -64,23 +69,30 @@ export class AblyAuth {
         });
     }
 
-    onChannelFailed = (ablyChannel: AblyChannel) => stateChange => {
+    onChannelFailed = (echoAblyChannel: AblyChannel) => stateChange => {
         if (stateChange.reason?.code == 40160) { // channel capability rejected https://help.ably.io/error/40160
-            this.handleChannelAuthError(ablyChannel);
+            this.handleChannelAuthError(echoAblyChannel);
         }
     }
 
-    handleChannelAuthError = (ablyChannel: AblyChannel) => {
-        const channelName = ablyChannel.name;
-        this.authRequestExecuter.request(channelName).then(jwtToken => { // get upgraded token with channel access
-            ablyChannel.ably.auth.authorize(null, { ...this.authOptions, token: toTokenDetails(jwtToken) as any}, (err, _tokenDetails) => {
+    handleChannelAuthError = (echoAblyChannel: AblyChannel) => {
+        const channelName = echoAblyChannel.name;
+        this.authRequestExecuter.request(channelName).then(({ token: jwtToken, info }) => { // get upgraded token with channel access
+            this.setPresenceInfo(echoAblyChannel, info);
+            echoAblyChannel.ably.auth.authorize(null, { ...this.authOptions, token: toTokenDetails(jwtToken) as any }, (err, _tokenDetails) => {
                 if (err) {
-                    ablyChannel._alertErrorListeners(err);
+                    echoAblyChannel._alertErrorListeners(err);
                 } else {
-                    ablyChannel.channel.attach(ablyChannel._alertErrorListeners);
+                    echoAblyChannel.channel.attach(echoAblyChannel._alertErrorListeners);
                 }
             });
-        }).catch(err => ablyChannel._alertErrorListeners(err));
+        }).catch(err => echoAblyChannel._alertErrorListeners(err));
+    }
+
+    setPresenceInfo = (echoAblyChannel: AblyChannel, info: any) => {
+        if (echoAblyChannel instanceof AblyPresenceChannel) {
+            echoAblyChannel.presenceData = info;
+        }
     }
 }
 

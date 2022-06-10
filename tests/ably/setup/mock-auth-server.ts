@@ -62,7 +62,7 @@ export class MockAuthServer {
         }
         claims = this.validateShortLivedOrBannedChannels(channelName, claims);
         const response = { token : jwt.sign(claims, this.keySecret, { header })};
-        if (this.isPresenceChannel(channelName)) {
+        if (channelName && this.isPresenceChannel(channelName)) {
             return {...response, info: this.userInfo}
         }
         return response;
