@@ -9,6 +9,7 @@ export class MockAuthServer {
     keySecret: string;
     ablyClient: Ably.Rest;
     clientId = 'sacOO7@github.com'
+    userInfo = {id : 'sacOO7@github.com', name: 'sacOO7'}
 
     shortLived: channels;
     banned: channels;
@@ -30,7 +31,7 @@ export class MockAuthServer {
         return tokenInvalid || payload.exp * 1000 <= serverTime;
     };
 
-    getSignedToken = async (channelName = null, token = null) => {
+    getSignedToken = async (channelName : any = null, token : any = null) => {
         const header = {
             "typ": "JWT",
             "alg": "HS256",
@@ -60,9 +61,15 @@ export class MockAuthServer {
             "x-ably-capability": JSON.stringify(capabilities)
         }
         claims = this.validateShortLivedOrBannedChannels(channelName, claims);
-        return jwt.sign(claims, this.keySecret, { header });
+        const response = { token : jwt.sign(claims, this.keySecret, { header })};
+        if (this.isPresenceChannel(channelName)) {
+            return {...response, info: this.userInfo}
+        }
+        return response;
     }
 
+    isPresenceChannel = channelName => channelName.startsWith("presence:");
+    
     setAuthExceptions = (shortLived : channels = [], banned : channels = []) => {
         this.shortLived = shortLived;
         this.banned = banned;
