@@ -9,29 +9,15 @@ export class AblyPresenceChannel extends AblyChannel implements PresenceChannel 
 
   presenceData: any;
 
-  hereListeners: Function[];
-
   constructor(ably: any, name: string, options: any, auth: AblyAuth) {
     super(ably, name, options, false);
-    this.hereListeners = [];
     this.channel.on("failed", auth.onChannelFailed(this));
-    this.channel.on("attached", () => {
-      this.enter(this.presenceData, (err: any) => {
-        if (err) {
-          this._alertErrorListeners(err);
-        } else {
-          this.channel.presence.get((err, members) => {
-            this.hereListeners.forEach(listener => listener(members, err));
-          });
-        }
-      });
-    });
+    this.channel.on("attached", () => this.enter(this.presenceData, this._alertErrorListeners));
     this.subscribe();
   }
 
   unsubscribe(): void {
-    this.leave(this.presenceData);
-    this.unregisterHere();
+    this.leave(this.presenceData, this._alertErrorListeners);
     this.channel.presence.unsubscribe();
     super.unsubscribe();
   }
@@ -40,7 +26,9 @@ export class AblyPresenceChannel extends AblyChannel implements PresenceChannel 
    * Register a callback to be called anytime the member list changes.
    */
   here(callback: Function): AblyPresenceChannel {
-    this.hereListeners.push(callback);
+    this.channel.presence.subscribe(['enter', 'update', 'leave'], _ => 
+      this.channel.presence.get((err, members) =>  callback(members, err)// returns local sync copy of updated members
+    ));
     return this;
   }
 
@@ -48,7 +36,7 @@ export class AblyPresenceChannel extends AblyChannel implements PresenceChannel 
    * Listen for someone joining the channel.
    */
   joining(callback: Function): AblyPresenceChannel {
-    this.channel.presence.subscribe('enter', (member) => {
+    this.channel.presence.subscribe(['enter', 'update'], (member) => {
       callback(member);
     });
 
@@ -98,16 +86,6 @@ export class AblyPresenceChannel extends AblyChannel implements PresenceChannel 
  */
   update(data: any, callback: Function): AblyPresenceChannel {
     this.channel.presence.update(data, callback as any);
-
-    return this;
-  }
-
-  unregisterHere(callback?: Function) {
-    if (callback) {
-      this.errorListeners = this.hereListeners.filter(e => e != callback);
-    } else {
-      this.errorListeners = [];
-    }
 
     return this;
   }
