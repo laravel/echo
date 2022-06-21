@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v1.11.7...master)
+## [Unreleased](https://github.com/laravel/echo/compare/v1.12.0...master)
+
+## [v1.12.0](https://github.com/laravel/echo/compare/v1.11.7...v1.12.0) - 2022-06-21
+
+### Added
+
+- User Authentication by @rennokki in https://github.com/laravel/echo/pull/340
 
 ## [v1.11.7](https://github.com/laravel/echo/compare/v1.11.6...v1.11.7) - 2022-04-21
 
