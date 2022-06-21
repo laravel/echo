@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v1.11.6...master)
+## [Unreleased](https://github.com/laravel/echo/compare/v1.11.7...master)
+
+## [v1.11.7](https://github.com/laravel/echo/compare/v1.11.6...v1.11.7) - 2022-04-21
+
+No significant changes.
 
 ## [v1.11.6](https://github.com/laravel/echo/compare/v1.11.5...v1.11.6) - 2022-04-21
 
