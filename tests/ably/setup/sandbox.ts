@@ -1,7 +1,6 @@
 import path from "path";
-import http from 'http';
-import https from 'https';
 import fs from 'fs';
+import { httpReqFunction } from "../../../src/channel/ably/utils";
 
 let restHost = 'sandbox-rest.ably.io';
 const tlsPort = 443;
@@ -23,28 +22,7 @@ const loadJsonData = (dataPath, callback) => {
     });
 }
 
-const httpReq = (options, callback) => {
-    var body = options.body;
-    delete options.body;
-    var response = '';
-    var request = (options.scheme == 'http' ? http : https).request(options, function (res) {
-        res.setEncoding('utf8');
-        res.on('data', function (chunk) {
-            response += chunk;
-        });
-        res.on('end', function () {
-            if (res.statusCode >= 300) {
-                callback('Invalid HTTP request: ' + response + '; statusCode = ' + res.statusCode);
-            } else {
-                callback(null, response);
-            }
-        });
-    });
-    request.on('error', function (err) {
-        callback(err);
-    });
-    request.end(body);
-}
+const httpReq = httpReqFunction();
 
 function prefixDomainWithEnvironment(domain, environment) {
     if (environment.toLowerCase() === 'production') {

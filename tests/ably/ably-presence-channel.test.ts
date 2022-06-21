@@ -77,14 +77,14 @@ describe('AblyPresenceChannel', () => {
         })
     })
 
-    test.skip('member left', done => {
+    test('member left', done => {
         const presenceChannel = echo.join('test') as AblyPresenceChannel;
-        presenceChannel.leaving((member) => {
+        presenceChannel.leaving(member => {
             safeAssert(() => {
                 expect(member.clientId).toBe('sacOO7@github.com');
                 expect(member.data).toStrictEqual({ name: 'sacOO7 leaving the channel' });
             }, done, true);
-        })
-        presenceChannel.leave({name: 'sacOO7 leaving the channel'});
+        });
+        presenceChannel.joining(()=> presenceChannel.leave({name: 'sacOO7 leaving the channel'}));
     })
 });

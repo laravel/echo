@@ -1,5 +1,5 @@
 import { beforeChannelAttach } from './attach';
-import { parseJwt, toTokenDetails } from './utils';
+import { httpReqFunction, parseJwt, toTokenDetails } from './utils';
 import { SequentialAuthTokenRequestExecuter } from './token-request';
 import { AblyChannel } from '../ably-channel';
 import { AblyConnector } from '../../connector/ably-connector';
@@ -9,6 +9,11 @@ export class AblyAuth {
 
     // TODO - Can be updated with request throttle, to send multiple request payload under single request
     authRequestExecuter: SequentialAuthTokenRequestExecuter;
+    authEndpoint = '/broadcasting/auth';
+    authHost = typeof window != 'undefined' && window?.location?.host;
+    authPort = typeof window != 'undefined' && window?.location?.port;
+
+    httpReq = httpReqFunction();
 
     authOptions = {
         queryTime: true,
@@ -24,13 +29,40 @@ export class AblyAuth {
         }
     }
 
-    // TODO - Add default HTTP request fn
-    requestToken = (channelName: string, existingToken: string) => {
+    requestToken = async (channelName: string, existingToken: string) => {
+        var postData = JSON.stringify({ channel_name: channelName, token: existingToken });
+        var postOptions = {
+            host: this.authHost,
+            port: this.authPort,
+            path: this.authEndpoint,
+            method: 'POST',
+            scheme: 'https',
+            headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'Content-Length': postData.length },
+            body: postData,
+        };
 
+        return new Promise((resolve, reject) => {
+            this.httpReq(postOptions, function (err: any, res: any) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(res);
+                }
+            })
+        });
     }
 
     constructor(options) {
-        const { token, requestTokenFn } = options;
+        const { token, requestTokenFn, authEndpoint, authHost, authPort } = options;
+        if (authEndpoint) {
+            this.authEndpoint = authEndpoint;
+        };
+        if (authHost) {
+            this.authHost = authHost;
+        }
+        if (authPort) {
+            this.authPort = authPort;
+        }
         this.authRequestExecuter = new SequentialAuthTokenRequestExecuter(token, requestTokenFn ?? this.requestToken);
     }
 
