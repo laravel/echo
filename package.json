@@ -21,8 +21,8 @@
     "types": "dist/echo.d.ts",
     "scripts": {
         "build": "npm run compile && npm run declarations",
-        "compile": "./node_modules/.bin/rollup -c",
-        "declarations": "./node_modules/.bin/tsc --emitDeclarationOnly",
+        "compile": "rollup -c",
+        "declarations": "tsc --emitDeclarationOnly",
         "lint": "eslint --ext .js,.ts ./src ./tests",
         "prepublish": "npm run build",
         "release": "npm run test && standard-version && git push --follow-tags && npm publish",
