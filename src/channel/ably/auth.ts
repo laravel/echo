@@ -12,6 +12,7 @@ export class AblyAuth {
     authEndpoint = '/broadcasting/auth';
     authHost = typeof window != 'undefined' && window?.location?.hostname;
     authPort = typeof window != 'undefined' && window?.location?.port;
+    authProtocol = typeof window != 'undefined' && window?.location?.protocol.replace(':', '');
 
     httpReq = httpReqFunction();
 
@@ -36,7 +37,7 @@ export class AblyAuth {
             port: this.authPort,
             path: this.authEndpoint,
             method: 'POST',
-            scheme: 'https',
+            scheme: this.authProtocol,
             headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'Content-Length': postData.length },
             body: postData,
         };
@@ -46,7 +47,11 @@ export class AblyAuth {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(res);
+                    if (typeof res === 'string') {
+                        resolve(JSON.parse(res));
+                    } else {
+                        resolve(res);
+                    }
                 }
             })
         });
