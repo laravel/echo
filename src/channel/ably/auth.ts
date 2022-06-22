@@ -10,7 +10,7 @@ export class AblyAuth {
     // TODO - Can be updated with request throttle, to send multiple request payload under single request
     authRequestExecuter: SequentialAuthTokenRequestExecuter;
     authEndpoint = '/broadcasting/auth';
-    authHost = typeof window != 'undefined' && window?.location?.host;
+    authHost = typeof window != 'undefined' && window?.location?.hostname;
     authPort = typeof window != 'undefined' && window?.location?.port;
 
     httpReq = httpReqFunction();
