@@ -10,13 +10,13 @@ export const beforeChannelAttach = (ablyClient, authorize: Function) => {
     if (channelAttachPatched) { //Only once all ably instance
         return;
     }
-    const internalAttach = dummyRealtimeChannel.__proto__._attach; // get parent class method, store it in temp. variable
+    const internalAttach = dummyRealtimeChannel.__proto__._attach; // get parent class method inferred from object, store it in temp. variable
     if (isNullOrUndefined(internalAttach)) {
         console.warn("channel internal attach function not found, please check for right library version")
         return;
     }
     function customInternalAttach(forceReattach, attachReason, errCallback) {// Define new function that needs to be added
-        const bindedInternalAttach = internalAttach.bind(this); // bind object instance at runtime based on who calls printMessage
+        const bindedInternalAttach = internalAttach.bind(this); // bind object instance at runtime
         // custom logic before attach
         authorize(this, (error) => {
             if (error) {
