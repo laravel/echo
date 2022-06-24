@@ -58,16 +58,19 @@ export class AblyAuth {
     }
 
     constructor(options) {
-        const { token, requestTokenFn, authEndpoint, authHost, authPort } = options;
+        const { token, requestTokenFn, authEndpoint, authHost, authPort, authProtocol } = options;
         if (authEndpoint) {
             this.authEndpoint = authEndpoint;
         };
         if (authHost) {
             this.authHost = authHost;
-        }
+        };
         if (authPort) {
             this.authPort = authPort;
-        }
+        };
+        if (authProtocol) {
+            this.authProtocol = authProtocol;
+        };
         this.authRequestExecuter = new SequentialAuthTokenRequestExecuter(token, requestTokenFn ?? this.requestToken);
     }
 
