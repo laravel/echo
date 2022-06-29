@@ -2,7 +2,7 @@ import babel from '@rollup/plugin-babel';
 import typescript from 'rollup-plugin-typescript2';
 
 export default {
-    input: './src/echo.ts',
+    input: './src/index.ts',
     output: [
         { file: './dist/echo.js', format: 'esm' },
         { file: './dist/echo.common.js', format: 'cjs' },
