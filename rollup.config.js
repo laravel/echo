@@ -30,9 +30,7 @@ export default [
     },
     {
         input: './src/index.iife.ts',
-        output: [
-            { file: './dist/echo.iife.js', format: 'iife', name: 'Echo' },
-        ],
+        output: [{ file: './dist/echo.iife.js', format: 'iife', name: 'Echo' }],
         plugins,
-    }
+    },
 ];

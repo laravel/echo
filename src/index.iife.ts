@@ -1,1 +1,1 @@
-export { default } from './echo'
+export { default } from './echo';
