@@ -16,9 +16,14 @@ export const beforeChannelAttach = (ablyClient, authorize: Function) => {
         return;
     }
     function customInternalAttach(forceReattach, attachReason, errCallback) {// Define new function that needs to be added
+        if (this.state === 'attached' || this.authorizing) {
+            return;
+        }
+        this.authorizing = true;
         const bindedInternalAttach = internalAttach.bind(this); // bind object instance at runtime
         // custom logic before attach
         authorize(this, (error) => {
+            this.authorizing = false;
             if (error) {
                 errCallback(error);
                 return;
