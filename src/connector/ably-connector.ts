@@ -1,5 +1,4 @@
 import { Connector } from './connector';
-import * as Ably from 'ably';
 
 import {
     AblyChannel,
@@ -7,6 +6,7 @@ import {
     AblyPresenceChannel,
     AblyAuth,
 } from './../channel';
+import { AblyRealtime } from '../../typings/ably';
 
 /**
  * This class creates a connector to Ably.
@@ -15,7 +15,7 @@ export class AblyConnector extends Connector {
     /**
      * The Ably instance.
      */
-    ably: Ably.Types.RealtimeCallbacks;
+    ably: AblyRealtime;
 
     /**
      * All of the subscribed channel names.

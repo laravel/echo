@@ -1,5 +1,3 @@
-import * as ably from 'ably';
-
 export const isNullOrUndefined = (obj) => obj == null || obj === undefined;
 export const isEmptyString = (stringToCheck, ignoreSpaces = true) => (ignoreSpaces ? stringToCheck.trim() : stringToCheck) === '';
 export const isNullOrUndefinedOrEmpty = (obj) => obj == null || obj === undefined || isEmptyString(obj);
@@ -103,7 +101,7 @@ export function httpReqFunction() {
                      * simulation apps self-delete after a while */
                     callback();
                 } else {// @ts-ignore
-                    new ably.Rest.Platform.Http().doUri( 
+                    new Ably.Rest.Platform.Http().doUri( 
                         options.method,
                         null,
                         uri,

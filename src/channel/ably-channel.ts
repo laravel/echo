@@ -1,6 +1,6 @@
+import { AblyRealtime, AblyRealtimeChannel } from '../../typings/ably';
 import { EventFormatter } from '../util';
 import { Channel } from './channel';
-import * as AblyImport from 'ably';
 
 /**
  * This class represents an Ably channel.
@@ -9,7 +9,7 @@ export class AblyChannel extends Channel {
     /**
      * The Ably client instance.
      */
-    ably: AblyImport.Types.RealtimeCallbacks;
+    ably: AblyRealtime;
 
     /**
      * The name of the channel.
@@ -29,7 +29,7 @@ export class AblyChannel extends Channel {
     /**
      * The subscription of the channel.
      */
-    channel: AblyImport.Types.RealtimeChannelCallbacks;
+    channel: AblyRealtimeChannel;
 
     /**
      * An array containing all registered subscribed listeners.
