@@ -171,7 +171,7 @@ describe('AblyChannel', () => {
 
         execute(() => mockAuthServer.broadcast('public:test', 'client-msg', 'Hello there'), 4);
         execute(() => mockAuthServer.broadcast('public:test', 'client-msg2', 'Hello there'), 1);
-        await sleep(3000);
+        await sleep(4000);
         expect(eventHandler1).toBeCalledTimes(4);
         expect(eventHandler2).toBeCalledTimes(4);
         expect(eventHandler3).toBeCalledTimes(1);
