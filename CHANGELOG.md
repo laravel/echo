@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v1.12.0...master)
+## [Unreleased](https://github.com/laravel/echo/compare/v1.12.1...master)
+
+## [v1.12.1](https://github.com/laravel/echo/compare/v1.12.0...v1.12.1) - 2022-07-13
+
+### Fixed
+
+- Fix IIFE build by @timacdonald in https://github.com/laravel/echo/pull/344
 
 ## [v1.12.0](https://github.com/laravel/echo/compare/v1.11.7...v1.12.0) - 2022-06-21
 
