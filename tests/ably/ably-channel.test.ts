@@ -1,8 +1,9 @@
 import { setup, tearDown } from './setup/sandbox';
 import Echo from '../../src/echo';
 import { MockAuthServer } from './setup/mock-auth-server';
-import { AblyChannel } from '../../src/channel';
+import { AblyChannel, AblyPresenceChannel } from '../../src/channel';
 import safeAssert, { execute, sleep } from './setup/utils';
+import * as Ably from 'ably';
 
 jest.setTimeout(20000);
 describe('AblyChannel', () => {
@@ -33,6 +34,7 @@ describe('AblyChannel', () => {
     })
 
     beforeEach(() => {
+        global.Ably = Ably;
         echo = new Echo({
             broadcaster: 'ably',
             useTls: true,
@@ -185,5 +187,24 @@ describe('AblyChannel', () => {
         expect(eventHandler2).toBeCalledTimes(3);
         expect(eventHandler3).toBeCalledTimes(2);
 
+    })
+
+    test('Leave channel', async() => {
+        const publicChannel = echo.channel('test') as AblyChannel;
+        const privateChannel = echo.private('test') as AblyChannel;
+        const presenceChannel = echo.join('test') as AblyPresenceChannel;
+        const publicChannelSubscription = new Promise(resolve => publicChannel.subscribed(resolve));
+        const privateChannelSubscription = new Promise(resolve => privateChannel.subscribed(resolve));
+        const presenceChannelSubscription = new Promise(resolve => presenceChannel.subscribed(resolve));
+        
+        await Promise.all([publicChannelSubscription, privateChannelSubscription, presenceChannelSubscription]);
+
+        echo.leave('test');
+
+        const publicDetachPromise = new Promise(resolve => publicChannel.channel.on('detached', resolve));
+        const privateDetachPromise = new Promise(resolve => privateChannel.channel.on('detached', resolve));
+        const presenceDetachPromise = new Promise(resolve => presenceChannel.channel.on('detached', resolve));
+
+        await Promise.all([publicDetachPromise, privateDetachPromise, presenceDetachPromise]);
     })
 });
