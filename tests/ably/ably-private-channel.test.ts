@@ -3,6 +3,7 @@ import Echo from '../../src/echo';
 import { MockAuthServer } from './setup/mock-auth-server';
 import safeAssert from './setup/utils';
 import { AblyChannel, AblyPrivateChannel } from '../../src/channel';
+import * as Ably from 'ably';
 
 jest.setTimeout(20000);
 describe('AblyPrivateChannel', () => {
@@ -33,6 +34,7 @@ describe('AblyPrivateChannel', () => {
     })
 
     beforeEach(() => {
+        global.Ably = Ably;
         echo = new Echo({
             broadcaster: 'ably',
             useTls: true,
