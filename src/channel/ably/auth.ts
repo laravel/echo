@@ -76,6 +76,7 @@ export class AblyAuth {
 
     enableAuthorizeBeforeChannelAttach = (ablyConnector: AblyConnector) => {
         const ablyClient: any = ablyConnector.ably;
+        ablyClient.auth.getTimestamp(this.authOptions.queryTime, ()=> {}); // generates serverTimeOffset in the background
         beforeChannelAttach(ablyClient, (realtimeChannel, errorCallback) => {
             const channelName = realtimeChannel.name;
             if (channelName.startsWith("public:")) {
@@ -88,7 +89,7 @@ export class AblyAuth {
             if (tokenDetails) {
                 const capability = parseJwt(tokenDetails.token).payload['x-ably-capability'];
                 const tokenHasChannelCapability = capability.includes(`${channelName}"`);
-                if (tokenHasChannelCapability && tokenDetails.expires > Date.now()) { // TODO : Replace with server time
+                if (tokenHasChannelCapability && tokenDetails.expires > ablyClient.auth.getTimestampUsingOffset()) { // checks with server time using offset, otherwise local time
                     errorCallback(null);
                     return;
                 }
