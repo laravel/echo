@@ -15,6 +15,7 @@ export abstract class Connector {
         },
         broadcaster: 'pusher',
         csrfToken: null,
+        bearerToken: null,
         host: null,
         key: null,
         namespace: 'App.Events',
@@ -44,6 +45,9 @@ export abstract class Connector {
         if (token) {
             this.options.auth.headers['X-CSRF-TOKEN'] = token;
             this.options.userAuthentication.headers['X-CSRF-TOKEN'] = token;
+        } else if (this.options.bearerToken) {
+            this.options.auth.headers['Authorization'] = 'Bearer ' + this.options.bearerToken;
+            this.options.userAuthentication.headers['Authorization'] = 'Bearer ' + this.options.bearerToken;
         }
 
         return options;
