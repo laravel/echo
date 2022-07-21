@@ -1,5 +1,5 @@
 import { beforeChannelAttach } from './attach';
-import { httpReqFunction, parseJwt, toTokenDetails } from './utils';
+import { httpRequest, toTokenDetails, parseJwt} from './utils';
 import { SequentialAuthTokenRequestExecuter } from './token-request';
 import { AblyChannel } from '../ably-channel';
 import { AblyConnector } from '../../connector/ably-connector';
@@ -13,8 +13,6 @@ export class AblyAuth {
     authHost = typeof window != 'undefined' && window?.location?.hostname;
     authPort = typeof window != 'undefined' && window?.location?.port;
     authProtocol = typeof window != 'undefined' && window?.location?.protocol.replace(':', '');
-
-    httpReq = httpReqFunction();
 
     authOptions = {
         queryTime: true,
@@ -43,7 +41,7 @@ export class AblyAuth {
         };
 
         return new Promise((resolve, reject) => {
-            this.httpReq(postOptions, function (err: any, res: any) {
+            httpRequest(postOptions, function (err: any, res: any) {
                 if (err) {
                     reject(err);
                 } else {
