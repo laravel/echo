@@ -50,6 +50,9 @@ export function httpRequest(options, callback) {
     if (!httpClient) {
         httpClient = new Ably.Rest.Platform.Http();
     }
+    if (isBrowser) {
+        delete options.headers['Content-Length']; // XHR warning - Refused to set unsafe header "Content-Length"
+    }
     httpClient.doUri(
         options.method,
         null,
