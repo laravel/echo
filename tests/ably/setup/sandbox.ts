@@ -9,10 +9,9 @@ const creatNewApp = async () => {
     };
     const res: {
         appId: string,
-        keys: { keyStr: string}[],
-      } = await got.post(sandboxUrl, { json: body }).json();
-
-    return res;  
+        keys: { keyStr: string }[],
+    } = await got.post(sandboxUrl, { json: body }).json();
+    return res;
 }
 
 const deleteApp = async (app) => {
