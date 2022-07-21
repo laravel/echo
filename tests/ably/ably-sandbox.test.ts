@@ -6,15 +6,12 @@ jest.setTimeout(20000);
 describe('AblySandbox', () => {
     let testApp;
 
-    beforeAll(done => {
-        setup((err, app) => {
-            if (err) {
-                done(err);
-                return;
-            }
-            testApp = app;
-            done();
-        })
+    beforeAll(async () => {
+        testApp = await setup();
+    })
+
+    afterAll(async() => {
+        return await tearDown(testApp);
     })
 
     test('init with key string', () => {
@@ -36,13 +33,4 @@ describe('AblySandbox', () => {
         });
     })
 
-    afterAll((done) => {
-        tearDown(testApp, (err) => {
-            if (err) {
-                done(err);
-                return;
-            }
-            done();
-        })
-    })
 });

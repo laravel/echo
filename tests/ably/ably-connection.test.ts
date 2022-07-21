@@ -10,26 +10,13 @@ describe('AblyConnection', () => {
     let mockAuthServer: MockAuthServer;
     let echo: Echo;
 
-    beforeAll(done => {
-        setup((err, app) => {
-            if (err) {
-                done(err);
-                return;
-            }
-            testApp = app;
-            mockAuthServer = new MockAuthServer(testApp.keys[0].keyStr);
-            done();
-        })
+    beforeAll(async () => {
+        testApp = await setup();
+        mockAuthServer = new MockAuthServer(testApp.keys[0].keyStr);
     })
 
-    afterAll((done) => {
-        tearDown(testApp, (err) => {
-            if (err) {
-                done(err);
-                return;
-            }
-            done();
-        })
+    afterAll(async() => {
+        return await tearDown(testApp);
     })
 
     beforeEach(() => {
