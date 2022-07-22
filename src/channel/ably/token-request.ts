@@ -24,13 +24,14 @@ export class SequentialAuthTokenRequestExecuter {
     request = (channelName: string):Promise<{token : string, info: any}> => this.execute(token => this.requestTokenFn(channelName, token));
 }
 
+type Task = Function;
 class TaskQueue {
     total: Number;
-    todo: Array<Function>;
-    running: Array<Function>;
+    todo: Array<Task>;
+    running: Array<Task>;
     count: Number;
 
-    constructor(tasks = [], concurrentCount = 1) {
+    constructor(tasks : Array<Task>= [], concurrentCount = 1) {
         this.total = tasks.length;
         this.todo = tasks;
         this.running = [];
@@ -39,7 +40,7 @@ class TaskQueue {
 
     canRunNext = () => (this.running.length < this.count) && this.todo.length;
 
-    run = async (task: Function) => {
+    run = async (task: Task) => {
         if (task) {
             this.todo.push(task);
         }
