@@ -7,7 +7,6 @@ import { AblyPresenceChannel } from '../ably-presence-channel';
 
 export class AblyAuth {
 
-    // TODO - Can be updated with request throttle, to send multiple request payload under single request
     authRequestExecuter: SequentialAuthTokenRequestExecuter;
     authEndpoint = '/broadcasting/auth';
     authHost = typeof window != 'undefined' && window?.location?.hostname;
@@ -17,9 +16,9 @@ export class AblyAuth {
     authOptions = {
         queryTime: true,
         useTokenAuth: true,
-        authCallback: async (_, callback) => { // get token from tokenParams
+        authCallback: async (_, callback) => {
             try {
-                const { token } = await this.authRequestExecuter.request(null); // Replace this by network request to PHP server
+                const { token } = await this.authRequestExecuter.request(null); 
                 const tokenDetails = toTokenDetails(token);
                 callback(null, tokenDetails);
             } catch (error) {
@@ -104,7 +103,7 @@ export class AblyAuth {
                         errorCallback(null);
                     }
                 });
-            }).catch(err => errorCallback(err)); // TODO : Check if errors/exceptions are properly handled
+            }).catch(err => errorCallback(err));
         });
     }
 
@@ -134,4 +133,3 @@ export class AblyAuth {
         }
     }
 }
-

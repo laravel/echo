@@ -7,5 +7,4 @@ declare global {
     var axios: any;
     var jQuery: any;
 }
-
 export {};

@@ -1,6 +1,5 @@
 import { parseJwt, toTokenDetails } from "../../src/channel/ably/utils";
 
-// TODO - Update token with string capability
 describe('Utils', () => {
   test('should parse JWT properly', () => {
     const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImtpZCI6ImFiY2QifQ.eyJpYXQiOjE2NTQ2MzQyMTIsImV4cCI6MTY1NDYzNzgxMiwieC1hYmx5LWNsaWVudElkIjoidXNlcjEyMyIsIngtYWJseS1jYXBhYmlsaXR5Ijoie1wicHVibGljOipcIjpbXCJzdWJzY3JpYmVcIixcImhpc3RvcnlcIixcImNoYW5uZWwtbWV0YWRhdGFcIl19In0.GenM5EyUeJvgAGBD_EG-89FueNKWtyRZyi61s9G2Bs4";

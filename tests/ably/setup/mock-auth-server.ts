@@ -86,4 +86,3 @@ export class MockAuthServer {
         return claims;
     }
 }
-

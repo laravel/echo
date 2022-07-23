@@ -56,7 +56,6 @@ describe('AblyPrivateChannel', () => {
             });
     })
 
-    // TODO - fix recursived attach when connection is closed, reproduce using API_KEY instead of sandbox
     test('channel subscription error, token expired', done => {
         mockAuthServer.setAuthExceptions(['private:shortLivedChannel']);
         const privateChannel = echo.private('shortLivedChannel') as AblyChannel;
