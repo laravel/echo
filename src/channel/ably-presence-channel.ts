@@ -26,7 +26,7 @@ export class AblyPresenceChannel extends AblyChannel implements PresenceChannel 
    * Register a callback to be called anytime the member list changes.
    */
   here(callback: Function): AblyPresenceChannel {
-    this.channel.presence.subscribe(['enter', 'update', 'leave'], _ => 
+    this.channel.presence.subscribe(['enter', 'update', 'leave'], () => 
       this.channel.presence.get((err, members) =>  callback(members, err)// returns local sync copy of updated members
     ));
     return this;
@@ -36,7 +36,7 @@ export class AblyPresenceChannel extends AblyChannel implements PresenceChannel 
    * Listen for someone joining the channel.
    */
   joining(callback: Function): AblyPresenceChannel {
-    this.channel.presence.subscribe(['enter', 'update'], (member) => {
+    this.channel.presence.subscribe(['enter', 'update'], member => {
       callback(member);
     });
 
@@ -47,7 +47,7 @@ export class AblyPresenceChannel extends AblyChannel implements PresenceChannel 
    * Listen for someone leaving the channel.
    */
   leaving(callback: Function): AblyPresenceChannel {
-    this.channel.presence.subscribe('leave', (member) => {
+    this.channel.presence.subscribe('leave', member => {
       callback(member);
     });
 
