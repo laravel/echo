@@ -1,3 +1,5 @@
+import { TokenDetails } from "../../../typings/ably";
+
 export const isNullOrUndefined = (obj) => obj == null || obj === undefined;
 export const isEmptyString = (stringToCheck, ignoreSpaces = true) => (ignoreSpaces ? stringToCheck.trim() : stringToCheck) === '';
 export const isNullOrUndefinedOrEmpty = (obj) => obj == null || obj === undefined || isEmptyString(obj);
@@ -18,7 +20,7 @@ export const parseJwt = (jwtToken: string): { header: any, payload: any } => {
 }
 
 // RSA4f - tokenDetails size should't exceed 128kb, so omitted `capability` property
-export const toTokenDetails = (jwtToken: string) => {
+export const toTokenDetails = (jwtToken: string) : TokenDetails | any => {
     const { payload } = parseJwt(jwtToken);
     return {
         clientId: payload['x-ably-clientId'],

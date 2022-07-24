@@ -1,9 +1,10 @@
 import { beforeChannelAttach } from './attach';
-import { httpRequest, toTokenDetails, parseJwt} from './utils';
+import { httpRequest, toTokenDetails, parseJwt } from './utils';
 import { SequentialAuthTokenRequestExecuter } from './token-request';
 import { AblyChannel } from '../ably-channel';
 import { AblyConnector } from '../../connector/ably-connector';
 import { AblyPresenceChannel } from '../ably-presence-channel';
+import { AuthOptions, ChannelStateChange } from '../../../typings/ably';
 
 export class AblyAuth {
 
@@ -13,12 +14,12 @@ export class AblyAuth {
     authPort = typeof window != 'undefined' && window?.location?.port;
     authProtocol = typeof window != 'undefined' && window?.location?.protocol.replace(':', '');
 
-    authOptions = {
+    authOptions : AuthOptions = {
         queryTime: true,
         useTokenAuth: true,
         authCallback: async (_, callback) => {
             try {
-                const { token } = await this.authRequestExecuter.request(null); 
+                const { token } = await this.authRequestExecuter.request(null);
                 const tokenDetails = toTokenDetails(token);
                 callback(null, tokenDetails);
             } catch (error) {
@@ -27,7 +28,7 @@ export class AblyAuth {
         }
     }
 
-    requestToken = async (channelName: string, existingToken: string) => {
+    async requestToken(channelName: string, existingToken: string) {
         var postData = JSON.stringify({ channel_name: channelName, token: existingToken });
         var postOptions = {
             host: this.authHost,
@@ -71,9 +72,9 @@ export class AblyAuth {
         this.authRequestExecuter = new SequentialAuthTokenRequestExecuter(token, requestTokenFn ?? this.requestToken);
     }
 
-    enableAuthorizeBeforeChannelAttach = (ablyConnector: AblyConnector) => {
+    enableAuthorizeBeforeChannelAttach(ablyConnector: AblyConnector) {
         const ablyClient: any = ablyConnector.ably;
-        ablyClient.auth.getTimestamp(this.authOptions.queryTime, ()=> {}); // generates serverTimeOffset in the background
+        ablyClient.auth.getTimestamp(this.authOptions.queryTime, () => { }); // generates serverTimeOffset in the background
         beforeChannelAttach(ablyClient, (realtimeChannel, errorCallback) => {
             const channelName = realtimeChannel.name;
             if (channelName.startsWith("public:")) {
@@ -107,9 +108,11 @@ export class AblyAuth {
         });
     }
 
-    onChannelFailed = (echoAblyChannel: AblyChannel) => stateChange => {
-        if (stateChange.reason?.code == 40160) { // channel capability rejected https://help.ably.io/error/40160
-            this.handleChannelAuthError(echoAblyChannel);
+    onChannelFailed(echoAblyChannel: AblyChannel) {
+        return (stateChange: ChannelStateChange) => {
+            if (stateChange.reason?.code == 40160) { // channel capability rejected https://help.ably.io/error/40160
+                this.handleChannelAuthError(echoAblyChannel);
+            }
         }
     }
 
