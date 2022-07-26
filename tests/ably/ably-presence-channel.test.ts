@@ -58,20 +58,20 @@ describe('AblyPresenceChannel', () => {
 
     test('member joined', done => {
         const presenceChannel = echo.join('test') as AblyPresenceChannel;
-        presenceChannel.joining(member => {
+        presenceChannel.joining((memberData, memberMetaData) => {
             safeAssert(() => {
-                expect(member.clientId).toBe('sacOO7@github.com');
-                expect(member.data).toStrictEqual({ id: 'sacOO7@github.com', name: 'sacOO7' });
+                expect(memberData).toStrictEqual({ id: 'sacOO7@github.com', name: 'sacOO7' });
+                expect(memberMetaData.clientId).toBe('sacOO7@github.com');
             }, done, true);
         })
     })
 
     test('member left', done => {
         const presenceChannel = echo.join('test') as AblyPresenceChannel;
-        presenceChannel.leaving(member => {
+        presenceChannel.leaving((memberData, memberMetaData) => {
             safeAssert(() => {
-                expect(member.clientId).toBe('sacOO7@github.com');
-                expect(member.data).toStrictEqual({ name: 'sacOO7 leaving the channel' });
+                expect(memberData).toStrictEqual({ name: 'sacOO7 leaving the channel' });
+                expect(memberMetaData.clientId).toBe('sacOO7@github.com');
             }, done, true);
         });
         presenceChannel.joining(()=> presenceChannel.leave({name: 'sacOO7 leaving the channel'}));
