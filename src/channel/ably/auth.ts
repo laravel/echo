@@ -14,7 +14,7 @@ export class AblyAuth {
     authPort = typeof window != 'undefined' && window?.location?.port;
     authProtocol = typeof window != 'undefined' && window?.location?.protocol.replace(':', '');
 
-    authOptions : AuthOptions = {
+    authOptions: AuthOptions = {
         queryTime: true,
         useTokenAuth: true,
         authCallback: async (_, callback) => {
@@ -28,7 +28,7 @@ export class AblyAuth {
         }
     }
 
-    async requestToken(channelName: string, existingToken: string) {
+    requestToken = async (channelName: string, existingToken: string) => {
         let postData = JSON.stringify({ channel_name: channelName, token: existingToken });
         let postOptions = {
             host: this.authHost,
@@ -72,9 +72,9 @@ export class AblyAuth {
         this.authRequestExecuter = new SequentialAuthTokenRequestExecuter(token, requestTokenFn ?? this.requestToken);
     }
 
-    enableAuthorizeBeforeChannelAttach(ablyConnector: AblyConnector) {
+    enableAuthorizeBeforeChannelAttach = (ablyConnector: AblyConnector) => {
         const ablyClient: any = ablyConnector.ably;
-        ablyClient.auth.getTimestamp(this.authOptions.queryTime, () => { 
+        ablyClient.auth.getTimestamp(this.authOptions.queryTime, () => {
             // do nothing.
         }); // generates serverTimeOffset in the background
         beforeChannelAttach(ablyClient, (realtimeChannel, errorCallback) => {
@@ -110,11 +110,9 @@ export class AblyAuth {
         });
     }
 
-    onChannelFailed(echoAblyChannel: AblyChannel) {
-        return (stateChange: ChannelStateChange) => {
-            if (stateChange.reason?.code == 40160) { // channel capability rejected https://help.ably.io/error/40160
-                this.handleChannelAuthError(echoAblyChannel);
-            }
+    onChannelFailed = (echoAblyChannel: AblyChannel) => (stateChange: ChannelStateChange) => {
+        if (stateChange.reason?.code == 40160) { // channel capability rejected https://help.ably.io/error/40160
+            this.handleChannelAuthError(echoAblyChannel);
         }
     }
 
