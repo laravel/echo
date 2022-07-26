@@ -29,8 +29,8 @@ export class AblyAuth {
     }
 
     async requestToken(channelName: string, existingToken: string) {
-        var postData = JSON.stringify({ channel_name: channelName, token: existingToken });
-        var postOptions = {
+        let postData = JSON.stringify({ channel_name: channelName, token: existingToken });
+        let postOptions = {
             host: this.authHost,
             port: this.authPort,
             path: this.authEndpoint,
@@ -59,22 +59,24 @@ export class AblyAuth {
         const { token, requestTokenFn, authEndpoint, authHost, authPort, authProtocol } = options;
         if (authEndpoint) {
             this.authEndpoint = authEndpoint;
-        };
+        }
         if (authHost) {
             this.authHost = authHost;
-        };
+        }
         if (authPort) {
             this.authPort = authPort;
-        };
+        }
         if (authProtocol) {
             this.authProtocol = authProtocol;
-        };
+        }
         this.authRequestExecuter = new SequentialAuthTokenRequestExecuter(token, requestTokenFn ?? this.requestToken);
     }
 
     enableAuthorizeBeforeChannelAttach(ablyConnector: AblyConnector) {
         const ablyClient: any = ablyConnector.ably;
-        ablyClient.auth.getTimestamp(this.authOptions.queryTime, () => { }); // generates serverTimeOffset in the background
+        ablyClient.auth.getTimestamp(this.authOptions.queryTime, () => { 
+            // do nothing.
+        }); // generates serverTimeOffset in the background
         beforeChannelAttach(ablyClient, (realtimeChannel, errorCallback) => {
             const channelName = realtimeChannel.name;
             if (channelName.startsWith("public:")) {

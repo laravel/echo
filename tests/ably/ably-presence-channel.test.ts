@@ -49,6 +49,7 @@ describe('AblyPresenceChannel', () => {
         const presenceChannel = echo.join('test') as AblyPresenceChannel;
         presenceChannel.here((members, err) => {
             safeAssert(() => {
+                expect(err).toBeFalsy();
                 expect(members).toHaveLength(1);
                 expect(members[0].clientId).toBe('sacOO7@github.com');
                 expect(members[0].data).toStrictEqual({ id: 'sacOO7@github.com', name: 'sacOO7' });

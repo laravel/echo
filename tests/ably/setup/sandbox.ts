@@ -3,7 +3,7 @@ import got from 'got';
 let sandboxUrl = 'https://sandbox-rest.ably.io/apps';
 
 const creatNewApp = async () => {
-    var body = {
+    let body = {
         "keys": [{}],
         "namespaces": []
     };
@@ -15,7 +15,7 @@ const creatNewApp = async () => {
 }
 
 const deleteApp = async (app) => {
-    var authKey = app.keys[0].keyStr;
+    let authKey = app.keys[0].keyStr;
     return got.delete(`${sandboxUrl}/${app.appId}?key=${authKey}`);
 }
 

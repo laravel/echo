@@ -10,8 +10,8 @@ export class SequentialAuthTokenRequestExecuter {
     }
 
     execute(tokenRequestFn: Function): Promise<{ token: string, info: any }> {
-        return new Promise(async (resolve, reject) => {
-            await this.queue.run(async () => {
+        return new Promise((resolve, reject) => {
+             this.queue.run(async () => {
                 try {
                     const { token, info } = await tokenRequestFn(this.cachedToken);
                     this.cachedToken = token;
@@ -44,7 +44,7 @@ class TaskQueue {
 
     canRunNext() {
         return (this.running.length < this.count) && this.todo.length;
-    };
+    }
 
     async run(task: Task) {
         if (task) {

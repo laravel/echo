@@ -1,13 +1,13 @@
 import { isNullOrUndefined } from './utils';
 
-let channelAttachPatched = false;
+let channelAttachAuthorized = false;
 
 /**
  * Modifies existing channel attach with custom authz implementation
  */
 export const beforeChannelAttach = (ablyClient, authorize: Function) => {
     const dummyRealtimeChannel = ablyClient.channels.get("dummy");
-    if (channelAttachPatched) { //Only once all ably instance
+    if (channelAttachAuthorized) { //Only once all ably instance
         return;
     }
     const internalAttach = dummyRealtimeChannel.__proto__._attach; // get parent class method inferred from object, store it in temp. variable
@@ -33,5 +33,5 @@ export const beforeChannelAttach = (ablyClient, authorize: Function) => {
         })
     }
     dummyRealtimeChannel.__proto__._attach = customInternalAttach; // add updated extension method to parent class, auto binded
-    channelAttachPatched = true;
+    channelAttachAuthorized = true;
 }
