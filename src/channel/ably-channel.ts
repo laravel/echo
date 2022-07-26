@@ -42,6 +42,11 @@ export class AblyChannel extends Channel {
     errorListeners: Function[];
 
     /**
+     * Channel event subscribe callbacks, maps callback to modified implementation.
+     */
+    callbacks: Map<Function, Function>;
+
+    /**
      * Create a new class instance.
      */
     constructor(ably: any, name: string, options: any, autoSubscribe = true) {
@@ -54,6 +59,7 @@ export class AblyChannel extends Channel {
         this.subscribedListeners = [];
         this.errorListeners = [];
         this.channel = ably.channels.get(name);
+        this.callbacks = new Map();
 
         if (autoSubscribe) {
             this.subscribe();
@@ -80,6 +86,7 @@ export class AblyChannel extends Channel {
      */
     unsubscribe(): void {
         this.channel.unsubscribe();
+        this.callbacks.clear();
         this.unregisterError();
         this.unregisterSubscribed();
         this.channel.off();
@@ -89,9 +96,9 @@ export class AblyChannel extends Channel {
     /**
      * Listen for an event on the channel instance.
      */
-    listen(event: string, callback: Function | any): AblyChannel {
-        this.channel.subscribe(this.eventFormatter.format(event), callback);
-
+    listen(event: string, callback: Function): AblyChannel {
+        this.callbacks.set(callback, ({ data, ...metaData }) => callback(data, metaData));
+        this.channel.subscribe(this.eventFormatter.format(event), this.callbacks.get(callback) as any);
         return this;
     }
 
@@ -99,14 +106,14 @@ export class AblyChannel extends Channel {
      * Listen for all events on the channel instance.
      */
     listenToAll(callback: Function): AblyChannel {
-        this.channel.subscribe(({ name, data }) => {
+        this.callbacks.set(callback, ({ name, data, ...metaData }) => {
             let namespace = this.options.namespace.replace(/\./g, '\\');
 
             let formattedEvent = name.startsWith(namespace) ? name.substring(namespace.length + 1) : '.' + name;
 
-            callback(formattedEvent, data);
+            callback(formattedEvent, data, metaData);
         });
-
+        this.channel.subscribe(this.callbacks.get(callback) as any);
         return this;
     }
 
@@ -115,7 +122,8 @@ export class AblyChannel extends Channel {
      */
     stopListening(event: string, callback?: Function): AblyChannel {
         if (callback) {
-            this.channel.unsubscribe(this.eventFormatter.format(event), callback as any);
+            this.channel.unsubscribe(this.eventFormatter.format(event), this.callbacks.get(callback) as any);
+            this.callbacks.delete(callback);
         } else {
             this.channel.unsubscribe(this.eventFormatter.format(event));
         }
@@ -128,7 +136,8 @@ export class AblyChannel extends Channel {
      */
     stopListeningToAll(callback?: Function): AblyChannel {
         if (callback) {
-            this.channel.unsubscribe(callback as any);
+            this.channel.unsubscribe(this.callbacks.get(callback) as any);
+            this.callbacks.delete(callback);
         } else {
             this.channel.unsubscribe();
         }

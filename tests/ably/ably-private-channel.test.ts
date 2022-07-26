@@ -51,7 +51,7 @@ describe('AblyPrivateChannel', () => {
             .subscribed(() => {
                 privateChannel.whisper('msg', 'Hello there jonny!');
             })
-            .listenForWhisper('msg', ({ data }) => {
+            .listenForWhisper('msg', data => {
                 safeAssert(() => expect(data).toBe('Hello there jonny!'), done, true);
             });
     })

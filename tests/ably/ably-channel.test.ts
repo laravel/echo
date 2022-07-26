@@ -50,7 +50,7 @@ describe('AblyChannel', () => {
             .subscribed(() => {
                 mockAuthServer.broadcast('public:test', 'App\\Events\\testEvent', 'Hello there');
             })
-            .listen('testEvent', ({ data }) => {
+            .listen('testEvent', data => {
                 safeAssert(() => expect(data).toBe('Hello there'), done, true);
             });
     });
@@ -62,7 +62,7 @@ describe('AblyChannel', () => {
             .subscribed(() => {
                 mockAuthServer.broadcast('public:test', 'testEvent', 'Hello there');
             })
-            .listen('.testEvent', ({ data }) => {
+            .listen('.testEvent', data => {
                 safeAssert(() => expect(data).toBe('Hello there'), done, true);
             });
     });
@@ -73,7 +73,7 @@ describe('AblyChannel', () => {
             .subscribed(() => {
                 mockAuthServer.broadcast('public:test', 'client-msg', 'Hello there');
             })
-            .listenForWhisper('msg', ({ data }) => {
+            .listenForWhisper('msg', data => {
                 safeAssert(() => expect(data).toBe('Hello there'), done, true);
             });
     })
@@ -85,7 +85,7 @@ describe('AblyChannel', () => {
             .subscribed(() => {
                 mockAuthServer.broadcast('public:test', 'Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', 'Hello there');
             })
-            .notification(({ data }) => {
+            .notification( data => {
                 safeAssert(() => expect(data).toBe('Hello there'), done, true);
             });
     })
@@ -169,7 +169,7 @@ describe('AblyChannel', () => {
 
         execute(() => mockAuthServer.broadcast('public:test', 'client-msg', 'Hello there'), 4);
         execute(() => mockAuthServer.broadcast('public:test', 'client-msg2', 'Hello there'), 1);
-        
+
         await waitForExpect(() => {
             expect(eventHandler1).toBeCalledTimes(4);
             expect(eventHandler2).toBeCalledTimes(4);
@@ -181,7 +181,7 @@ describe('AblyChannel', () => {
 
         execute(() => mockAuthServer.broadcast('public:test', 'client-msg', 'Hello there'), 3);
         execute(() => mockAuthServer.broadcast('public:test', 'client-msg2', 'Hello there'), 2);
-        
+
         await waitForExpect(() => {
             expect(eventHandler1).toBeCalledTimes(0);
             expect(eventHandler2).toBeCalledTimes(3);
