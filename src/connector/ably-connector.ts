@@ -1,8 +1,12 @@
 import { Connector } from './connector';
-import { AblyChannel } from '../channel/ably-channel';
-import * as AblyImport from 'ably';
-import { PresenceChannel } from '../channel';
-import { AblyPresenceChannel } from '../channel/ably-presence-channel';
+
+import {
+    AblyChannel,
+    AblyPrivateChannel,
+    AblyPresenceChannel,
+    AblyAuth,
+} from './../channel';
+import { AblyRealtime } from '../../typings/ably';
 
 /**
  * This class creates a connector to Ably.
@@ -11,12 +15,17 @@ export class AblyConnector extends Connector {
     /**
      * The Ably instance.
      */
-    ably: AblyImport.Types.RealtimeCallbacks;
+    ably: AblyRealtime;
 
     /**
      * All of the subscribed channel names.
      */
     channels: Record<string, AblyChannel> = {};
+
+    /**
+     * Auth instance containing all explicit channel authz ops.
+     */
+    ablyAuth: AblyAuth;
 
     /**
      * Create a fresh Ably connection.
@@ -25,7 +34,9 @@ export class AblyConnector extends Connector {
         if (typeof this.options.client !== 'undefined') {
             this.ably = this.options.client;
         } else {
-            this.ably = new Ably.Realtime(this.options);
+            this.ablyAuth = new AblyAuth(this.options);
+            this.ably = new Ably.Realtime({ ...this.ablyAuth.authOptions, ...this.options });
+            this.ablyAuth.enableAuthorizeBeforeChannelAttach(this);
         }
     }
 
@@ -40,61 +51,43 @@ export class AblyConnector extends Connector {
      * Get a channel instance by name.
      */
     channel(name: string): AblyChannel {
-        if (!this.channels[name]) {
-            this.channels[name] = new AblyChannel(this.ably, name, this.options);
+        const prefixedName = `public:${name}`; // adding public as a ably namespace prefix
+        if (!this.channels[prefixedName]) {
+            this.channels[prefixedName] = new AblyChannel(this.ably, prefixedName, this.options);
         }
 
-        return this.channels[name];
+        return this.channels[prefixedName];
     }
 
     /**
      * Get a private channel instance by name.
      */
-    privateChannel(name: string): AblyChannel {
-        // if (!this.channels['private-' + name]) {
-        //     this.channels['private-' + name] = new AblyPrivateChannel(this.ably, 'private-' + name, this.options);
-        // }
-        //
-        // return this.channels['private-' + name];
-        return this.channel(name);
-    }
-
-    /**
-     * Get a private encrypted channel instance by name.
-     */
-    encryptedPrivateChannel(name: string): AblyChannel {
-        // if (!this.channels['private-encrypted-' + name]) {
-        //     this.channels['private-encrypted-' + name] = new AblyEncryptedPrivateChannel(
-        //         this.ably,
-        //         'private-encrypted-' + name,
-        //         this.options
-        //     );
-        // }
-        //
-        // return this.channels['private-encrypted-' + name];
-        return this.channel(name);
-    }
-
-    /**
-     * Get a presence channel instance by name.
-     */
-    presenceChannel(name: string): PresenceChannel {
-        if (!this.channels['presence-' + name]) {
-            this.channels['presence-' + name] = new AblyPresenceChannel(
-                this.ably,
-                'presence-' + name,
-                this.options
-            );
+    privateChannel(name: string): AblyPrivateChannel {
+        const prefixedName = `private:${name}`; // adding private as a ably namespace prefix
+        if (!this.channels[prefixedName]) {
+            this.channels[prefixedName] = new AblyPrivateChannel(this.ably, prefixedName, this.options, this.ablyAuth);
         }
 
-        return this.channels['presence-' + name] as AblyPresenceChannel;
+        return this.channels[prefixedName] as AblyPrivateChannel;
+    }
+
+    /**
+    * Get a presence channel instance by name.
+    */
+    presenceChannel(name: string): AblyPresenceChannel {
+        const prefixedName = `presence:${name}`; // adding presence as a ably namespace prefix
+        if (!this.channels[prefixedName]) {
+            this.channels[prefixedName] = new AblyPresenceChannel(this.ably, prefixedName, this.options, this.ablyAuth);
+        }
+
+        return this.channels[prefixedName] as AblyPresenceChannel;
     }
 
     /**
      * Leave the given channel, as well as its private and presence variants.
      */
     leave(name: string): void {
-        let channels = [name, 'private-' + name, 'presence-' + name];
+        let channels = [`public:${name}`, `private:${name}`, `presence:${name}`];
 
         channels.forEach((name: string, index: number) => {
             this.leaveChannel(name);

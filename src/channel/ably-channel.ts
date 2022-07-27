@@ -1,6 +1,6 @@
+import { AblyRealtime, AblyRealtimeChannel } from '../../typings/ably';
 import { EventFormatter } from '../util';
 import { Channel } from './channel';
-import * as AblyImport from 'ably';
 
 /**
  * This class represents an Ably channel.
@@ -9,7 +9,7 @@ export class AblyChannel extends Channel {
     /**
      * The Ably client instance.
      */
-    ably: AblyImport.Types.RealtimeCallbacks;
+    ably: AblyRealtime;
 
     /**
      * The name of the channel.
@@ -29,7 +29,7 @@ export class AblyChannel extends Channel {
     /**
      * The subscription of the channel.
      */
-    channel: AblyImport.Types.RealtimeChannelCallbacks;
+    channel: AblyRealtimeChannel;
 
     /**
      * An array containing all registered subscribed listeners.
@@ -42,9 +42,14 @@ export class AblyChannel extends Channel {
     errorListeners: Function[];
 
     /**
+     * Channel event subscribe callbacks, maps callback to modified implementation.
+     */
+    callbacks: Map<Function, Function>;
+
+    /**
      * Create a new class instance.
      */
-    constructor(ably: any, name: string, options: any) {
+    constructor(ably: any, name: string, options: any, autoSubscribe = true) {
         super();
 
         this.name = name;
@@ -52,30 +57,48 @@ export class AblyChannel extends Channel {
         this.options = options;
         this.eventFormatter = new EventFormatter(this.options.namespace);
         this.subscribedListeners = [];
+        this.errorListeners = [];
+        this.channel = ably.channels.get(name);
+        this.callbacks = new Map();
 
-        this.subscribe();
+        if (autoSubscribe) {
+            this.subscribe();
+        }
     }
 
     /**
      * Subscribe to an Ably channel.
      */
     subscribe(): any {
-        this.channel = this.ably.channels.get(this.name);
+        this.channel.on(stateChange => {
+            const { previous, current, reason } = stateChange;
+            if (previous !== 'attached' && current == 'attached') {
+                this.subscribedListeners.forEach(listener => listener());
+            } else if (reason) {
+                this._alertErrorListeners(stateChange);
+            }
+        });
+        this.channel.attach(this._alertErrorListeners);
     }
 
     /**
-     * Unsubscribe from an Ably channel.
+     * Unsubscribe from an Ably channel, unregister all callbacks and finally detach the channel
      */
     unsubscribe(): void {
         this.channel.unsubscribe();
+        this.callbacks.clear();
+        this.unregisterError();
+        this.unregisterSubscribed();
+        this.channel.off();
+        this.channel.detach();
     }
 
     /**
      * Listen for an event on the channel instance.
      */
     listen(event: string, callback: Function): AblyChannel {
-        this.on(this.eventFormatter.format(event), callback);
-
+        this.callbacks.set(callback, ({ data, ...metaData }) => callback(data, metaData));
+        this.channel.subscribe(this.eventFormatter.format(event), this.callbacks.get(callback) as any);
         return this;
     }
 
@@ -83,14 +106,14 @@ export class AblyChannel extends Channel {
      * Listen for all events on the channel instance.
      */
     listenToAll(callback: Function): AblyChannel {
-        this.channel.subscribe(({name, data}) => {
+        this.callbacks.set(callback, ({ name, data, ...metaData }) => {
             let namespace = this.options.namespace.replace(/\./g, '\\');
 
-            let formattedEvent = name.startsWith(namespace) ? name.substring(namespace.length + 1) : '.' + event;
+            let formattedEvent = name.startsWith(namespace) ? name.substring(namespace.length + 1) : '.' + name;
 
-            callback(formattedEvent, data);
+            callback(formattedEvent, data, metaData);
         });
-
+        this.channel.subscribe(this.callbacks.get(callback) as any);
         return this;
     }
 
@@ -99,7 +122,8 @@ export class AblyChannel extends Channel {
      */
     stopListening(event: string, callback?: Function): AblyChannel {
         if (callback) {
-            this.channel.unsubscribe(this.eventFormatter.format(event), callback as any);
+            this.channel.unsubscribe(this.eventFormatter.format(event), this.callbacks.get(callback) as any);
+            this.callbacks.delete(callback);
         } else {
             this.channel.unsubscribe(this.eventFormatter.format(event));
         }
@@ -112,7 +136,8 @@ export class AblyChannel extends Channel {
      */
     stopListeningToAll(callback?: Function): AblyChannel {
         if (callback) {
-            this.channel.unsubscribe(callback as any);
+            this.channel.unsubscribe(this.callbacks.get(callback) as any);
+            this.callbacks.delete(callback);
         } else {
             this.channel.unsubscribe();
         }
@@ -133,23 +158,44 @@ export class AblyChannel extends Channel {
      * Register a callback to be called anytime a subscription error occurs.
      */
     error(callback: Function): AblyChannel {
-      this.errorListeners.push(callback);
+        this.errorListeners.push(callback);
 
-      return this;
+        return this;
     }
 
     /**
-     * Bind a channel to an event.
+     * Unregisters given error callback from the listeners.
+     * @param callback 
+     * @returns AblyChannel
      */
-    on(event: string, callback: Function): AblyChannel {
-        this.channel.subscribe(event, callback as any, (err) => {
-          if (err) {
-            this.errorListeners.forEach(listener => listener(err));
-          } else {
-            this.subscribedListeners.forEach(listener => listener());
-          }
-        });
+    unregisterSubscribed(callback?: Function): AblyChannel {
+        if (callback) {
+            this.subscribedListeners = this.subscribedListeners.filter(s => s != callback);
+        } else {
+            this.subscribedListeners = [];
+        }
 
         return this;
+    }
+
+    /**
+     * Unregisters given error callback from the listeners.
+     * @param callback 
+     * @returns AblyChannel
+     */
+    unregisterError(callback?: Function): AblyChannel {
+        if (callback) {
+            this.errorListeners = this.errorListeners.filter(e => e != callback);
+        } else {
+            this.errorListeners = [];
+        }
+
+        return this;
+    }
+
+    _alertErrorListeners = (err: any) => {
+        if (err) {
+            this.errorListeners.forEach(listener => listener(err));
+        }
     }
 }
