@@ -1,5 +1,5 @@
 import { Channel, PresenceChannel } from './channel';
-import { PusherConnector, SocketIoConnector, NullConnector } from './connector';
+import { AblyConnector, PusherConnector, SocketIoConnector, NullConnector } from './connector';
 
 /**
  * This class is the primary API for interacting with broadcasting.
@@ -38,7 +38,9 @@ export default class Echo {
      * Create a new connection.
      */
     connect(): void {
-        if (this.options.broadcaster == 'pusher') {
+        if (this.options.broadcaster == 'ably') {
+            this.connector = new AblyConnector(this.options);
+        } else if (this.options.broadcaster == 'pusher') {
             this.connector = new PusherConnector(this.options);
         } else if (this.options.broadcaster == 'socket.io') {
             this.connector = new SocketIoConnector(this.options);
