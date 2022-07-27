@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v1.12.1...master)
+## [Unreleased](https://github.com/laravel/echo/compare/v1.13.0...master)
+
+## [v1.13.0](https://github.com/laravel/echo/compare/v1.12.1...v1.13.0) - 2022-07-26
+
+### Added
+
+- Adds Turbo Interceptor to add X-Socket-Id header on Turbo requests by @tonysm in https://github.com/laravel/echo/pull/348
 
 ## [v1.12.1](https://github.com/laravel/echo/compare/v1.12.0...v1.12.1) - 2022-07-13
 
