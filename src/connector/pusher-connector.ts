@@ -102,7 +102,7 @@ export class PusherConnector extends Connector {
      * Leave the given channel, as well as its private and presence variants.
      */
     leave(name: string): void {
-        let channels = [name, 'private-' + name, 'presence-' + name];
+        let channels = [name, 'private-' + name, 'private-encrypted-' + name, 'presence-' + name];
 
         channels.forEach((name: string, index: number) => {
             this.leaveChannel(name);
