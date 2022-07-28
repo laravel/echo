@@ -13,7 +13,12 @@ export class AblyAuth {
     authHost = typeof window != 'undefined' && window?.location?.hostname;
     authPort = typeof window != 'undefined' && window?.location?.port;
     authProtocol = typeof window != 'undefined' && window?.location?.protocol.replace(':', '');
-
+    
+    expiredAuthChannels = new Set<string>();
+    setExpired = (channelName : string) => this.expiredAuthChannels.add(channelName);
+    isExpired = (channelName : string) => this.expiredAuthChannels.has(channelName);
+    removeExpired = (channelName : string) => this.expiredAuthChannels.delete(channelName);
+    
     authOptions: AuthOptions = {
         queryTime: true,
         useTokenAuth: true,
@@ -86,7 +91,7 @@ export class AblyAuth {
 
             // Use cached token if has channel capability and is not expired
             const tokenDetails = ablyClient.auth.tokenDetails;
-            if (tokenDetails) {
+            if (tokenDetails && !this.isExpired(channelName)) {
                 const capability = parseJwt(tokenDetails.token).payload['x-ably-capability'];
                 const tokenHasChannelCapability = capability.includes(`${channelName}"`);
                 if (tokenHasChannelCapability && tokenDetails.expires > ablyClient.auth.getTimestampUsingOffset()) { // checks with server time using offset, otherwise local time
@@ -103,6 +108,7 @@ export class AblyAuth {
                     if (err) {
                         errorCallback(err);
                     } else {
+                        this.removeExpired(channelName);
                         errorCallback(null);
                     }
                 });

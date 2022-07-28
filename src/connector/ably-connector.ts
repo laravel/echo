@@ -100,7 +100,7 @@ export class AblyConnector extends Connector {
     leaveChannel(name: string): void {
         if (this.channels[name]) {
             this.channels[name].unsubscribe();
-
+            this.ablyAuth.setExpired(name);
             delete this.channels[name];
         }
     }
