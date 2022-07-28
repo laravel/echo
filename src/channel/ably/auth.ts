@@ -116,7 +116,9 @@ export class AblyAuth {
         }
     }
 
+
     handleChannelAuthError = (echoAblyChannel: AblyChannel) => {
+        if ((echoAblyChannel as any).skipAuth) { return }
         const channelName = echoAblyChannel.name;
         this.authRequestExecuter.request(channelName).then(({ token: jwtToken, info }) => { // get upgraded token with channel access
             this.setPresenceInfo(echoAblyChannel, info);
@@ -124,6 +126,8 @@ export class AblyAuth {
                 if (err) {
                     echoAblyChannel._alertErrorListeners(err);
                 } else {
+                    (echoAblyChannel as any).skipAuth = true;
+                    echoAblyChannel.channel.once('attached', () => { (echoAblyChannel as any).skipAuth = false });
                     echoAblyChannel.channel.attach(echoAblyChannel._alertErrorListeners);
                 }
             });
