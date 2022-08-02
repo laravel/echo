@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v1.13.0...master)
+## [Unreleased](https://github.com/laravel/echo/compare/v1.13.1...master)
+
+## [v1.13.1](https://github.com/laravel/echo/compare/v1.13.0...v1.13.1) - 2022-08-02
+
+### Changed
+
+- Also leave Pusher private encrypted channel by @daannet in https://github.com/laravel/echo/pull/349
 
 ## [v1.13.0](https://github.com/laravel/echo/compare/v1.12.1...v1.13.0) - 2022-07-26
 
