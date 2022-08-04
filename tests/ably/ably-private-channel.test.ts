@@ -26,7 +26,8 @@ describe('AblyPrivateChannel', () => {
             broadcaster: 'ably',
             useTls: true,
             environment: 'sandbox',
-            requestTokenFn: mockAuthServer.getSignedToken
+            requestTokenFn: mockAuthServer.getSignedToken,
+            echoMessages: true, // https://docs.ably.io/client-lib-development-guide/features/#TO3h
         });
     });
 

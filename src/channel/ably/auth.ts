@@ -17,7 +17,7 @@ export class AblyAuth {
     isExpired = (channelName: string) => this.expiredAuthChannels.has(channelName);
     removeExpired = (channelName: string) => this.expiredAuthChannels.delete(channelName);
 
-    authOptions: AuthOptions = {
+    options: AuthOptions & Pick<ClientOptions, "echoMessages"> = {
         queryTime: true,
         useTokenAuth: true,
         authCallback: async (_, callback) => {
@@ -29,6 +29,7 @@ export class AblyAuth {
                 callback(error, null);
             }
         },
+        echoMessages: false // https://docs.ably.io/client-lib-development-guide/features/#TO3h
     }
 
     requestToken = async (channelName: string, existingToken: string) => {
@@ -69,7 +70,7 @@ export class AblyAuth {
 
     enableAuthorizeBeforeChannelAttach = (ablyConnector: AblyConnector) => {
         const ablyClient: any = ablyConnector.ably;
-        ablyClient.auth.getTimestamp(this.authOptions.queryTime, () => void 0); // generates serverTimeOffset in the background
+        ablyClient.auth.getTimestamp(this.options.queryTime, () => void 0); // generates serverTimeOffset in the background
 
         beforeChannelAttach(ablyClient, (realtimeChannel, errorCallback) => {
             const channelName = realtimeChannel.name;
@@ -93,7 +94,7 @@ export class AblyAuth {
             this.authRequestExecuter.request(channelName).then(({ token: jwtToken, info }) => { // get upgraded token with channel access
                 const echoChannel = ablyConnector.channels[channelName];
                 this.setPresenceInfo(echoChannel, info);
-                ablyClient.auth.authorize(null, { ...this.authOptions, token: toTokenDetails(jwtToken) }, (err, _tokenDetails) => {
+                ablyClient.auth.authorize(null, { ...this.options, token: toTokenDetails(jwtToken) }, (err, _tokenDetails) => {
                     if (err) {
                         errorCallback(err);
                     } else {
@@ -116,7 +117,7 @@ export class AblyAuth {
         const channelName = echoAblyChannel.name;
         this.authRequestExecuter.request(channelName).then(({ token: jwtToken, info }) => { // get upgraded token with channel access
             this.setPresenceInfo(echoAblyChannel, info);
-            echoAblyChannel.ably.auth.authorize(null, { ...this.authOptions, token: toTokenDetails(jwtToken) as any }, (err, _tokenDetails) => {
+            echoAblyChannel.ably.auth.authorize(null, { ...this.options, token: toTokenDetails(jwtToken) as any }, (err, _tokenDetails) => {
                 if (err) {
                     echoAblyChannel._alertErrorListeners(err);
                 } else {

@@ -35,7 +35,7 @@ export class AblyConnector extends Connector {
             this.ably = this.options.client;
         } else {
             this.ablyAuth = new AblyAuth(this.options);
-            this.ably = new Ably.Realtime({ ...this.ablyAuth.authOptions, ...this.options });
+            this.ably = new Ably.Realtime({ ...this.ablyAuth.options, ...this.options });
             this.ablyAuth.enableAuthorizeBeforeChannelAttach(this);
         }
     }
