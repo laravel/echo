@@ -26,8 +26,8 @@ export class AblyPresenceChannel extends AblyChannel implements PresenceChannel 
    * Register a callback to be called anytime the member list changes.
    */
   here(callback: Function): AblyPresenceChannel {
-    this.channel.presence.subscribe(['enter', 'update', 'leave'], () => 
-      this.channel.presence.get((err, members) =>  callback(members, err)// returns local sync copy of updated members
+    this.channel.presence.subscribe(['enter', 'update', 'leave'], () =>
+      this.channel.presence.get((err, members) => callback(members, err)// returns local sync copy of updated members
     ));
     return this;
   }
@@ -93,10 +93,12 @@ export class AblyPresenceChannel extends AblyChannel implements PresenceChannel 
   /**
  * Trigger client event on the channel.
  */
-  whisper(eventName: string, data: any): AblyPresenceChannel {
-    this.channel.publish(`client-${eventName}`, data);
-
+  whisper(eventName: string, data: any, callback: Function): AblyPresenceChannel {
+    if (callback) {
+      this.channel.publish(`client-${eventName}`, data, callback as any);
+    } else {
+      this.channel.publish(`client-${eventName}`, data);
+    }
     return this;
   }
-
 }
