@@ -55,8 +55,8 @@ export class AblyAuth {
     }
 
     constructor(options) {
-        const { token, requestTokenFn, authEndpoint } = options;
-        this.authEndpoint = fullUrl(authEndpoint);
+        const { authEndpoint, token, requestTokenFn } = options;
+        this.authEndpoint = fullUrl(authEndpoint ?? this.authEndpoint);
         this.authRequestExecuter = new SequentialAuthTokenRequestExecuter(token, requestTokenFn ?? this.requestToken);
     }
 
