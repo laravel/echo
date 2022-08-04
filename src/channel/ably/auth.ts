@@ -4,18 +4,19 @@ import { SequentialAuthTokenRequestExecuter } from './token-request';
 import { AblyChannel } from '../ably-channel';
 import { AblyConnector } from '../../connector/ably-connector';
 import { AblyPresenceChannel } from '../ably-presence-channel';
-import { AuthOptions, ChannelStateChange } from '../../../typings/ably';
+import { AuthOptions, ChannelStateChange, ClientOptions } from '../../../typings/ably';
 
 export class AblyAuth {
 
+    authEndpoint: string;
+    authHeaders: any;
     authRequestExecuter: SequentialAuthTokenRequestExecuter;
-    authEndpoint = '/broadcasting/auth';
-    
+
     expiredAuthChannels = new Set<string>();
-    setExpired = (channelName : string) => this.expiredAuthChannels.add(channelName);
-    isExpired = (channelName : string) => this.expiredAuthChannels.has(channelName);
-    removeExpired = (channelName : string) => this.expiredAuthChannels.delete(channelName);
-    
+    setExpired = (channelName: string) => this.expiredAuthChannels.add(channelName);
+    isExpired = (channelName: string) => this.expiredAuthChannels.has(channelName);
+    removeExpired = (channelName: string) => this.expiredAuthChannels.delete(channelName);
+
     authOptions: AuthOptions = {
         queryTime: true,
         useTokenAuth: true,
@@ -27,7 +28,7 @@ export class AblyAuth {
             } catch (error) {
                 callback(error, null);
             }
-        }
+        },
     }
 
     requestToken = async (channelName: string, existingToken: string) => {
@@ -35,7 +36,12 @@ export class AblyAuth {
         let postOptions = {
             uri: this.authEndpoint,
             method: 'POST',
-            headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'Content-Length': postData.length },
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Content-Length': postData.length,
+                ...this.authHeaders
+            },
             body: postData,
         };
 
@@ -55,16 +61,16 @@ export class AblyAuth {
     }
 
     constructor(options) {
-        const { authEndpoint, token, requestTokenFn } = options;
-        this.authEndpoint = fullUrl(authEndpoint ?? this.authEndpoint);
+        const { authEndpoint, auth: { headers }, token, requestTokenFn } = options;
+        this.authEndpoint = fullUrl(authEndpoint);
+        this.authHeaders = headers;
         this.authRequestExecuter = new SequentialAuthTokenRequestExecuter(token, requestTokenFn ?? this.requestToken);
     }
 
     enableAuthorizeBeforeChannelAttach = (ablyConnector: AblyConnector) => {
         const ablyClient: any = ablyConnector.ably;
-        ablyClient.auth.getTimestamp(this.authOptions.queryTime, () => {
-            // do nothing.
-        }); // generates serverTimeOffset in the background
+        ablyClient.auth.getTimestamp(this.authOptions.queryTime, () => void 0); // generates serverTimeOffset in the background
+
         beforeChannelAttach(ablyClient, (realtimeChannel, errorCallback) => {
             const channelName = realtimeChannel.name;
             if (channelName.startsWith("public:")) {
@@ -104,7 +110,6 @@ export class AblyAuth {
             this.handleChannelAuthError(echoAblyChannel);
         }
     }
-
 
     handleChannelAuthError = (echoAblyChannel: AblyChannel) => {
         if ((echoAblyChannel as any).skipAuth) { return }
