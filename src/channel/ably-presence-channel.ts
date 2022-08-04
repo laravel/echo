@@ -93,7 +93,7 @@ export class AblyPresenceChannel extends AblyChannel implements PresenceChannel 
   /**
  * Trigger client event on the channel.
  */
-  whisper(eventName: string, data: any, callback: Function): AblyPresenceChannel {
+  whisper(eventName: string, data: any, callback?: Function): AblyPresenceChannel {
     if (callback) {
       this.channel.publish(`client-${eventName}`, data, callback as any);
     } else {
