@@ -46,9 +46,23 @@ const toText = (base64: string) => {
     return Buffer.from(base64, 'base64').toString('binary');
 };
 
+const isAbsoluteUrl = (url: string) => url && url.indexOf('http://') === 0 || url.indexOf('https://') === 0;
+
+export const fullUrl = (url : string) => {
+    if (!isAbsoluteUrl(url) && typeof window != 'undefined') {
+        const host =  window?.location?.hostname;
+        const port = window?.location?.port;
+        const protocol = window?.location?.protocol.replace(':', '');
+        if (host && port && protocol) {
+            return protocol + '://' + host + ':' + port + url; 
+        }
+    }
+    return url;
+}
+
+
 let httpClient: any;
 export function httpRequest(options, callback) {
-    const uri = options.scheme + '://' + options.host + ':' + options.port + options.path;
     if (!httpClient) {
         httpClient = new Ably.Rest.Platform.Http();
     }
@@ -58,7 +72,7 @@ export function httpRequest(options, callback) {
     httpClient.doUri(
         options.method,
         null,
-        uri,
+        options.uri,
         options.headers,
         options.body,
         options.paramsIfNoHeaders || {},

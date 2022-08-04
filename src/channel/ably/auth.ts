@@ -1,5 +1,5 @@
 import { beforeChannelAttach } from './attach';
-import { httpRequest, toTokenDetails, parseJwt } from './utils';
+import { httpRequest, toTokenDetails, parseJwt, fullUrl } from './utils';
 import { SequentialAuthTokenRequestExecuter } from './token-request';
 import { AblyChannel } from '../ably-channel';
 import { AblyConnector } from '../../connector/ably-connector';
@@ -10,9 +10,6 @@ export class AblyAuth {
 
     authRequestExecuter: SequentialAuthTokenRequestExecuter;
     authEndpoint = '/broadcasting/auth';
-    authHost = typeof window != 'undefined' && window?.location?.hostname;
-    authPort = typeof window != 'undefined' && window?.location?.port;
-    authProtocol = typeof window != 'undefined' && window?.location?.protocol.replace(':', '');
     
     expiredAuthChannels = new Set<string>();
     setExpired = (channelName : string) => this.expiredAuthChannels.add(channelName);
@@ -36,11 +33,8 @@ export class AblyAuth {
     requestToken = async (channelName: string, existingToken: string) => {
         let postData = JSON.stringify({ channel_name: channelName, token: existingToken });
         let postOptions = {
-            host: this.authHost,
-            port: this.authPort,
-            path: this.authEndpoint,
+            uri: this.authEndpoint,
             method: 'POST',
-            scheme: this.authProtocol,
             headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'Content-Length': postData.length },
             body: postData,
         };
@@ -61,19 +55,8 @@ export class AblyAuth {
     }
 
     constructor(options) {
-        const { token, requestTokenFn, authEndpoint, authHost, authPort, authProtocol } = options;
-        if (authEndpoint) {
-            this.authEndpoint = authEndpoint;
-        }
-        if (authHost) {
-            this.authHost = authHost;
-        }
-        if (authPort) {
-            this.authPort = authPort;
-        }
-        if (authProtocol) {
-            this.authProtocol = authProtocol;
-        }
+        const { token, requestTokenFn, authEndpoint } = options;
+        this.authEndpoint = fullUrl(authEndpoint);
         this.authRequestExecuter = new SequentialAuthTokenRequestExecuter(token, requestTokenFn ?? this.requestToken);
     }
 
