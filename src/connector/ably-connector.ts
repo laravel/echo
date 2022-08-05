@@ -109,7 +109,7 @@ export class AblyConnector extends Connector {
      * Get the socket ID for the connection.
      */
     socketId(): string {
-        return this.ably.connection.id;
+        return this.ably.connection.key;
     }
 
     /**
