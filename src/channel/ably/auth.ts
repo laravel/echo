@@ -1,5 +1,5 @@
 import { beforeChannelAttach } from './attach';
-import { httpRequest, toTokenDetails, parseJwt, fullUrl } from './utils';
+import { toTokenDetails, parseJwt, fullUrl, httpRequestAsync } from './utils';
 import { SequentialAuthTokenRequestExecuter } from './token-request';
 import { AblyChannel } from '../ably-channel';
 import { AblyConnector } from '../../connector/ably-connector';
@@ -45,20 +45,7 @@ export class AblyAuth {
             },
             body: postData,
         };
-
-        return new Promise((resolve, reject) => {
-            httpRequest(postOptions, function (err: any, res: any) {
-                if (err) {
-                    reject(err);
-                } else {
-                    if (typeof res === 'string') {
-                        resolve(JSON.parse(res));
-                    } else {
-                        resolve(res);
-                    }
-                }
-            })
-        });
+        return await httpRequestAsync(postOptions);
     }
 
     constructor(options) {

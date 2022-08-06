@@ -11,6 +11,7 @@ describe('AblyConnection', () => {
     let echo: Echo;
 
     beforeAll(async () => {
+        global.Ably = Ably;
         testApp = await setup();
         mockAuthServer = new MockAuthServer(testApp.keys[0].keyStr);
     })
@@ -20,7 +21,6 @@ describe('AblyConnection', () => {
     })
 
     beforeEach(() => {
-        global.Ably = Ably;
         echo = new Echo({
             broadcaster: 'ably',
             useTls: true,

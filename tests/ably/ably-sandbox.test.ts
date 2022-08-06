@@ -7,6 +7,7 @@ describe('AblySandbox', () => {
     let testApp;
 
     beforeAll(async () => {
+        global.Ably = Ably;
         testApp = await setup();
     })
 
