@@ -98,6 +98,9 @@ export class AblyConnector extends Connector {
      * Leave the given channel.
      */
     leaveChannel(name: string): void {
+        if (name.indexOf('public:') !== 0 && name.indexOf('private:') !== 0 && name.indexOf('presence:') !== 0) {
+            throw new Error(`Error leaving ${name}, name should be prefixed with either "public:", "private:" or "presence:"`);
+        }
         if (this.channels[name]) {
             this.channels[name].unsubscribe();
             this.ablyAuth.setExpired(name);
