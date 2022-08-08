@@ -123,6 +123,10 @@ export default class Echo {
         if (typeof jQuery === 'function') {
             this.registerjQueryAjaxSetup();
         }
+
+        if (typeof Turbo === 'object') {
+            this.registerTurboRequestInterceptor();
+        }
     }
 
     /**
@@ -162,6 +166,15 @@ export default class Echo {
                 }
             });
         }
+    }
+
+    /**
+     * Register the Turbo Request interceptor to add the X-Socket-ID header.
+     */
+    registerTurboRequestInterceptor(): void {
+        document.addEventListener('turbo:before-fetch-request', (event: any) => {
+            event.detail.fetchOptions.headers['X-Socket-Id'] = this.socketId();
+        });
     }
 }
 

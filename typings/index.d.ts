@@ -6,5 +6,6 @@ declare global {
     var Vue: any;
     var axios: any;
     var jQuery: any;
+    var Turbo: any;
 }
 export {};

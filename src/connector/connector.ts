@@ -9,6 +9,10 @@ export abstract class Connector {
             headers: {},
         },
         authEndpoint: '/broadcasting/auth',
+        userAuthentication: {
+            endpoint: '/broadcasting/user-auth',
+            headers: {},
+        },
         broadcaster: 'pusher',
         csrfToken: null,
         host: null,
@@ -35,8 +39,11 @@ export abstract class Connector {
     protected setOptions(options: any): any {
         this.options = Object.assign(this._defaultOptions, options);
 
-        if (this.csrfToken()) {
-            this.options.auth.headers['X-CSRF-TOKEN'] = this.csrfToken();
+        let token = this.csrfToken();
+
+        if (token) {
+            this.options.auth.headers['X-CSRF-TOKEN'] = token;
+            this.options.userAuthentication.headers['X-CSRF-TOKEN'] = token;
         }
 
         return options;

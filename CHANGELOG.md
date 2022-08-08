@@ -1,6 +1,38 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v1.11.5...master)
+## [Unreleased](https://github.com/laravel/echo/compare/v1.13.1...master)
+
+## [v1.13.1](https://github.com/laravel/echo/compare/v1.13.0...v1.13.1) - 2022-08-02
+
+### Changed
+
+- Also leave Pusher private encrypted channel by @daannet in https://github.com/laravel/echo/pull/349
+
+## [v1.13.0](https://github.com/laravel/echo/compare/v1.12.1...v1.13.0) - 2022-07-26
+
+### Added
+
+- Adds Turbo Interceptor to add X-Socket-Id header on Turbo requests by @tonysm in https://github.com/laravel/echo/pull/348
+
+## [v1.12.1](https://github.com/laravel/echo/compare/v1.12.0...v1.12.1) - 2022-07-13
+
+### Fixed
+
+- Fix IIFE build by @timacdonald in https://github.com/laravel/echo/pull/344
+
+## [v1.12.0](https://github.com/laravel/echo/compare/v1.11.7...v1.12.0) - 2022-06-21
+
+### Added
+
+- User Authentication by @rennokki in https://github.com/laravel/echo/pull/340
+
+## [v1.11.7](https://github.com/laravel/echo/compare/v1.11.6...v1.11.7) - 2022-04-21
+
+No significant changes.
+
+## [v1.11.6](https://github.com/laravel/echo/compare/v1.11.5...v1.11.6) - 2022-04-21
+
+No significant changes.
 
 ## [v1.11.5](https://github.com/laravel/echo/compare/v1.11.4...v1.11.5) - 2022-04-12
 

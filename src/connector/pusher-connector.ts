@@ -33,6 +33,13 @@ export class PusherConnector extends Connector {
     }
 
     /**
+     * Sign in the user via Pusher user authentication (https://pusher.com/docs/channels/using_channels/user-authentication/).
+     */
+    signin(): void {
+        this.pusher.signin();
+    }
+
+    /**
      * Listen for an event on a channel instance.
      */
     listen(name: string, event: string, callback: Function): PusherChannel {
@@ -95,7 +102,7 @@ export class PusherConnector extends Connector {
      * Leave the given channel, as well as its private and presence variants.
      */
     leave(name: string): void {
-        let channels = [name, 'private-' + name, 'presence-' + name];
+        let channels = [name, 'private-' + name, 'private-encrypted-' + name, 'presence-' + name];
 
         channels.forEach((name: string, index: number) => {
             this.leaveChannel(name);

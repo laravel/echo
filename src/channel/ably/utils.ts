@@ -84,9 +84,7 @@ export const httpRequestAsync = (options): Promise<any> => {
                     resolve(JSON.parse(res));
                 }
                 else if (!isBrowser && Buffer.isBuffer(res)) {
-                    try {
-                        resolve(JSON.parse(res.toString()))
-                    } catch (e) { resolve(res)}
+                    try { resolve(JSON.parse(res.toString()))} catch (e) { resolve(res)}
                 }
                 else {
                     resolve(res);
