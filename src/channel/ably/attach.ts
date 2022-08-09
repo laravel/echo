@@ -7,31 +7,31 @@ let channelAttachAuthorized = false;
  */
 export const beforeChannelAttach = (ablyClient, authorize: Function) => {
     const dummyRealtimeChannel = ablyClient.channels.get("dummy");
-    if (channelAttachAuthorized) { //Only once all ably instance
+    if (channelAttachAuthorized) {
         return;
     }
-    const internalAttach = dummyRealtimeChannel.__proto__._attach; // get parent class method inferred from object, store it in temp. variable
+    const internalAttach = dummyRealtimeChannel.__proto__._attach;
     if (isNullOrUndefined(internalAttach)) {
-        console.warn("channel internal attach function not found, please check for right library version")
+        console.warn("Failed to enable authorize for pre-attach, please check for right library version")
         return;
     }
-    function customInternalAttach(forceReattach, attachReason, errCallback) {// Define new function that needs to be added
+    function customInternalAttach(forceReattach, attachReason, errCallback) {
         if (this.state === 'attached' || this.authorizing) {
             return;
         }
         this.authorizing = true;
-        const bindedInternalAttach = internalAttach.bind(this); // bind object instance at runtime
-        // custom logic before attach
+        const bindedInternalAttach = internalAttach.bind(this);
+
         authorize(this, (error) => {
             this.authorizing = false;
             if (error) {
                 errCallback(error);
                 return;
             } else {
-                bindedInternalAttach(forceReattach, attachReason, errCallback);// call internal function here
+                bindedInternalAttach(forceReattach, attachReason, errCallback);
             }
         })
     }
-    dummyRealtimeChannel.__proto__._attach = customInternalAttach; // add updated extension method to parent class, auto binded
+    dummyRealtimeChannel.__proto__._attach = customInternalAttach;
     channelAttachAuthorized = true;
 }
