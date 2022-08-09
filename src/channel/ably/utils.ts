@@ -19,7 +19,7 @@ export const parseJwt = (jwtToken: string): { header: any, payload: any } => {
     return { header, payload };
 }
 
-// RSA4f - tokenDetails size should't exceed 128kb, so omitted `capability` property
+// RSA4f - omitted `capability` property
 export const toTokenDetails = (jwtToken: string): TokenDetails | any => {
     const { payload } = parseJwt(jwtToken);
     return {
