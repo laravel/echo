@@ -4,7 +4,7 @@ import { MockAuthServer } from './setup/mock-auth-server';
 import { AblyChannel, AblyPresenceChannel } from '../../src/channel';
 import safeAssert, { execute } from './setup/utils';
 import * as Ably from 'ably';
-import waitForExpect from "wait-for-expect";
+import waitForExpect from 'wait-for-expect';
 
 jest.setTimeout(20000);
 describe('AblyChannel', () => {
@@ -16,22 +16,22 @@ describe('AblyChannel', () => {
         global.Ably = Ably;
         testApp = await setup();
         mockAuthServer = new MockAuthServer(testApp.keys[0].keyStr);
-    })
+    });
 
     afterAll(async () => {
         return await tearDown(testApp);
-    })
+    });
 
     beforeEach(() => {
         echo = new Echo({
             broadcaster: 'ably',
             useTls: true,
             environment: 'sandbox',
-            requestTokenFn: mockAuthServer.getSignedToken
+            requestTokenFn: mockAuthServer.getSignedToken,
         });
     });
 
-    afterEach(done => {
+    afterEach((done) => {
         echo.disconnect();
         echo.connector.ably.connection.once('closed', () => {
             done();
@@ -50,7 +50,7 @@ describe('AblyChannel', () => {
             .subscribed(() => {
                 mockAuthServer.broadcast('public:test', 'App\\Events\\testEvent', 'Hello there');
             })
-            .listen('testEvent', data => {
+            .listen('testEvent', (data) => {
                 safeAssert(() => expect(data).toBe('Hello there'), done, true);
             });
     });
@@ -62,33 +62,36 @@ describe('AblyChannel', () => {
             .subscribed(() => {
                 mockAuthServer.broadcast('public:test', 'testEvent', 'Hello there');
             })
-            .listen('.testEvent', data => {
+            .listen('.testEvent', (data) => {
                 safeAssert(() => expect(data).toBe('Hello there'), done, true);
             });
     });
 
-    test('Listen to a whisper', done => {
+    test('Listen to a whisper', (done) => {
         const publicChannel = echo.channel('test') as AblyChannel;
         publicChannel
             .subscribed(() => {
                 mockAuthServer.broadcast('public:test', 'client-msg', 'Hello there');
             })
-            .listenForWhisper('msg', data => {
+            .listenForWhisper('msg', (data) => {
                 safeAssert(() => expect(data).toBe('Hello there'), done, true);
             });
-    })
+    });
 
-
-    test('Listen to a notification', done => {
+    test('Listen to a notification', (done) => {
         const publicChannel = echo.channel('test') as AblyChannel;
         publicChannel
             .subscribed(() => {
-                mockAuthServer.broadcast('public:test', 'Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', 'Hello there');
+                mockAuthServer.broadcast(
+                    'public:test',
+                    'Illuminate\\Notifications\\Events\\BroadcastNotificationCreated',
+                    'Hello there'
+                );
             })
-            .notification( data => {
+            .notification((data) => {
                 safeAssert(() => expect(data).toBe('Hello there'), done, true);
             });
-    })
+    });
 
     test('Listen to all events', (done) => {
         const publicChannel = echo.channel('test1') as AblyChannel;
@@ -97,10 +100,14 @@ describe('AblyChannel', () => {
                 mockAuthServer.broadcast('public:test1', 'testEvent', 'Hello there');
             })
             .listenToAll((eventName, data) => {
-                safeAssert(() => {
-                    expect(eventName).toBe('.testEvent');
-                    expect(data).toBe('Hello there');
-                }, done, true);
+                safeAssert(
+                    () => {
+                        expect(eventName).toBe('.testEvent');
+                        expect(data).toBe('Hello there');
+                    },
+                    done,
+                    true
+                );
             });
     });
 
@@ -110,13 +117,12 @@ describe('AblyChannel', () => {
         const eventHandler2 = jest.fn();
         const eventHandler3 = jest.fn();
 
-
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
             publicChannel
                 .subscribed(resolve)
                 .listen('.testEvent', eventHandler1)
                 .listen('.testEvent', eventHandler2)
-                .listen('.testEvent', eventHandler3)
+                .listen('.testEvent', eventHandler3);
         });
 
         execute(() => mockAuthServer.broadcast('public:test', 'testEvent', 'Hello there'), 4);
@@ -125,7 +131,7 @@ describe('AblyChannel', () => {
             expect(eventHandler1).toBeCalledTimes(4);
             expect(eventHandler2).toBeCalledTimes(4);
             expect(eventHandler3).toBeCalledTimes(4);
-        })
+        });
 
         jest.clearAllMocks();
         publicChannel.stopListening('.testEvent', eventHandler1);
@@ -136,7 +142,7 @@ describe('AblyChannel', () => {
             expect(eventHandler1).toBeCalledTimes(0);
             expect(eventHandler2).toBeCalledTimes(3);
             expect(eventHandler3).toBeCalledTimes(3);
-        })
+        });
 
         jest.clearAllMocks();
         publicChannel.stopListening('.testEvent');
@@ -148,8 +154,7 @@ describe('AblyChannel', () => {
             expect(eventHandler2).toBeCalledTimes(0);
             expect(eventHandler3).toBeCalledTimes(0);
         });
-
-    })
+    });
 
     // internally calls stop listening to a event
     test('stop listening to a whisper/client-event', async () => {
@@ -158,13 +163,12 @@ describe('AblyChannel', () => {
         const eventHandler2 = jest.fn();
         const eventHandler3 = jest.fn();
 
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
             publicChannel
                 .subscribed(resolve)
                 .listenForWhisper('msg', eventHandler1)
                 .listenForWhisper('msg', eventHandler2)
-                .listenForWhisper('msg2', eventHandler3)
-
+                .listenForWhisper('msg2', eventHandler3);
         });
 
         execute(() => mockAuthServer.broadcast('public:test', 'client-msg', 'Hello there'), 4);
@@ -186,25 +190,25 @@ describe('AblyChannel', () => {
             expect(eventHandler1).toBeCalledTimes(0);
             expect(eventHandler2).toBeCalledTimes(3);
             expect(eventHandler3).toBeCalledTimes(2);
-        })
-    })
+        });
+    });
 
     test('Leave channel', async () => {
         const publicChannel = echo.channel('test') as AblyChannel;
         const privateChannel = echo.private('test') as AblyChannel;
         const presenceChannel = echo.join('test') as AblyPresenceChannel;
-        const publicChannelSubscription = new Promise(resolve => publicChannel.subscribed(resolve));
-        const privateChannelSubscription = new Promise(resolve => privateChannel.subscribed(resolve));
-        const presenceChannelSubscription = new Promise(resolve => presenceChannel.subscribed(resolve));
+        const publicChannelSubscription = new Promise((resolve) => publicChannel.subscribed(resolve));
+        const privateChannelSubscription = new Promise((resolve) => privateChannel.subscribed(resolve));
+        const presenceChannelSubscription = new Promise((resolve) => presenceChannel.subscribed(resolve));
 
         await Promise.all([publicChannelSubscription, privateChannelSubscription, presenceChannelSubscription]);
 
         echo.leave('test');
 
-        const publicDetachPromise = new Promise(resolve => publicChannel.channel.on('detached', resolve));
-        const privateDetachPromise = new Promise(resolve => privateChannel.channel.on('detached', resolve));
-        const presenceDetachPromise = new Promise(resolve => presenceChannel.channel.on('detached', resolve));
+        const publicDetachPromise = new Promise((resolve) => publicChannel.channel.on('detached', resolve));
+        const privateDetachPromise = new Promise((resolve) => privateChannel.channel.on('detached', resolve));
+        const presenceDetachPromise = new Promise((resolve) => presenceChannel.channel.on('detached', resolve));
 
         await Promise.all([publicDetachPromise, privateDetachPromise, presenceDetachPromise]);
-    })
+    });
 });

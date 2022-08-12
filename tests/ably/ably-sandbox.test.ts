@@ -9,17 +9,17 @@ describe('AblySandbox', () => {
     beforeAll(async () => {
         global.Ably = Ably;
         testApp = await setup();
-    })
+    });
 
-    afterAll(async() => {
+    afterAll(async () => {
         return await tearDown(testApp);
-    })
+    });
 
     test('init with key string', () => {
         const apiKey = testApp.keys[0].keyStr;
         expect(typeof apiKey).toBe('string');
         expect(apiKey).toBeTruthy();
-    })
+    });
 
     test('rest time should work', (done) => {
         const apiKey = testApp.keys[0].keyStr;
@@ -32,6 +32,5 @@ describe('AblySandbox', () => {
             }
             safeAssert(() => expect(typeof time).toBe('number'), done, true);
         });
-    })
-
+    });
 });
