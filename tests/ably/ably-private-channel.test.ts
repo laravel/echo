@@ -15,11 +15,11 @@ describe('AblyPrivateChannel', () => {
         global.Ably = Ably;
         testApp = await setup();
         mockAuthServer = new MockAuthServer(testApp.keys[0].keyStr);
-    })
+    });
 
-    afterAll(async() => {
+    afterAll(async () => {
         return await tearDown(testApp);
-    })
+    });
 
     beforeEach(() => {
         echo = new Echo({
@@ -31,9 +31,9 @@ describe('AblyPrivateChannel', () => {
         });
     });
 
-    afterEach(done => {
+    afterEach((done) => {
         echo.disconnect();
-        echo.connector.ably.connection.once('closed', ()=> {
+        echo.connector.ably.connection.once('closed', () => {
             done();
         });
     });
@@ -46,34 +46,32 @@ describe('AblyPrivateChannel', () => {
         });
     });
 
-    test('Whisper and listen to it', done => {
+    test('Whisper and listen to it', (done) => {
         const privateChannel = echo.private('test') as AblyPrivateChannel;
         privateChannel
             .subscribed(() => {
                 privateChannel.whisper('msg', 'Hello there jonny!');
             })
-            .listenForWhisper('msg', data => {
+            .listenForWhisper('msg', (data) => {
                 safeAssert(() => expect(data).toBe('Hello there jonny!'), done, true);
-            });
-    })
-
-    test('channel subscription error, token expired', done => {
-        mockAuthServer.setAuthExceptions(['private:shortLivedChannel']);
-        const privateChannel = echo.private('shortLivedChannel') as AblyChannel;
-        privateChannel
-            .error(stateChangeError => {
-                privateChannel.unregisterError();
-                safeAssert(() => expect(stateChangeError).toBeTruthy(), done, true)
             });
     });
 
-    test('channel subscription error, access denied', done => {
+    test('channel subscription error, token expired', (done) => {
+        mockAuthServer.setAuthExceptions(['private:shortLivedChannel']);
+        const privateChannel = echo.private('shortLivedChannel') as AblyChannel;
+        privateChannel.error((stateChangeError) => {
+            privateChannel.unregisterError();
+            safeAssert(() => expect(stateChangeError).toBeTruthy(), done, true);
+        });
+    });
+
+    test('channel subscription error, access denied', (done) => {
         mockAuthServer.setAuthExceptions([], ['private:bannedChannel']);
         const privateChannel = echo.private('bannedChannel') as AblyChannel;
-        privateChannel
-            .error(stateChangeError => {
-                privateChannel.unregisterError();
-                safeAssert(() => expect(stateChangeError).toBeTruthy(), done, true)
-            });
+        privateChannel.error((stateChangeError) => {
+            privateChannel.unregisterError();
+            safeAssert(() => expect(stateChangeError).toBeTruthy(), done, true);
+        });
     });
 });

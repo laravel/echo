@@ -1,11 +1,6 @@
 import { Connector } from './connector';
 
-import {
-    AblyChannel,
-    AblyPrivateChannel,
-    AblyPresenceChannel,
-    AblyAuth,
-} from './../channel';
+import { AblyChannel, AblyPrivateChannel, AblyPresenceChannel, AblyAuth } from './../channel';
 import { AblyRealtime } from '../../typings/ably';
 
 /**
@@ -72,8 +67,8 @@ export class AblyConnector extends Connector {
     }
 
     /**
-    * Get a presence channel instance by name.
-    */
+     * Get a presence channel instance by name.
+     */
     presenceChannel(name: string): AblyPresenceChannel {
         const prefixedName = `presence:${name}`; // adding presence as a ably namespace prefix
         if (!this.channels[prefixedName]) {
@@ -99,7 +94,9 @@ export class AblyConnector extends Connector {
      */
     leaveChannel(name: string): void {
         if (name.indexOf('public:') !== 0 && name.indexOf('private:') !== 0 && name.indexOf('presence:') !== 0) {
-            throw new Error(`Error leaving ${name}, name should be prefixed with either "public:", "private:" or "presence:"`);
+            throw new Error(
+                `Error leaving ${name}, name should be prefixed with either "public:", "private:" or "presence:"`
+            );
         }
         if (this.channels[name]) {
             this.channels[name].unsubscribe();

@@ -14,27 +14,27 @@ describe('AblyConnection', () => {
         global.Ably = Ably;
         testApp = await setup();
         mockAuthServer = new MockAuthServer(testApp.keys[0].keyStr);
-    })
+    });
 
-    afterAll(async() => {
+    afterAll(async () => {
         return await tearDown(testApp);
-    })
+    });
 
     beforeEach(() => {
         echo = new Echo({
             broadcaster: 'ably',
             useTls: true,
             environment: 'sandbox',
-            requestTokenFn: mockAuthServer.getSignedToken
+            requestTokenFn: mockAuthServer.getSignedToken,
         });
     });
 
-    afterEach(done => {
+    afterEach((done) => {
         if (echo.connector.ably.connection.state === 'closed') {
             done();
         } else {
             echo.disconnect();
-            echo.connector.ably.connection.once('closed', ()=> {
+            echo.connector.ably.connection.once('closed', () => {
                 done();
             });
         }
@@ -45,46 +45,41 @@ describe('AblyConnection', () => {
         echo.connector.ably.connection.on(({ current, previous, reason }) => {
             if (current == 'connecting') {
                 safeAssert(() => expect(previous).toBe('initialized'), done);
-            }
-            else if (current == 'connected') {
+            } else if (current == 'connected') {
                 safeAssert(() => {
                     expect(previous).toBe('connecting');
                     expect(typeof echo.socketId()).toBe('string');
                 }, done);
-                setTimeout(() => { // Added timeout to make sure connection stays active
+                // Added timeout to make sure connection stays active
+                setTimeout(() => {
                     echo.connector.ably.connection.off();
                     done();
-                }, 3000)
-            }
-            else if (reason) {
+                }, 3000);
+            } else if (reason) {
                 done(reason);
                 return;
             }
         });
-    })
+    });
 
     test('should be able to disconnect from server', (done) => {
         expect.assertions(4);
         echo.connector.ably.connection.on(({ current, previous, reason }) => {
             if (current == 'connecting') {
                 safeAssert(() => expect(previous).toBe('initialized'), done);
-            }
-            else if (current == 'connected') {
+            } else if (current == 'connected') {
                 safeAssert(() => expect(previous).toBe('connecting'), done);
                 echo.disconnect();
-            }
-            else if (current == 'closing') {
+            } else if (current == 'closing') {
                 safeAssert(() => expect(previous).toBe('connected'), done);
-            }
-            else if (current == 'closed') {
+            } else if (current == 'closed') {
                 safeAssert(() => expect(previous).toBe('closing'), done);
                 echo.connector.ably.connection.off();
                 done();
-            }
-            else if (reason) {
+            } else if (reason) {
                 done(reason);
                 return;
             }
         });
-    })
+    });
 });
