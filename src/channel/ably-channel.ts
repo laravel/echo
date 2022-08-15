@@ -70,10 +70,10 @@ export class AblyChannel extends Channel {
      * Subscribe to an Ably channel.
      */
     subscribe(): any {
-        this.channel.on(stateChange => {
+        this.channel.on((stateChange) => {
             const { previous, current, reason } = stateChange;
             if (previous !== 'attached' && current == 'attached') {
-                this.subscribedListeners.forEach(listener => listener());
+                this.subscribedListeners.forEach((listener) => listener());
             } else if (reason) {
                 this._alertErrorListeners(stateChange);
             }
@@ -165,12 +165,12 @@ export class AblyChannel extends Channel {
 
     /**
      * Unregisters given error callback from the listeners.
-     * @param callback 
+     * @param callback
      * @returns AblyChannel
      */
     unregisterSubscribed(callback?: Function): AblyChannel {
         if (callback) {
-            this.subscribedListeners = this.subscribedListeners.filter(s => s != callback);
+            this.subscribedListeners = this.subscribedListeners.filter((s) => s != callback);
         } else {
             this.subscribedListeners = [];
         }
@@ -180,12 +180,12 @@ export class AblyChannel extends Channel {
 
     /**
      * Unregisters given error callback from the listeners.
-     * @param callback 
+     * @param callback
      * @returns AblyChannel
      */
     unregisterError(callback?: Function): AblyChannel {
         if (callback) {
-            this.errorListeners = this.errorListeners.filter(e => e != callback);
+            this.errorListeners = this.errorListeners.filter((e) => e != callback);
         } else {
             this.errorListeners = [];
         }
@@ -195,7 +195,7 @@ export class AblyChannel extends Channel {
 
     _alertErrorListeners = (err: any) => {
         if (err) {
-            this.errorListeners.forEach(listener => listener(err));
+            this.errorListeners.forEach((listener) => listener(err));
         }
-    }
+    };
 }

@@ -9,20 +9,21 @@ export class SequentialAuthTokenRequestExecuter {
         this.queue = new TaskQueue();
     }
 
-    execute = (tokenRequestFn: Function): Promise<{ token: string, info: any }> => new Promise((resolve, reject) => {
-        this.queue.run(async () => {
-            try {
-                const { token, info } = await tokenRequestFn(this.cachedToken);
-                this.cachedToken = token;
-                resolve({ token, info });
-            } catch (err) {
-                reject(err);
-            }
-        })
-    })
+    execute = (tokenRequestFn: Function): Promise<{ token: string; info: any }> =>
+        new Promise((resolve, reject) => {
+            this.queue.run(async () => {
+                try {
+                    const { token, info } = await tokenRequestFn(this.cachedToken);
+                    this.cachedToken = token;
+                    resolve({ token, info });
+                } catch (err) {
+                    reject(err);
+                }
+            });
+        });
 
-    request = (channelName: string): Promise<{ token: string, info: any }> => this.execute(token => this.requestTokenFn(channelName, token));
-
+    request = (channelName: string): Promise<{ token: string; info: any }> =>
+        this.execute((token) => this.requestTokenFn(channelName, token));
 }
 
 type Task = Function;
@@ -39,7 +40,7 @@ class TaskQueue {
         this.count = concurrentCount;
     }
 
-    canRunNext = () => (this.running.length < this.count) && this.todo.length;
+    canRunNext = () => this.running.length < this.count && this.todo.length;
 
     run = async (task: Task) => {
         if (task) {
@@ -51,5 +52,5 @@ class TaskQueue {
             await currentTask();
             this.running.shift();
         }
-    }
+    };
 }

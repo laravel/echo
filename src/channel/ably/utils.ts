@@ -1,13 +1,14 @@
-import { TokenDetails } from "../../../typings/ably";
+import { TokenDetails } from '../../../typings/ably';
 
 export const isNullOrUndefined = (obj) => obj == null || obj === undefined;
-export const isEmptyString = (stringToCheck, ignoreSpaces = true) => (ignoreSpaces ? stringToCheck.trim() : stringToCheck) === '';
+export const isEmptyString = (stringToCheck, ignoreSpaces = true) =>
+    (ignoreSpaces ? stringToCheck.trim() : stringToCheck) === '';
 export const isNullOrUndefinedOrEmpty = (obj) => obj == null || obj === undefined || isEmptyString(obj);
 
 /**
  * @throws Exception if parsing error
  */
-export const parseJwt = (jwtToken: string): { header: any, payload: any } => {
+export const parseJwt = (jwtToken: string): { header: any; payload: any } => {
     // Get Token Header
     const base64HeaderUrl = jwtToken.split('.')[0];
     const base64Header = base64HeaderUrl.replace('-', '+').replace('_', '/');
@@ -17,7 +18,7 @@ export const parseJwt = (jwtToken: string): { header: any, payload: any } => {
     const base64 = base64Url.replace('-', '+').replace('_', '/');
     const payload = JSON.parse(toText(base64));
     return { header, payload };
-}
+};
 
 // RSA4f - omitted `capability` property
 export const toTokenDetails = (jwtToken: string): TokenDetails | any => {
@@ -26,9 +27,9 @@ export const toTokenDetails = (jwtToken: string): TokenDetails | any => {
         clientId: payload['x-ably-clientId'],
         expires: payload.exp * 1000, // Convert Seconds to ms
         issued: payload.iat * 1000,
-        token: jwtToken
+        token: jwtToken,
     };
-}
+};
 
 const isBrowser = typeof window === 'object';
 
@@ -39,7 +40,7 @@ const toText = (base64: string) => {
     return Buffer.from(base64, 'base64').toString('binary');
 };
 
-const isAbsoluteUrl = (url: string) => url && url.indexOf('http://') === 0 || url.indexOf('https://') === 0;
+const isAbsoluteUrl = (url: string) => (url && url.indexOf('http://') === 0) || url.indexOf('https://') === 0;
 
 export const fullUrl = (url: string) => {
     if (!isAbsoluteUrl(url) && typeof window != 'undefined') {
@@ -51,14 +52,15 @@ export const fullUrl = (url: string) => {
         }
     }
     return url;
-}
+};
 
 let httpClient: any;
 function httpRequest(options, callback) {
     if (!httpClient) {
         httpClient = new Ably.Rest.Platform.Http();
     }
-    if (isBrowser) { // Automatically set by browser
+    // Automatically set by browser
+    if (isBrowser) {
         delete options.headers['Content-Length']; // XHR warning - Refused to set unsafe header "Content-Length"
     } else {
         options.method = options.method.toLowerCase();
@@ -82,14 +84,16 @@ export const httpRequestAsync = (options): Promise<any> => {
             } else {
                 if (typeof res === 'string') {
                     resolve(JSON.parse(res));
-                }
-                else if (!isBrowser && Buffer.isBuffer(res)) {
-                    try { resolve(JSON.parse(res.toString()))} catch (e) { resolve(res)}
-                }
-                else {
+                } else if (!isBrowser && Buffer.isBuffer(res)) {
+                    try {
+                        resolve(JSON.parse(res.toString()));
+                    } catch (e) {
+                        resolve(res);
+                    }
+                } else {
                     resolve(res);
                 }
             }
-        })
+        });
     });
-}
+};
