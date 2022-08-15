@@ -16,7 +16,7 @@ export const beforeChannelAttach = (ablyClient, authorize: Function) => {
         return;
     }
     function customInternalAttach(forceReattach, attachReason, errCallback) {
-        if (this.state === 'attached' || this.authorizing) {
+        if (this.authorizing) {
             return;
         }
         this.authorizing = true;
