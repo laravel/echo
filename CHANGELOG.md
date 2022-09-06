@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v1.13.1...master)
+## [Unreleased](https://github.com/laravel/echo/compare/v1.14.0...master)
+
+## [v1.14.0](https://github.com/laravel/echo/compare/v1.13.1...v1.14.0) - 2022-08-30
+
+### Added
+
+- Bearer token Authorization support by @parallels999 in https://github.com/laravel/echo/pull/353
 
 ## [v1.13.1](https://github.com/laravel/echo/compare/v1.13.0...v1.13.1) - 2022-08-02
 
