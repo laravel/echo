@@ -1,5 +1,10 @@
 import { Channel, PresenceChannel } from './channel';
 import { PusherConnector, SocketIoConnector, NullConnector } from './connector';
+import type { Connector, Options } from './connector';
+
+interface EchoOptions extends Options {
+    withoutInterceptors: boolean;
+}
 
 /**
  * This class is the primary API for interacting with broadcasting.
@@ -8,17 +13,17 @@ export default class Echo {
     /**
      * The broadcasting connector.
      */
-    connector: any;
+    connector: Connector;
 
     /**
      * The Echo options.
      */
-    options: any;
+    options: EchoOptions;
 
     /**
      * Create a new class instance.
      */
-    constructor(options: any) {
+    constructor(options: EchoOptions) {
         this.options = options;
         this.connect();
 
@@ -95,7 +100,7 @@ export default class Echo {
      * Get a private encrypted channel instance by name.
      */
     encryptedPrivate(channel: string): Channel {
-        return this.connector.encryptedPrivateChannel(channel);
+        return (this.connector as NullConnector | PusherConnector).encryptedPrivateChannel(channel);
     }
 
     /**
@@ -106,8 +111,8 @@ export default class Echo {
     }
 
     /**
-     * Register 3rd party request interceptiors. These are used to automatically
-     * send a connections socket id to a Laravel app with a X-Socket-Id header.
+     * Register 3rd party request interceptors. These are used to automatically
+     * send a connections socket id to a Laravel app with an X-Socket-Id header.
      */
     registerInterceptors(): void {
         if (typeof Vue === 'function' && Vue.http) {

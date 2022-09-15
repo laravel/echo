@@ -50,7 +50,7 @@ export class SocketIoConnector extends Connector {
     /**
      * Listen for an event on a channel instance.
      */
-    listen(name: string, event: string, callback: Function): SocketIoChannel {
+    listen(name: string, event: string, callback: CallableFunction): SocketIoChannel {
         return this.channel(name).listen(event, callback);
     }
 

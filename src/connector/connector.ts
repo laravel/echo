@@ -1,10 +1,28 @@
 import { Channel, PresenceChannel } from './../channel';
 
+type CustomConnector = new (options: Options) => Connector;
+
+type Broadcaster = 'socket.io' | 'pusher' | 'null' | CustomConnector
+
+export interface Options {
+    auth: {
+        headers: Record<string, string>
+    },
+    userAuthentication: {
+        endpoint: string,
+        headers: Record<string, string>,
+    },
+    broadcaster: Broadcaster,
+    csrfToken: string | null,
+    bearerToken: string | null,
+    [K: string]: unknown
+}
+
 export abstract class Connector {
     /**
      * Default connector options.
      */
-    private _defaultOptions: any = {
+    private _defaultOptions: Options = {
         auth: {
             headers: {},
         },
@@ -29,7 +47,7 @@ export abstract class Connector {
     /**
      * Create a new class instance.
      */
-    constructor(options: any) {
+    constructor(options: Options) {
         this.setOptions(options);
         this.connect();
     }
@@ -37,7 +55,7 @@ export abstract class Connector {
     /**
      * Merge the custom options with the defaults.
      */
-    protected setOptions(options: any): any {
+    protected setOptions(options: Options): any {
         this.options = Object.assign(this._defaultOptions, options);
 
         let token = this.csrfToken();
@@ -82,6 +100,11 @@ export abstract class Connector {
      * Create a fresh connection.
      */
     abstract connect(): void;
+
+    /**
+     * Listen for an event on a channel instance.
+     */
+    abstract listen(name: string, event: string, callback: CallableFunction): Channel;
 
     /**
      * Get a channel instance by name.
