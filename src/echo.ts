@@ -186,4 +186,4 @@ export default class Echo<O extends Record<PropertyKey, unknown>> {
 /**
  * Export channel classes for TypeScript.
  */
-export { Channel, PresenceChannel };
+export { Channel, PresenceChannel, EchoOptions };
