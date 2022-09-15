@@ -3,13 +3,13 @@ import { PusherConnector, SocketIoConnector, NullConnector } from './connector';
 import type { Connector, Options } from './connector';
 
 interface EchoOptions extends Options {
-    withoutInterceptors: boolean;
+    withoutInterceptors?: boolean;
 }
 
 /**
  * This class is the primary API for interacting with broadcasting.
  */
-export default class Echo {
+export default class Echo<O extends Record<PropertyKey, unknown>> {
     /**
      * The broadcasting connector.
      */
@@ -18,12 +18,12 @@ export default class Echo {
     /**
      * The Echo options.
      */
-    options: EchoOptions;
+    options: EchoOptions & O;
 
     /**
      * Create a new class instance.
      */
-    constructor(options: EchoOptions) {
+    constructor(options: EchoOptions & O) {
         this.options = options;
         this.connect();
 
@@ -51,6 +51,8 @@ export default class Echo {
             this.connector = new NullConnector(this.options);
         } else if (typeof this.options.broadcaster == 'function') {
             this.connector = new this.options.broadcaster(this.options);
+        } else {
+            throw new Error('Broadcaster option not set when initialising Echo.');
         }
     }
 

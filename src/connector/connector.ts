@@ -5,16 +5,16 @@ type CustomConnector = new (options: Options) => Connector;
 type Broadcaster = 'socket.io' | 'pusher' | 'null' | CustomConnector
 
 export interface Options {
-    auth: {
+    auth?: {
         headers: Record<string, string>
     },
-    userAuthentication: {
-        endpoint: string,
-        headers: Record<string, string>,
+    userAuthentication?: {
+        endpoint?: string,
+        headers?: Record<string, string>,
     },
-    broadcaster: Broadcaster,
-    csrfToken: string | null,
-    bearerToken: string | null,
+    broadcaster?: Broadcaster,
+    csrfToken?: string | null,
+    bearerToken?: string | null,
     [K: string]: unknown
 }
 
