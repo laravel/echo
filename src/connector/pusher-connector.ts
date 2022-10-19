@@ -27,6 +27,8 @@ export class PusherConnector extends Connector {
     connect(): void {
         if (typeof this.options.client !== 'undefined') {
             this.pusher = this.options.client;
+        } else if (this.options.Pusher) {
+            this.pusher = new this.options.Pusher(this.options.key, this.options);
         } else {
             this.pusher = new Pusher(this.options.key, this.options);
         }
