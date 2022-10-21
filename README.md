@@ -1,36 +1,68 @@
-<p align="center"><img src="/art/logo.svg" alt="Logo Laravel Echo"></p>
-
-<p align="center">
-<a href="https://github.com/laravel/echo/actions"><img src="https://github.com/laravel/echo/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://www.npmjs.com/package/laravel-echo"><img src="https://img.shields.io/npm/dt/laravel-echo" alt="Total Downloads"></a>
-<a href="https://www.npmjs.com/package/laravel-echo"><img src="https://img.shields.io/npm/v/laravel-echo" alt="Latest Stable Version"></a>
-<a href="https://www.npmjs.com/package/laravel-echo"><img src="https://img.shields.io/npm/l/laravel-echo" alt="License"></a>
-</p>
-
 ## Introduction
 
-In many modern web applications, WebSockets are used to implement realtime, live-updating user interfaces. When some data is updated on the server, a message is typically sent over a WebSocket connection to be handled by the client. This provides a more robust, efficient alternative to continually polling your application for changes.
+- This repository is a fork of https://github.com/laravel/echo. 
+- Currently, ably specific implementation is added to support native [ably-js](https://github.com/ably/ably-js).
 
-To assist you in building these types of applications, Laravel makes it easy to "broadcast" your events over a WebSocket connection. Broadcasting your Laravel events allows you to share the same event names between your server-side code and your client-side JavaScript application.
+## Installation 
+- `npm install @ably/laravel-echo ably`
 
-Laravel Echo is a JavaScript library that makes it painless to subscribe to channels and listen for events broadcast by Laravel. You may install Echo via the NPM package manager.
+Once Echo is installed, you are ready to create a fresh Echo instance in your applications JavaScript. A great place to do this is at the bottom of the `resources/js/bootstrap.js` file that is included with the Laravel framework. By default, an example Echo configuration is already included in this file; however, the default configuration in the `bootstrap.js` file is intended for Pusher. You may copy the configuration below to transition your configuration to Ably.
+
+```js
+import Echo from 'laravel-echo';
+import * as Ably from 'ably';
+
+window.Ably = Ably;
+window.Echo = new Echo({
+    broadcaster: 'ably',
+});
+
+window.Echo.connector.ably.connection.on(stateChange => {
+    if (stateChange.current === 'connected') {
+        console.log('connected to ably server');
+    }
+});
+```
+You can set custom [clientOptions](https://ably.com/docs/api/realtime-sdk?lang=javascript#client-options) when creating an `Echo` instance.
+
+```
+    broadcaster: 'ably',
+    authEndpoint: 'http://www.localhost:8000/broadcasting/auth'
+      // Additional ably specific options - https://ably.com/docs/api/realtime-sdk?lang=javascript#client-options  
+    realtimeHost: 'realtime.ably.com',
+    restHost: 'rest.ably.com',
+    port: '80',
+    echoMessages: true // By default self-echo for published message is false
+```
+Once you have uncommented and adjusted the Echo configuration according to your needs, you may compile your application's assets:
+
+```shell
+npm run dev
+```
+
 
 ## Official Documentation
-
-Documentation for Echo can be found on the [Laravel website](https://laravel.com/docs/broadcasting).
+- More documentation for Echo can be found on the [Laravel website](https://laravel.com/docs/broadcasting).
 
 ## Contributing
+- Current repository inherits public interface methods from base repo.
+- Make sure all of the public interfacing methods on `Echo` object are kept intact irrespective of internal implementation.
+- Follow the below steps for modifying the code
+1. Fork it.
+2. Create your feature branch (`git checkout -b my-new-feature`).
+3. Commit your changes (`git commit -am 'Add some feature'`).
+4. Ensure you have added suitable tests and the test suite is passing (run `vendor/bin/phpunit`)
+4. Push to the branch (`git push origin my-new-feature`).
+5. Create a new Pull Request.
 
-Thank you for considering contributing to Echo! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-## Code of Conduct
+## Release Process
+This library uses [semantic versioning](http://semver.org/). For each release, the following needs to be done:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-Please review [our security policy](https://github.com/laravel/echo/security/policy) on how to report security vulnerabilities.
-
-## License
-
-Laravel Echo is open-sourced software licensed under the [MIT license](LICENSE.md).
+1. Create a new branch for the release, named like `release/1.2.4` (where `1.2.4` is what you're releasing, being the new version)
+2. Run [`github_changelog_generator`](https://github.com/skywinder/Github-Changelog-Generator) to automate the update of the [CHANGELOG](./CHANGELOG.md). Once the `CHANGELOG` update has completed, manually change the `Unreleased` heading and link with the current version number such as `1.2.4`. Also ensure that the `Full Changelog` link points to the new version tag instead of the `HEAD`.
+3. Commit generated [CHANGELOG.md](./CHANGELOG.md) file.
+4. Make a PR against `main`.
+5. Once the PR is approved, merge it into `main`.
+6. Add a tag and push it to origin - e.g.: `git tag v1.2.4 && git push origin v1.2.4`.
+7. Publish npm package on npmjs.com.
