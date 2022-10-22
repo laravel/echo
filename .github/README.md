@@ -69,5 +69,6 @@ This library uses [semantic versioning](http://semver.org/). For each release, t
 7. Publish npm package on npmjs.com.
 
 ## Note 
-- Current `README` is newly created and located under `.github/README.md` to avoid syncing conflicts with root `README`.
-- `CHANGELOG-ABLY.md` will be used for commiting changelog instead of `CHANGELOG.md` to avoid conflicts while syncing.
+- Current `README` is newly created and located under `.github/README.md`.
+- `CHANGELOG-ABLY.md` will be used for commiting changelog instead of `CHANGELOG.md`.
+- This is mainly to avoid syncing conflicts.
