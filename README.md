@@ -1,12 +1,13 @@
 ## Introduction
 
 - This repository is a fork of https://github.com/laravel/echo. 
-- Currently, ably specific implementation is added to support native [ably-js](https://github.com/ably/ably-js).
+- Current repository adheres to public interface methods from base repo.
+- Ably-specific implementation is added to support native [ably-js](https://github.com/ably/ably-js).
 
 ## Installation 
 - `npm install @ably/laravel-echo ably`
 
-Once Echo is installed, you are ready to create a fresh Echo instance in your applications JavaScript. A great place to do this is at the bottom of the `resources/js/bootstrap.js` file that is included with the Laravel framework. By default, an example Echo configuration is already included in this file; however, the default configuration in the `bootstrap.js` file is intended for Pusher. You may copy the configuration below to transition your configuration to Ably.
+Once Echo is installed, you are ready to create a fresh Echo instance in your application's JavaScript. A great place to do this is at the bottom of the `resources/js/bootstrap.js` file that is included with the Laravel framework. By default, an example Echo configuration is already included in this file; however, the default configuration in the `bootstrap.js` file is intended for Pusher. You may copy the configuration below to transition your configuration to Ably.
 
 ```js
 import Echo from 'laravel-echo';
@@ -45,9 +46,8 @@ npm run dev
 - More documentation for Echo can be found on the [Laravel website](https://laravel.com/docs/broadcasting).
 
 ## Contributing
-- Current repository inherits public interface methods from base repo.
-- Make sure all of the public interfacing methods on `Echo` object are kept intact irrespective of internal implementation.
-- Follow the below steps for modifying the code
+- Make sure all of the public interfacing methods on `Echo` and `Channel` object are kept intact irrespective of internal implementation.
+- Follow the below steps for modifying the code.
 1. Fork it.
 2. Create your feature branch (`git checkout -b my-new-feature`).
 3. Commit your changes (`git commit -am 'Add some feature'`).
