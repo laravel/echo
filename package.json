@@ -1,16 +1,15 @@
 {
-    "name": "laravel-echo",
-    "version": "1.13.1",
-    "description": "Laravel Echo library for beautiful Pusher and Socket.IO integration",
+    "name": "@ably/laravel-echo",
+    "version": "1.0.0",
+    "description": "Laravel Echo library for beautiful Ably integration",
     "keywords": [
         "laravel",
-        "pusher",
         "ably"
     ],
-    "homepage": "https://github.com/laravel/echo",
+    "homepage": "https://github.com/ably-forks/laravel-echo",
     "repository": {
         "type": "git",
-        "url": "https://github.com/laravel/echo"
+        "url": "https://github.com/ably-forks/laravel-echo"
     },
     "license": "MIT",
     "author": {
