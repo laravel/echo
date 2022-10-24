@@ -1,9 +1,6 @@
 ## Introduction
-
-- This repository is a fork of https://github.com/laravel/echo. 
-- It adheres to public interface methods from base repo.
-- It will be synced regularly with base repo. to make sure all the code is up to date.
-- Ably-specific implementation is added to support native [ably-js](https://github.com/ably/ably-js).
+This repository is a fork of https://github.com/laravel/echo. It adheres to public interface methods from base repository.It will be synced regularly with the base repository to make sure all the code is up to date.
+Ably-specific implementation is added to support native [ably-js](https://github.com/ably/ably-js).
 
 ## Installation 
 - `npm install @ably/laravel-echo ably`
@@ -42,6 +39,19 @@ Once you have uncommented and adjusted the Echo configuration according to your 
 npm run dev
 ```
 
+## Leaving the channel
+- Make sure to use following syntax while using `leaveChannel` method on `Echo`.
+```
+ // public channel
+Echo.channel('channel1');
+Echo.leaveChannel("public:channel1");
+// private channel
+Echo.private('channel2'); 
+Echo.leaveChannel("private:channel2")
+// presence channel
+Echo.join('channel3'); 
+Echo.leaveChannel("presence:channel3")
+```
 
 ## Official Documentation
 - More documentation for Echo can be found on the [Laravel website](https://laravel.com/docs/broadcasting).
