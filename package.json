@@ -24,6 +24,10 @@
         "declarations": "tsc --emitDeclarationOnly",
         "lint": "eslint --ext .js,.ts ./src ./tests",
         "prepublish": "npm run build",
+        "use:ablyReadme": "mv 'README.md' 'base.README.md' && mv '.github/README.md' 'README.md'",
+        "use:baseReadme": "mv 'README.md' '.github/README.md' && mv 'base.README.md' 'README.md'",
+        "prepublishOnly": "run-s build use:npmReadme",
+        "postpublish": "npm run use:gitReadme",
         "release": "npm run test && standard-version && git push --follow-tags && npm publish",
         "test": "jest"
     },
@@ -44,6 +48,7 @@
         "eslint": "^8.11.0",
         "jest": "^27.5.1",
         "jsonwebtoken": "^8.5.1",
+        "npm-run-all": "^4.1.5",
         "rollup": "^2.70.1",
         "rollup-plugin-typescript2": "^0.31.2",
         "standard-version": "^9.3.2",
