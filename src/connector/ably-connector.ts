@@ -7,6 +7,12 @@ import { AblyRealtime } from '../../typings/ably';
  * This class creates a connector to Ably.
  */
 export class AblyConnector extends Connector {
+
+    /**
+     * The laravel-echo library version.
+     */
+    LIB_VERSION = '1.0.0';
+
     /**
      * The Ably instance.
      */
@@ -30,6 +36,10 @@ export class AblyConnector extends Connector {
             this.ably = this.options.client;
         } else {
             this.ablyAuth = new AblyAuth(this.options);
+            if (!this.options.agents) {
+                this.options.agents = {};
+            }
+            this.options.agents['laravel-echo'] = this.LIB_VERSION;
             this.ably = new Ably.Realtime({ ...this.ablyAuth.options, ...this.options });
             this.ablyAuth.enableAuthorizeBeforeChannelAttach(this);
         }
