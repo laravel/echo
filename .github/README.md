@@ -3,7 +3,7 @@ This repository is a fork of https://github.com/laravel/echo. It adheres to publ
 Ably-specific implementation is added to support native [ably-js](https://github.com/ably/ably-js).
 
 ## Installation 
-- Install `@ably/laravel-echo` (wrapper for pluggable lib) and latest version of `ably` (pluggable lib) using npm.
+ Install `@ably/laravel-echo` (wrapper for pluggable lib) and latest version of `ably` (pluggable lib) using npm.
 ```js
  npm install @ably/laravel-echo ably
 ```
@@ -79,8 +79,11 @@ This library uses [semantic versioning](http://semver.org/). For each release, t
 4. Commit generated [CHANGELOG-ABLY.md](../CHANGELOG-ABLY.md) file at root.
 5. Make a PR against `main`.
 6. Once the PR is approved, merge it into `main`.
-7. Add a tag and push it to origin - e.g.: `git tag v1.2.4 && git push origin v1.2.4`.
+7. Add a tag and push it to origin - e.g.: `git tag ably-echo-1.2.4
+ && git push origin ably-echo-1.2.4`.
 8. Publish npm package on npmjs.com.
+9. Visit https://github.com/ably-forks/laravel-echo/tags and add release notes to the release (generally you can just copy the notes you added to the CHANGELOG).
+10. Update the [Ably Changelog](https://changelog.ably.com/) (via [headwayapp](https://headwayapp.co/)) with these changes (again, you can just copy the notes you added to the CHANGELOG).
 
 ## Note 
 - Current `README` is newly created and located under `.github/README.md`.
