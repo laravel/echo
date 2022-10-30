@@ -84,13 +84,14 @@ describe('AblyConnection', () => {
     });
 
     test('should set ably agent header', (done) => {
-        expect(echo.connector.ably.options.agents).toBe({
+        expect(echo.connector.ably.options.agents).toStrictEqual({
             'laravel-echo': AblyConnector.LIB_VERSION
         })
         //Intercept Http.do with test
         function testRequestHandler(_, __, ___, headers) {
             expect('X-Ably-Version' in headers).toBeTruthy();
             expect('Ably-Agent' in headers).toBeTruthy();
+            expect(headers['Ably-Agent'].indexOf('laravel-echo/'+ AblyConnector.LIB_VERSION) > -1).toBeTruthy();
         }
 
         const do_inner = echo.connector.ably.http.do;
@@ -100,7 +101,7 @@ describe('AblyConnection', () => {
         echo.connector.ably.auth.requestToken();
         echo.connector.ably.time();
         echo.connector.ably.stats();
-        var channel = echo.connector.ably.channels.get('http_test_channel');
+        const channel = echo.connector.ably.channels.get('http_test_channel');
         channel.publish('test', 'Testing http headers');
         channel.presence.get();
 
