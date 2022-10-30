@@ -11,8 +11,8 @@ export class AblyConnector extends Connector {
     /**
      * The laravel-echo library version.
      */
-    LIB_VERSION = '1.0.0';
-
+    static LIB_VERSION = '1.0.0';
+    
     /**
      * The Ably instance.
      */
@@ -39,7 +39,7 @@ export class AblyConnector extends Connector {
             if (!this.options.agents) {
                 this.options.agents = {};
             }
-            this.options.agents['laravel-echo'] = this.LIB_VERSION;
+            this.options.agents['laravel-echo'] = AblyConnector.LIB_VERSION;
             this.ably = new Ably.Realtime({ ...this.ablyAuth.options, ...this.options });
             this.ablyAuth.enableAuthorizeBeforeChannelAttach(this);
         }
