@@ -1,9 +1,12 @@
 ## Introduction
-This repository is a fork of https://github.com/laravel/echo. It adheres to public interface methods from base repository.It will be synced regularly with the base repository to make sure all the code is up to date.
+This repository is a fork of https://github.com/laravel/echo. It adheres to public interface methods from base repository. It will be synced regularly with the base repository to make sure all the code is up to date.
 Ably-specific implementation is added to support native [ably-js](https://github.com/ably/ably-js).
 
 ## Installation 
-- `npm install @ably/laravel-echo ably`
+- Install `@ably/laravel-echo` (wrapper for pluggable lib) and latest version of `ably` (pluggable lib) using npm.
+```js
+ npm install @ably/laravel-echo ably
+```
 
 Once Echo is installed, you are ready to create a fresh Echo instance in your application's JavaScript. A great place to do this is at the bottom of the `resources/js/bootstrap.js` file that is included with the Laravel framework. By default, an example Echo configuration is already included in this file; however, the default configuration in the `bootstrap.js` file is intended for Pusher. You may copy the configuration below to transition your configuration to Ably.
 
@@ -11,7 +14,7 @@ Once Echo is installed, you are ready to create a fresh Echo instance in your ap
 import Echo from 'laravel-echo';
 import * as Ably from 'ably';
 
-window.Ably = Ably;
+window.Ably = Ably; // make globally accessible to Echo
 window.Echo = new Echo({
     broadcaster: 'ably',
 });
@@ -71,8 +74,8 @@ Echo.leaveChannel("presence:channel3")
 This library uses [semantic versioning](http://semver.org/). For each release, the following needs to be done:
 
 1. Create a new branch for the release, named like `release/1.2.4` (where `1.2.4` is what you're releasing, being the new version)
-2. Run [`github_changelog_generator`](https://github.com/skywinder/Github-Changelog-Generator) to automate the update of the [CHANGELOG-ABLY.md](./CHANGELOG-ABLY.md). Once the `CHANGELOG-ABLY` update has completed, manually change the `Unreleased` heading and link with the current version number such as `1.2.4`. Also ensure that the `Full Changelog` link points to the new version tag instead of the `HEAD`.
-3. Commit generated [CHANGELOG-ABLY.md](./CHANGELOG-ABLY.md) file.
+2. Run [`github_changelog_generator`](https://github.com/skywinder/Github-Changelog-Generator) to automate the update of the [CHANGELOG-ABLY.md](../CHANGELOG-ABLY.md). Once the `CHANGELOG-ABLY` update has completed, manually change the `Unreleased` heading and link with the current version number such as `1.2.4`. Also ensure that the `Full Changelog` link points to the new version tag instead of the `HEAD`.
+3. Commit generated [CHANGELOG-ABLY.md](../CHANGELOG-ABLY.md) file at root.
 4. Make a PR against `main`.
 5. Once the PR is approved, merge it into `main`.
 6. Add a tag and push it to origin - e.g.: `git tag v1.2.4 && git push origin v1.2.4`.
@@ -81,4 +84,4 @@ This library uses [semantic versioning](http://semver.org/). For each release, t
 ## Note 
 - Current `README` is newly created and located under `.github/README.md`.
 - `CHANGELOG-ABLY.md` will be used for commiting changelog instead of `CHANGELOG.md`.
-- This is mainly to avoid syncing conflicts.
+- This is mainly to avoid syncing conflicts with base repository.
