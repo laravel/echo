@@ -3,7 +3,7 @@ This repository is a fork of https://github.com/laravel/echo. It adheres to publ
 Ably-specific implementation is added to support native [ably-js](https://github.com/ably/ably-js).
 
 ## Installation 
-- Install `@ably/laravel-echo` (wrapper for pluggable lib) and latest version of `ably` (pluggable lib) using npm.
+ Install `@ably/laravel-echo` (wrapper for pluggable lib) and latest version of `ably` (pluggable lib) using npm.
 ```js
  npm install @ably/laravel-echo ably
 ```
@@ -74,12 +74,16 @@ Echo.leaveChannel("presence:channel3")
 This library uses [semantic versioning](http://semver.org/). For each release, the following needs to be done:
 
 1. Create a new branch for the release, named like `release/1.2.4` (where `1.2.4` is what you're releasing, being the new version)
-2. Run [`github_changelog_generator`](https://github.com/skywinder/Github-Changelog-Generator) to automate the update of the [CHANGELOG-ABLY.md](../CHANGELOG-ABLY.md). Once the `CHANGELOG-ABLY` update has completed, manually change the `Unreleased` heading and link with the current version number such as `1.2.4`. Also ensure that the `Full Changelog` link points to the new version tag instead of the `HEAD`.
-3. Commit generated [CHANGELOG-ABLY.md](../CHANGELOG-ABLY.md) file at root.
-4. Make a PR against `main`.
-5. Once the PR is approved, merge it into `main`.
-6. Add a tag and push it to origin - e.g.: `git tag v1.2.4 && git push origin v1.2.4`.
-7. Publish npm package on npmjs.com.
+2. Update the `LIB_VERSION` in `src/connector/ably-connector.ts`.
+3. Run [`github_changelog_generator`](https://github.com/skywinder/Github-Changelog-Generator) to automate the update of the [CHANGELOG-ABLY.md](../CHANGELOG-ABLY.md). Once the `CHANGELOG-ABLY` update has completed, manually change the `Unreleased` heading and link with the current version number such as `1.2.4`. Also ensure that the `Full Changelog` link points to the new version tag instead of the `HEAD`.
+4. Commit generated [CHANGELOG-ABLY.md](../CHANGELOG-ABLY.md) file at root.
+5. Make a PR against `main`.
+6. Once the PR is approved, merge it into `main`.
+7. Add a tag and push it to origin - e.g.: `git tag ably-echo-1.2.4
+ && git push origin ably-echo-1.2.4`.
+8. Publish npm package on npmjs.com.
+9. Visit https://github.com/ably-forks/laravel-echo/tags and add release notes to the release (generally you can just copy the notes you added to the CHANGELOG).
+10. Update the [Ably Changelog](https://changelog.ably.com/) (via [headwayapp](https://headwayapp.co/)) with these changes (again, you can just copy the notes you added to the CHANGELOG).
 
 ## Note 
 - Current `README` is newly created and located under `.github/README.md`.

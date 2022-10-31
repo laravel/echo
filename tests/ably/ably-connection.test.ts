@@ -3,7 +3,7 @@ import Echo from '../../src/echo';
 import { MockAuthServer } from './setup/mock-auth-server';
 import safeAssert from './setup/utils';
 import * as Ably from 'ably';
-
+import { AblyConnector } from '../../src/connector/ably-connector';
 jest.setTimeout(20000);
 describe('AblyConnection', () => {
     let testApp: any;
@@ -82,4 +82,31 @@ describe('AblyConnection', () => {
             }
         });
     });
+
+    test('should set ably agent header', (done) => {
+        expect(echo.connector.ably.options.agents).toStrictEqual({
+            'laravel-echo': AblyConnector.LIB_VERSION
+        })
+        //Intercept Http.do with test
+        function testRequestHandler(_, __, ___, headers) {
+            expect('X-Ably-Version' in headers).toBeTruthy();
+            expect('Ably-Agent' in headers).toBeTruthy();
+            expect(headers['Ably-Agent'].indexOf('laravel-echo/'+ AblyConnector.LIB_VERSION) > -1).toBeTruthy();
+        }
+
+        const do_inner = echo.connector.ably.http.do;
+        echo.connector.ably.http.do = testRequestHandler;
+
+        // Call all methods that use rest http calls
+        echo.connector.ably.auth.requestToken();
+        echo.connector.ably.time();
+        echo.connector.ably.stats();
+        const channel = echo.connector.ably.channels.get('http_test_channel');
+        channel.publish('test', 'Testing http headers');
+        channel.presence.get();
+
+        // Clean interceptors from Http.do
+        echo.connector.ably.http.do = do_inner;
+        done();
+    })
 });
