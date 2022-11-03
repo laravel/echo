@@ -6,7 +6,7 @@ Ably-specific implementation is added to support native [ably-js](https://github
  Install `@ably/laravel-echo` (wrapper for pluggable lib) and latest version of `ably` (pluggable lib) using npm.
 
 ```bash
-npm install --save-dev @ably/laravel-echo ably
+npm install @ably/laravel-echo ably
 ```
 
 Once Echo is installed, you are ready to create a fresh Echo instance in your application's JavaScript. A great place to do this is at the bottom of the `resources/js/bootstrap.js` file that is included with the Laravel framework. By default, an example Echo configuration is already included in this file; however, the default configuration in the `bootstrap.js` file is intended for Pusher. You may copy the configuration below to transition your configuration to Ably.
