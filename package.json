@@ -1,6 +1,6 @@
 {
     "name": "@ably/laravel-echo",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Laravel Echo library for beautiful Ably integration",
     "keywords": [
         "laravel",
@@ -26,8 +26,8 @@
         "prepublish": "npm run build",
         "use:ablyReadme": "move-cli 'README.md' 'base.README.md' && move-cli '.github/README.md' 'README.md'",
         "use:baseReadme": "move-cli 'README.md' '.github/README.md' && move-cli 'base.README.md' 'README.md'",
-        "prepublishOnly": "run-s build use:npmReadme",
-        "postpublish": "npm run use:gitReadme",
+        "prepublishOnly": "run-s build use:ablyReadme",
+        "postpublish": "npm run use:baseReadme",
         "release": "npm run test && standard-version && git push --follow-tags && npm publish",
         "test": "jest"
     },
