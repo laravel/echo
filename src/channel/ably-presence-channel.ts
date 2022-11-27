@@ -26,8 +26,8 @@ export class AblyPresenceChannel extends AblyChannel implements PresenceChannel 
      */
     here(callback: Function): AblyPresenceChannel {
         this.channel.presence.subscribe(['enter', 'update', 'leave'], () =>
-            this.channel.presence.get(
-                (err, members) => callback(members, err) // returns local sync copy of updated members
+            this.channel.presence.get((err, members) =>
+                callback(members.map(({data}) => data), err)
             )
         );
         return this;
