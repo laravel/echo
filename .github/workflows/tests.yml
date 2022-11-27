@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - master
+      - '*.x'
   schedule:
     - cron: '0 0 * * 0' # Once in a week run tests to check assertions against updated(if any) ably-js package.
 
