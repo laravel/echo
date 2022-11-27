@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v1.14.1...master)
+## [Unreleased](https://github.com/laravel/echo/compare/v1.14.2...master)
+
+## [v1.14.2](https://github.com/laravel/echo/compare/v1.14.1...v1.14.2) - 2022-11-22
+
+### Fixed
+
+- Fix node type issue by @timacdonald in https://github.com/laravel/echo/pull/361
 
 ## [v1.14.1](https://github.com/laravel/echo/compare/v1.14.0...v1.14.1) - 2022-10-25
 
