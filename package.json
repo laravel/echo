@@ -41,7 +41,7 @@
         "@babel/preset-env": "^7.16.11",
         "@rollup/plugin-babel": "^5.3.1",
         "@types/jest": "^27.4.1",
-        "@types/node": "^17.0.21",
+        "@types/node": "^18.11.9",
         "@typescript-eslint/eslint-plugin": "^5.14.0",
         "@typescript-eslint/parser": "^5.14.0",
         "ably": "^1.2.20",
