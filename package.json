@@ -1,6 +1,6 @@
 {
     "name": "@ably/laravel-echo",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Laravel Echo library for beautiful Ably integration",
     "keywords": [
         "laravel",
