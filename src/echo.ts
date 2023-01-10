@@ -81,8 +81,8 @@ export default class Echo {
      * Leave from all channels
      */
     leaveAllChannels(): void {
-        for (let channel in this.connector.channels) {
-            this.leaveChannel(channel)
+        for (const channel in this.connector.channels) {
+            this.leaveChannel(channel);
         }
     }
 
