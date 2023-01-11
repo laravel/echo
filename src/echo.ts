@@ -78,6 +78,15 @@ export default class Echo {
     }
 
     /**
+     * Leave all channels.
+     */
+    leaveAllChannels(): void {
+        for (const channel in this.connector.channels) {
+            this.leaveChannel(channel);
+        }
+    }
+
+    /**
      * Listen for an event on a channel instance.
      */
     listen(channel: string, event: string, callback: Function): Channel {
