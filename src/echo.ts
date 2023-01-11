@@ -78,7 +78,7 @@ export default class Echo {
     }
 
     /**
-     * Leave from all channels
+     * Leave all channels.
      */
     leaveAllChannels(): void {
         for (const channel in this.connector.channels) {
