@@ -26,6 +26,13 @@ export class NullChannel extends Channel {
     }
 
     /**
+     * Listen for all events on the channel instance.
+     */
+    listenToAll(callback: Function): NullChannel {
+        return this;
+    }
+
+    /**
      * Stop listening for an event on the channel instance.
      */
     stopListening(event: string, callback?: Function): NullChannel {
