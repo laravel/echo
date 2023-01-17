@@ -1,6 +1,14 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v1.14.2...master)
+## [Unreleased](https://github.com/laravel/echo/compare/v1.15.0...master)
+
+## [v1.15.0](https://github.com/laravel/echo/compare/v1.14.2...v1.15.0) - 2023-01-17
+
+### Added
+
+- Leave from all channels by @k0mar12 in https://github.com/laravel/echo/pull/365
+- Add an `encrypedPrivateChannel` function to the NullConnector. by @luniki in https://github.com/laravel/echo/pull/369
+- Add a `listenToAll` function to the NullConnector. by @luniki in https://github.com/laravel/echo/pull/368
 
 ## [v1.14.2](https://github.com/laravel/echo/compare/v1.14.1...v1.14.2) - 2022-11-22
 
