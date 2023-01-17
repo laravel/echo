@@ -39,6 +39,13 @@ export class NullConnector extends Connector {
     }
 
     /**
+     * Get a private encrypted channel instance by name.
+     */
+    encryptedPrivateChannel(name: string): NullPrivateChannel {
+        return new NullPrivateChannel();
+    }
+
+    /**
      * Get a presence channel instance by name.
      */
     presenceChannel(name: string): PresenceChannel {
