@@ -1,5 +1,5 @@
 import { Channel, PresenceChannel } from './channel';
-import { PusherConnector, SocketIoConnector, NullConnector } from './connector';
+import { PusherConnector, SocketIoConnector, NullConnector, CentrifugeConnector } from './connector';
 
 /**
  * This class is the primary API for interacting with broadcasting.
@@ -44,6 +44,8 @@ export default class Echo {
             this.connector = new SocketIoConnector(this.options);
         } else if (this.options.broadcaster == 'null') {
             this.connector = new NullConnector(this.options);
+        } else if (this.options.broadcaster == 'centrifuge') {
+            this.connector = new CentrifugeConnector(this.options);
         } else if (typeof this.options.broadcaster == 'function') {
             this.connector = new this.options.broadcaster(this.options);
         }

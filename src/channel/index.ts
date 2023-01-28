@@ -10,3 +10,5 @@ export * from './socketio-presence-channel';
 export * from './null-channel';
 export * from './null-private-channel';
 export * from './null-presence-channel';
+export * from './centrifuge-channel';
+export * from './centrifuge-presence-channel';
