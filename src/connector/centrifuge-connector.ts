@@ -31,6 +31,8 @@ export class CentrifugeConnector extends Connector {
                 'Centrifuge-js client not found. Should be globally available or passed via options.client'
             );
         }
+
+        this.centrifuge.connect();
     }
 
     /**
