@@ -87,7 +87,7 @@ export class CentrifugeChannel extends Channel {
 
         this.subscription.on('publication', (ctx) => {
             if (ctx.data.event in this.events) {
-                this.events[ctx.data.event](ctx.data.channel, ctx.data);
+                this.events[ctx.data.event](ctx.channel, ctx.data);
             }
         });
     }
