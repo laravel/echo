@@ -18,4 +18,9 @@ export interface PresenceChannel extends Channel {
      * Listen for someone leaving the channel.
      */
     leaving(callback: Function): PresenceChannel;
+    
+    /**
+     * Fire a whisper event to clients present in the channel.
+     */
+    whisper(eventName: string, data: any): PresenceChannel;
 }
