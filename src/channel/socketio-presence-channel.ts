@@ -33,4 +33,17 @@ export class SocketIoPresenceChannel extends SocketIoPrivateChannel implements P
 
         return this;
     }
+
+    /**
+     * Trigger client event on the channel.
+     */
+    whisper(eventName: string, data: any): SocketIoPresenceChannel {
+        this.socket.emit('client event', {
+            channel: this.name,
+            event: `client-${eventName}`,
+            data: data,
+        });
+
+        return this;
+    }
 }
