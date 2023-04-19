@@ -26,16 +26,7 @@ export class SocketIoPresenceChannel extends SocketIoPrivateChannel implements P
     }
 
     /**
-     * Listen for someone leaving the channel.
-     */
-    leaving(callback: Function): SocketIoPresenceChannel {
-        this.on('presence:leaving', (member) => callback(member.user_info));
-
-        return this;
-    }
-
-    /**
-     * Trigger client event on the channel.
+     * Send a whisper event to other clients in the channel.
      */
     whisper(eventName: string, data: any): SocketIoPresenceChannel {
         this.socket.emit('client event', {
@@ -43,6 +34,15 @@ export class SocketIoPresenceChannel extends SocketIoPrivateChannel implements P
             event: `client-${eventName}`,
             data: data,
         });
+
+        return this;
+    }
+
+    /**
+     * Listen for someone leaving the channel.
+     */
+    leaving(callback: Function): SocketIoPresenceChannel {
+        this.on('presence:leaving', (member) => callback(member.user_info));
 
         return this;
     }
