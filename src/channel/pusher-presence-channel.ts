@@ -28,21 +28,21 @@ export class PusherPresenceChannel extends PusherChannel implements PresenceChan
     }
 
     /**
+     * Send a whisper event to other clients in the channel.
+     */
+    whisper(eventName: string, data: any): PusherPresenceChannel {
+        this.pusher.channels.channels[this.name].trigger(`client-${eventName}`, data);
+
+        return this;
+    }
+
+    /**
      * Listen for someone leaving the channel.
      */
     leaving(callback: Function): PusherPresenceChannel {
         this.on('pusher:member_removed', (member) => {
             callback(member.info);
         });
-
-        return this;
-    }
-
-    /**
-     * Trigger client event on the channel.
-     */
-    whisper(eventName: string, data: any): PusherPresenceChannel {
-        this.pusher.channels.channels[this.name].trigger(`client-${eventName}`, data);
 
         return this;
     }

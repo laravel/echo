@@ -26,6 +26,19 @@ export class SocketIoPresenceChannel extends SocketIoPrivateChannel implements P
     }
 
     /**
+     * Send a whisper event to other clients in the channel.
+     */
+    whisper(eventName: string, data: any): SocketIoPresenceChannel {
+        this.socket.emit('client event', {
+            channel: this.name,
+            event: `client-${eventName}`,
+            data: data,
+        });
+
+        return this;
+    }
+
+    /**
      * Listen for someone leaving the channel.
      */
     leaving(callback: Function): SocketIoPresenceChannel {

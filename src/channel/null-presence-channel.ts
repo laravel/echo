@@ -20,16 +20,16 @@ export class NullPresenceChannel extends NullChannel implements PresenceChannel 
     }
 
     /**
-     * Listen for someone leaving the channel.
+     * Send a whisper event to other clients in the channel.
      */
-    leaving(callback: Function): NullPresenceChannel {
+    whisper(eventName: string, data: any): NullPresenceChannel {
         return this;
     }
 
     /**
-     * Trigger client event on the channel.
+     * Listen for someone leaving the channel.
      */
-    whisper(eventName: string, data: any): NullPresenceChannel {
+    leaving(callback: Function): NullPresenceChannel {
         return this;
     }
 }
