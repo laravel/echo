@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v1.15.0...master)
+## [Unreleased](https://github.com/laravel/echo/compare/v1.15.1...master)
+
+## [v1.15.1](https://github.com/laravel/echo/compare/v1.15.0...v1.15.1) - 2023-04-26
+
+- Fix broken Typescript presence channel interface "whisper" method by @DellanX in https://github.com/laravel/echo/pull/377
 
 ## [v1.15.0](https://github.com/laravel/echo/compare/v1.14.2...v1.15.0) - 2023-01-17
 
