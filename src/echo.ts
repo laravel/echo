@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/triple-slash-reference */
 /// <reference path="../typings/index.d.ts" />
 
 import type { Options } from "../typings/options";

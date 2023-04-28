@@ -2,7 +2,7 @@ import babel from "@rollup/plugin-babel";
 import { builtinModules } from "node:module";
 import json from "@rollup/plugin-json";
 import dts from "rollup-plugin-dts";
-import pkg from "./package.json";
+import pkg from "./package.json" assert { type: "json" };
 import { defineConfig } from "rollup";
 import esbuild from "rollup-plugin-esbuild";
 
