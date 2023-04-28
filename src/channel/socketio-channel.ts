@@ -1,5 +1,5 @@
-import { EventFormatter } from "../util";
-import { Channel } from "./channel";
+import { EventFormatter } from '../util';
+import { Channel } from './channel';
 
 /**
  * This class represents a Socket.io channel.
@@ -53,7 +53,7 @@ export class SocketIoChannel extends Channel {
      * Subscribe to a Socket.io channel.
      */
     subscribe(): void {
-        this.socket.emit("subscribe", {
+        this.socket.emit('subscribe', {
             channel: this.name,
             auth: this.options.auth || {},
         });
@@ -65,7 +65,7 @@ export class SocketIoChannel extends Channel {
     unsubscribe(): void {
         this.unbind();
 
-        this.socket.emit("unsubscribe", {
+        this.socket.emit('unsubscribe', {
             channel: this.name,
             auth: this.options.auth || {},
         });
@@ -93,7 +93,7 @@ export class SocketIoChannel extends Channel {
      * Register a callback to be called anytime a subscription succeeds.
      */
     subscribed(callback: Function): SocketIoChannel {
-        this.on("connect", (socket) => {
+        this.on('connect', (socket) => {
             callback(socket);
         });
 

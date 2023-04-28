@@ -8,10 +8,15 @@ describe('SocketIoChannel', () => {
         const channelName = 'some.channel';
         let listeners = [];
         socket = {
-            emit: (event, data) => listeners.filter(([e]) => e === event).forEach(([, fn]) => fn(channelName, data)),
+            emit: (event, data) =>
+                listeners
+                    .filter(([e]) => e === event)
+                    .forEach(([, fn]) => fn(channelName, data)),
             on: (event, fn) => listeners.push([event, fn]),
             removeListener: (event, fn) => {
-                listeners = listeners.filter(([e, f]) => (!fn ? e !== event : e !== event || f !== fn));
+                listeners = listeners.filter(([e, f]) =>
+                    !fn ? e !== event : e !== event || f !== fn
+                );
             },
         };
 

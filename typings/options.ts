@@ -1,10 +1,10 @@
 export type BroadcasterOption =
-    | "pusher"
-    | "socket.io"
-    | "null"
+    | 'pusher'
+    | 'socket.io'
+    | 'null'
     | ((option: Options) => void);
 
-export type TransportOption = "ws" | "wss";
+export type TransportOption = 'ws' | 'wss';
 
 /**
  * The options available in echo
@@ -13,7 +13,7 @@ export type Options = {
     /**
      * Pusher client.
      */
-    Pusher?: (key: Options["key"], options: Options) => void;
+    Pusher?: (key: Options['key'], options: Options) => void;
 
     broadcaster?: BroadcasterOption;
 

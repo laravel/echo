@@ -4,7 +4,10 @@ import { PresenceChannel } from './presence-channel';
 /**
  * This class represents a Pusher presence channel.
  */
-export class PusherPresenceChannel extends PusherChannel implements PresenceChannel {
+export class PusherPresenceChannel
+    extends PusherChannel
+    implements PresenceChannel
+{
     /**
      * Register a callback to be called anytime the member list changes.
      */
@@ -31,7 +34,10 @@ export class PusherPresenceChannel extends PusherChannel implements PresenceChan
      * Send a whisper event to other clients in the channel.
      */
     whisper(eventName: string, data: any): PusherPresenceChannel {
-        this.pusher.channels.channels[this.name].trigger(`client-${eventName}`, data);
+        this.pusher.channels.channels[this.name].trigger(
+            `client-${eventName}`,
+            data
+        );
 
         return this;
     }
