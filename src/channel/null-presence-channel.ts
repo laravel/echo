@@ -4,10 +4,7 @@ import { PresenceChannel } from './presence-channel';
 /**
  * This class represents a null presence channel.
  */
-export class NullPresenceChannel
-    extends NullChannel
-    implements PresenceChannel
-{
+export class NullPresenceChannel extends NullChannel implements PresenceChannel {
     /**
      * Register a callback to be called anytime the member list changes.
      */

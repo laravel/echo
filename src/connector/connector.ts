@@ -52,8 +52,7 @@ export abstract class Connector {
 
         if (token) {
             this.options.auth.headers['Authorization'] = 'Bearer ' + token;
-            this.options.userAuthentication.headers['Authorization'] =
-                'Bearer ' + token;
+            this.options.userAuthentication.headers['Authorization'] = 'Bearer ' + token;
         }
 
         return options;
@@ -65,11 +64,7 @@ export abstract class Connector {
     protected csrfToken(): null | string {
         let selector;
 
-        if (
-            typeof window !== 'undefined' &&
-            window['Laravel'] &&
-            window['Laravel'].csrfToken
-        ) {
+        if (typeof window !== 'undefined' && window['Laravel'] && window['Laravel'].csrfToken) {
             return window['Laravel'].csrfToken;
         } else if (this.options.csrfToken) {
             return this.options.csrfToken;

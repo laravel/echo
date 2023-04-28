@@ -2,11 +2,6 @@
  * This class represents a basic channel.
  */
 export abstract class Channel {
-    // /**
-    //  * The Echo options.
-    //  */
-    // options: any;
-
     /**
      * Listen for an event on the channel instance.
      */
@@ -23,10 +18,7 @@ export abstract class Channel {
      * Listen for an event on the channel instance.
      */
     notification(callback: Function): Channel {
-        return this.listen(
-            '.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated',
-            callback
-        );
+        return this.listen('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', callback);
     }
 
     /**

@@ -1,8 +1,4 @@
-export type BroadcasterOption =
-    | 'pusher'
-    | 'socket.io'
-    | 'null'
-    | ((option: Options) => void);
+export type BroadcasterOption = 'pusher' | 'socket.io' | 'null' | ((option: Options) => void);
 
 export type TransportOption = 'ws' | 'wss';
 

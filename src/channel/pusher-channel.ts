@@ -78,9 +78,7 @@ export class PusherChannel extends Channel {
 
             let namespace = this.options.namespace.replace(/\./g, '\\');
 
-            let formattedEvent = event.startsWith(namespace)
-                ? event.substring(namespace.length + 1)
-                : '.' + event;
+            let formattedEvent = event.startsWith(namespace) ? event.substring(namespace.length + 1) : '.' + event;
 
             callback(formattedEvent, data);
         });
@@ -93,10 +91,7 @@ export class PusherChannel extends Channel {
      */
     stopListening(event: string, callback?: Function): PusherChannel {
         if (callback) {
-            this.subscription.unbind(
-                this.eventFormatter.format(event),
-                callback
-            );
+            this.subscription.unbind(this.eventFormatter.format(event), callback);
         } else {
             this.subscription.unbind(this.eventFormatter.format(event));
         }

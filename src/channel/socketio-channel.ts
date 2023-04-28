@@ -144,9 +144,7 @@ export class SocketIoChannel extends Channel {
         this.listeners[event] = this.listeners[event] || [];
 
         if (callback) {
-            this.listeners[event] = this.listeners[event].filter(
-                (cb) => cb !== callback
-            );
+            this.listeners[event] = this.listeners[event].filter((cb) => cb !== callback);
         }
 
         if (!callback || this.listeners[event].length === 0) {

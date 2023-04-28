@@ -28,10 +28,7 @@ export class PusherConnector extends Connector {
         if (typeof this.options.client !== 'undefined') {
             this.pusher = this.options.client;
         } else if (this.options.Pusher) {
-            this.pusher = new this.options.Pusher(
-                this.options.key,
-                this.options
-            );
+            this.pusher = new this.options.Pusher(this.options.key, this.options);
         } else {
             this.pusher = new Pusher(this.options.key, this.options);
         }
@@ -56,11 +53,7 @@ export class PusherConnector extends Connector {
      */
     channel(name: string): PusherChannel {
         if (!this.channels[name]) {
-            this.channels[name] = new PusherChannel(
-                this.pusher,
-                name,
-                this.options
-            );
+            this.channels[name] = new PusherChannel(this.pusher, name, this.options);
         }
 
         return this.channels[name];
@@ -71,11 +64,7 @@ export class PusherConnector extends Connector {
      */
     privateChannel(name: string): PusherChannel {
         if (!this.channels['private-' + name]) {
-            this.channels['private-' + name] = new PusherPrivateChannel(
-                this.pusher,
-                'private-' + name,
-                this.options
-            );
+            this.channels['private-' + name] = new PusherPrivateChannel(this.pusher, 'private-' + name, this.options);
         }
 
         return this.channels['private-' + name];
@@ -86,12 +75,11 @@ export class PusherConnector extends Connector {
      */
     encryptedPrivateChannel(name: string): PusherChannel {
         if (!this.channels['private-encrypted-' + name]) {
-            this.channels['private-encrypted-' + name] =
-                new PusherEncryptedPrivateChannel(
-                    this.pusher,
-                    'private-encrypted-' + name,
-                    this.options
-                );
+            this.channels['private-encrypted-' + name] = new PusherEncryptedPrivateChannel(
+                this.pusher,
+                'private-encrypted-' + name,
+                this.options
+            );
         }
 
         return this.channels['private-encrypted-' + name];
@@ -116,12 +104,7 @@ export class PusherConnector extends Connector {
      * Leave the given channel, as well as its private and presence variants.
      */
     leave(name: string): void {
-        let channels = [
-            name,
-            'private-' + name,
-            'private-encrypted-' + name,
-            'presence-' + name,
-        ];
+        let channels = [name, 'private-' + name, 'private-encrypted-' + name, 'presence-' + name];
 
         channels.forEach((name: string, index: number) => {
             this.leaveChannel(name);
