@@ -3,11 +3,6 @@
  */
 export abstract class Channel {
     /**
-     * The Echo options.
-     */
-    options: any;
-
-    /**
      * Listen for an event on the channel instance.
      */
     abstract listen(event: string, callback: Function): Channel;
