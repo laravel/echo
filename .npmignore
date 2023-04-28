@@ -1,1 +1,4 @@
 build/
+.eslintrc.js
+jest.config.js
+tsconfig.json

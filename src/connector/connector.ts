@@ -1,35 +1,36 @@
-import { Channel, PresenceChannel } from './../channel';
+import { Options } from "../../typings";
+import { Channel, PresenceChannel } from "./../channel";
 
 export abstract class Connector {
     /**
      * Default connector options.
      */
-    private _defaultOptions: any = {
+    private _defaultOptions: Options = {
         auth: {
             headers: {},
         },
-        authEndpoint: '/broadcasting/auth',
+        authEndpoint: "/broadcasting/auth",
         userAuthentication: {
-            endpoint: '/broadcasting/user-auth',
+            endpoint: "/broadcasting/user-auth",
             headers: {},
         },
-        broadcaster: 'pusher',
+        broadcaster: "pusher",
         csrfToken: null,
         bearerToken: null,
         host: null,
         key: null,
-        namespace: 'App.Events',
+        namespace: "App.Events",
     };
 
     /**
      * Connector options.
      */
-    options: any;
+    options: Options;
 
     /**
      * Create a new class instance.
      */
-    constructor(options: any) {
+    constructor(options: Options) {
         this.setOptions(options);
         this.connect();
     }
@@ -43,15 +44,16 @@ export abstract class Connector {
         let token = this.csrfToken();
 
         if (token) {
-            this.options.auth.headers['X-CSRF-TOKEN'] = token;
-            this.options.userAuthentication.headers['X-CSRF-TOKEN'] = token;
+            this.options.auth.headers["X-CSRF-TOKEN"] = token;
+            this.options.userAuthentication.headers["X-CSRF-TOKEN"] = token;
         }
 
         token = this.options.bearerToken;
 
         if (token) {
-            this.options.auth.headers['Authorization'] = 'Bearer ' + token;
-            this.options.userAuthentication.headers['Authorization'] = 'Bearer ' + token;
+            this.options.auth.headers["Authorization"] = "Bearer " + token;
+            this.options.userAuthentication.headers["Authorization"] =
+                "Bearer " + token;
         }
 
         return options;
@@ -63,16 +65,20 @@ export abstract class Connector {
     protected csrfToken(): null | string {
         let selector;
 
-        if (typeof window !== 'undefined' && window['Laravel'] && window['Laravel'].csrfToken) {
-            return window['Laravel'].csrfToken;
+        if (
+            typeof window !== "undefined" &&
+            window["Laravel"] &&
+            window["Laravel"].csrfToken
+        ) {
+            return window["Laravel"].csrfToken;
         } else if (this.options.csrfToken) {
             return this.options.csrfToken;
         } else if (
-            typeof document !== 'undefined' &&
-            typeof document.querySelector === 'function' &&
+            typeof document !== "undefined" &&
+            typeof document.querySelector === "function" &&
             (selector = document.querySelector('meta[name="csrf-token"]'))
         ) {
-            return selector.getAttribute('content');
+            return selector.getAttribute("content");
         }
 
         return null;

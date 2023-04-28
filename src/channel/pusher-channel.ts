@@ -1,5 +1,5 @@
-import { EventFormatter } from '../util';
-import { Channel } from './channel';
+import { EventFormatter } from "../util";
+import { Channel } from "./channel";
 
 /**
  * This class represents a Pusher channel.
@@ -72,13 +72,15 @@ export class PusherChannel extends Channel {
      */
     listenToAll(callback: Function): PusherChannel {
         this.subscription.bind_global((event, data) => {
-            if (event.startsWith('pusher:')) {
+            if (event.startsWith("pusher:")) {
                 return;
             }
 
-            let namespace = this.options.namespace.replace(/\./g, '\\');
+            let namespace = this.options.namespace.replace(/\./g, "\\");
 
-            let formattedEvent = event.startsWith(namespace) ? event.substring(namespace.length + 1) : '.' + event;
+            let formattedEvent = event.startsWith(namespace)
+                ? event.substring(namespace.length + 1)
+                : "." + event;
 
             callback(formattedEvent, data);
         });
@@ -91,7 +93,10 @@ export class PusherChannel extends Channel {
      */
     stopListening(event: string, callback?: Function): PusherChannel {
         if (callback) {
-            this.subscription.unbind(this.eventFormatter.format(event), callback);
+            this.subscription.unbind(
+                this.eventFormatter.format(event),
+                callback
+            );
         } else {
             this.subscription.unbind(this.eventFormatter.format(event));
         }
@@ -116,7 +121,7 @@ export class PusherChannel extends Channel {
      * Register a callback to be called anytime a subscription succeeds.
      */
     subscribed(callback: Function): PusherChannel {
-        this.on('pusher:subscription_succeeded', () => {
+        this.on("pusher:subscription_succeeded", () => {
             callback();
         });
 
@@ -127,7 +132,7 @@ export class PusherChannel extends Channel {
      * Register a callback to be called anytime a subscription error occurs.
      */
     error(callback: Function): PusherChannel {
-        this.on('pusher:subscription_error', (status) => {
+        this.on("pusher:subscription_error", (status) => {
             callback(status);
         });
 

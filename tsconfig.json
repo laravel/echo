@@ -1,6 +1,5 @@
 {
     "compilerOptions": {
-        "declaration": true,
         "module": "es6",
         "moduleResolution": "node",
         "outDir": "./dist",
@@ -8,16 +7,21 @@
         "target": "es6",
         "isolatedModules": false,
         "esModuleInterop": true,
+        "inlineSourceMap": true,
+        "skipLibCheck": true,
+        "declaration": true,
         "typeRoots": [
             "node_modules/@types"
         ],
         "lib": [
             "es2017",
             "dom"
-        ]
+        ],
     },
-    "include": [
-        "./typings/*.ts",
-        "./src/*.ts"
+    "exclude": [
+        "node_modules",
+        "**/dist/**",
+        "**tests**",
+        "./**/*.d.ts"
     ]
 }

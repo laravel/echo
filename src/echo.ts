@@ -1,5 +1,9 @@
-import { Channel, PresenceChannel } from './channel';
-import { PusherConnector, SocketIoConnector, NullConnector } from './connector';
+/* eslint-disable @typescript-eslint/triple-slash-reference */
+/// <reference path="../typings/index.d.ts" />
+
+import type { Options } from "../typings/options";
+import { Channel, type PresenceChannel } from "./channel";
+import { PusherConnector, SocketIoConnector, NullConnector } from "./connector";
 
 /**
  * This class is the primary API for interacting with broadcasting.
@@ -13,12 +17,12 @@ export default class Echo {
     /**
      * The Echo options.
      */
-    options: any;
+    options: Options;
 
     /**
      * Create a new class instance.
      */
-    constructor(options: any) {
+    constructor(options: Options) {
         this.options = options;
         this.connect();
 
@@ -38,13 +42,13 @@ export default class Echo {
      * Create a new connection.
      */
     connect(): void {
-        if (this.options.broadcaster == 'pusher') {
+        if (this.options.broadcaster == "pusher") {
             this.connector = new PusherConnector(this.options);
-        } else if (this.options.broadcaster == 'socket.io') {
+        } else if (this.options.broadcaster == "socket.io") {
             this.connector = new SocketIoConnector(this.options);
-        } else if (this.options.broadcaster == 'null') {
+        } else if (this.options.broadcaster == "null") {
             this.connector = new NullConnector(this.options);
-        } else if (typeof this.options.broadcaster == 'function') {
+        } else if (typeof this.options.broadcaster == "function") {
             this.connector = new this.options.broadcaster(this.options);
         }
     }
@@ -119,19 +123,19 @@ export default class Echo {
      * send a connections socket id to a Laravel app with a X-Socket-Id header.
      */
     registerInterceptors(): void {
-        if (typeof Vue === 'function' && Vue.http) {
+        if (typeof Vue === "function" && Vue.http) {
             this.registerVueRequestInterceptor();
         }
 
-        if (typeof axios === 'function') {
+        if (typeof axios === "function") {
             this.registerAxiosRequestInterceptor();
         }
 
-        if (typeof jQuery === 'function') {
+        if (typeof jQuery === "function") {
             this.registerjQueryAjaxSetup();
         }
 
-        if (typeof Turbo === 'object') {
+        if (typeof Turbo === "object") {
             this.registerTurboRequestInterceptor();
         }
     }
@@ -142,7 +146,7 @@ export default class Echo {
     registerVueRequestInterceptor(): void {
         Vue.http.interceptors.push((request, next) => {
             if (this.socketId()) {
-                request.headers.set('X-Socket-ID', this.socketId());
+                request.headers.set("X-Socket-ID", this.socketId());
             }
 
             next();
@@ -155,7 +159,7 @@ export default class Echo {
     registerAxiosRequestInterceptor(): void {
         axios.interceptors.request.use((config) => {
             if (this.socketId()) {
-                config.headers['X-Socket-Id'] = this.socketId();
+                config.headers["X-Socket-Id"] = this.socketId();
             }
 
             return config;
@@ -166,10 +170,10 @@ export default class Echo {
      * Register jQuery AjaxPrefilter to add the X-Socket-ID header.
      */
     registerjQueryAjaxSetup(): void {
-        if (typeof jQuery.ajax != 'undefined') {
+        if (typeof jQuery.ajax != "undefined") {
             jQuery.ajaxPrefilter((options, originalOptions, xhr) => {
                 if (this.socketId()) {
-                    xhr.setRequestHeader('X-Socket-Id', this.socketId());
+                    xhr.setRequestHeader("X-Socket-Id", this.socketId());
                 }
             });
         }
@@ -179,9 +183,13 @@ export default class Echo {
      * Register the Turbo Request interceptor to add the X-Socket-ID header.
      */
     registerTurboRequestInterceptor(): void {
-        document.addEventListener('turbo:before-fetch-request', (event: any) => {
-            event.detail.fetchOptions.headers['X-Socket-Id'] = this.socketId();
-        });
+        document.addEventListener(
+            "turbo:before-fetch-request",
+            (event: any) => {
+                event.detail.fetchOptions.headers["X-Socket-Id"] =
+                    this.socketId();
+            }
+        );
     }
 }
 
