@@ -1,4 +1,7 @@
 build/
-.eslintrc.js
-jest.config.js
+.eslintrc.cjs
+jest.config.cjs
 tsconfig.json
+src
+tests
+typings
