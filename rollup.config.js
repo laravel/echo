@@ -43,7 +43,7 @@ export default defineConfig([
         onwarn,
     },
     {
-        input: 'src/echo.ts',
+        input: 'src/index.iife.ts',
         output: [{ file: './dist/echo.iife.js', format: 'iife', name: 'Echo' }],
         plugins,
         onwarn,
