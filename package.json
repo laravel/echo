@@ -24,7 +24,7 @@
         "dist"
     ],
     "scripts": {
-        "build": "rimraf dist && npm run compile",
+        "build": "rimraf dist && npm run compile && npm run declarations",
         "compile": "./node_modules/.bin/rollup -c",
         "declarations": "./node_modules/.bin/tsc --emitDeclarationOnly",
         "lint": "eslint --ext .js,.ts ./src ./tests ./typings",
