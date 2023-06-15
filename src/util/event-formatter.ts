@@ -3,15 +3,10 @@
  */
 export class EventFormatter {
     /**
-     * Event namespace.
-     */
-    namespace: string | boolean;
-
-    /**
      * Create a new class instance.
      */
-    constructor(namespace: string | boolean) {
-        this.setNamespace(namespace);
+    constructor(private namespace: string | boolean) {
+        //
     }
 
     /**
