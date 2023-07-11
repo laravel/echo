@@ -1,6 +1,11 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v1.15.1...master)
+## [Unreleased](https://github.com/laravel/echo/compare/v1.15.2...master)
+
+## [v1.15.2](https://github.com/laravel/echo/compare/v1.15.1...v1.15.2) - 2023-07-11
+
+- Fix broken Typescript presence channel interface "whisper" method by [@DellanX](https://github.com/DellanX) in https://github.com/laravel/echo/pull/377
+- Fix TS error in EventFormatter for projects using TS5 by [@SanderMuller](https://github.com/SanderMuller) in https://github.com/laravel/echo/pull/381
 
 ## [v1.15.1](https://github.com/laravel/echo/compare/v1.15.0...v1.15.1) - 2023-04-26
 
