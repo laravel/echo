@@ -1,5 +1,5 @@
 import { Channel, PresenceChannel } from './channel';
-import { PusherConnector, SocketIoConnector, NullConnector } from './connector';
+import { Connector, PusherConnector, SocketIoConnector, NullConnector } from './connector';
 
 /**
  * This class is the primary API for interacting with broadcasting.
@@ -188,4 +188,6 @@ export default class Echo {
 /**
  * Export channel classes for TypeScript.
  */
-export { Channel, PresenceChannel };
+export { Connector, Channel, PresenceChannel };
+
+export { EventFormatter } from './util';
