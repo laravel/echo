@@ -1,6 +1,6 @@
 {
     "name": "laravel-echo",
-    "version": "1.15.2",
+    "version": "1.15.3",
     "description": "Laravel Echo library for beautiful Pusher and Socket.IO integration",
     "keywords": [
         "laravel",
