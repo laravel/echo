@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v1.15.2...master)
+## [Unreleased](https://github.com/laravel/echo/compare/v1.15.3...master)
+
+## [v1.15.3](https://github.com/laravel/echo/compare/v1.15.2...v1.15.3) - 2023-08-29
+
+- Export `Connector` and `EventFormatter` to provide full extensibility by [@slavarazum](https://github.com/slavarazum) in https://github.com/laravel/echo/pull/383
 
 ## [v1.15.2](https://github.com/laravel/echo/compare/v1.15.1...v1.15.2) - 2023-07-11
 
