@@ -1,5 +1,5 @@
-import { Connector } from './connector';
-import { SocketIoChannel, SocketIoPrivateChannel, SocketIoPresenceChannel } from './../channel';
+import {Connector} from './connector';
+import {SocketIoChannel, SocketIoPrivateChannel, SocketIoPresenceChannel} from './../channel';
 
 /**
  * This class creates a connnector to a Socket.io server.
@@ -14,6 +14,8 @@ export class SocketIoConnector extends Connector {
      * All of the subscribed channel names.
      */
     channels: { [name: string]: SocketIoChannel } = {};
+
+    redisPrefix = this.options.redisPrefix + '_'
 
     /**
      * Create a fresh Socket.io connection.
@@ -58,10 +60,10 @@ export class SocketIoConnector extends Connector {
      * Get a channel instance by name.
      */
     channel(name: string): SocketIoChannel {
+        name = this.redisPrefix + name;
         if (!this.channels[name]) {
             this.channels[name] = new SocketIoChannel(this.socket, name, this.options);
         }
-
         return this.channels[name];
     }
 
@@ -70,10 +72,10 @@ export class SocketIoConnector extends Connector {
      */
     privateChannel(name: string): SocketIoPrivateChannel {
         if (!this.channels['private-' + name]) {
-            this.channels['private-' + name] = new SocketIoPrivateChannel(this.socket, 'private-' + name, this.options);
+            name = this.redisPrefix + 'private-' + name;
+            this.channels[name] = new SocketIoPrivateChannel(this.socket, name, this.options);
         }
-
-        return this.channels['private-' + name] as SocketIoPrivateChannel;
+        return this.channels[name] as SocketIoPrivateChannel;
     }
 
     /**
@@ -81,21 +83,21 @@ export class SocketIoConnector extends Connector {
      */
     presenceChannel(name: string): SocketIoPresenceChannel {
         if (!this.channels['presence-' + name]) {
-            this.channels['presence-' + name] = new SocketIoPresenceChannel(
+            name = this.redisPrefix + 'private-' + name;
+            this.channels[name] = new SocketIoPresenceChannel(
                 this.socket,
-                'presence-' + name,
+                name,
                 this.options
             );
         }
-
-        return this.channels['presence-' + name] as SocketIoPresenceChannel;
+        return this.channels[name] as SocketIoPresenceChannel;
     }
 
     /**
      * Leave the given channel, as well as its private and presence variants.
      */
     leave(name: string): void {
-        let channels = [name, 'private-' + name, 'presence-' + name];
+        let channels = [name, this.redisPrefix + 'private-' + name, this.redisPrefix + 'presence-' + name];
 
         channels.forEach((name) => {
             this.leaveChannel(name);
