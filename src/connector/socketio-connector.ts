@@ -15,7 +15,7 @@ export class SocketIoConnector extends Connector {
      */
     channels: { [name: string]: SocketIoChannel } = {};
 
-    redisPrefix = this.options.redisPrefix + '_'
+    redisPrefix = this.options.redisPrefix
 
     /**
      * Create a fresh Socket.io connection.
