@@ -1,8 +1,8 @@
-import {Connector} from './connector';
-import {SocketIoChannel, SocketIoPrivateChannel, SocketIoPresenceChannel} from './../channel';
+import { Connector } from './connector';
+import { SocketIoChannel, SocketIoPrivateChannel, SocketIoPresenceChannel } from '../channel';
 
 /**
- * This class creates a connnector to a Socket.io server.
+ * This class creates a connector to a Socket.io server.
  */
 export class SocketIoConnector extends Connector {
     /**
@@ -11,7 +11,7 @@ export class SocketIoConnector extends Connector {
     socket: any;
 
     /**
-     * All of the subscribed channel names.
+     * All the subscribed channel names.
      */
     channels: { [name: string]: SocketIoChannel } = {};
 
