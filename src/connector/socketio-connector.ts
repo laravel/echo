@@ -97,7 +97,7 @@ export class SocketIoConnector extends Connector {
      * Leave the given channel, as well as its private and presence variants.
      */
     leave(name: string): void {
-        let channels = [name, this.redisPrefix + 'private-' + name, this.redisPrefix + 'presence-' + name];
+        let channels = [this.redisPrefix + name, this.redisPrefix + 'private-' + name, this.redisPrefix + 'presence-' + name];
 
         channels.forEach((name) => {
             this.leaveChannel(name);
