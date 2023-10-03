@@ -18,7 +18,6 @@ export abstract class Connector {
         bearerToken: null,
         host: null,
         key: null,
-        redisPrefix: undefined,
         namespace: 'App.Events',
     };
 
