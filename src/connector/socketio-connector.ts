@@ -15,7 +15,7 @@ export class SocketIoConnector extends Connector {
      */
     channels: { [name: string]: SocketIoChannel } = {};
 
-    redisPrefix = this.options.redisPrefix??''
+    redisPrefix = this.options.redisPrefix ?? ''
 
     /**
      * Create a fresh Socket.io connection.
@@ -84,11 +84,7 @@ export class SocketIoConnector extends Connector {
     presenceChannel(name: string): SocketIoPresenceChannel {
         if (!this.channels['presence-' + name]) {
             name = this.redisPrefix + 'private-' + name;
-            this.channels[name] = new SocketIoPresenceChannel(
-                this.socket,
-                name,
-                this.options
-            );
+            this.channels[name] = new SocketIoPresenceChannel(this.socket, name, this.options);
         }
         return this.channels[name] as SocketIoPresenceChannel;
     }
@@ -97,7 +93,11 @@ export class SocketIoConnector extends Connector {
      * Leave the given channel, as well as its private and presence variants.
      */
     leave(name: string): void {
-        let channels = [this.redisPrefix + name, this.redisPrefix + 'private-' + name, this.redisPrefix + 'presence-' + name];
+        let channels = [
+            this.redisPrefix + name,
+            this.redisPrefix + 'private-' + name,
+            this.redisPrefix + 'presence-' + name,
+        ];
 
         channels.forEach((name) => {
             this.leaveChannel(name);
