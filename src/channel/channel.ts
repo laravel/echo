@@ -13,6 +13,11 @@ export abstract class Channel {
     abstract listen(event: string, callback: Function): Channel;
 
     /**
+     * Whisper a client event on the channel instance.
+     */
+    abstract whisper(event: string, data: object): Channel;
+
+    /**
      * Listen for a whisper event on the channel instance.
      */
     listenForWhisper(event: string, callback: Function): Channel {
