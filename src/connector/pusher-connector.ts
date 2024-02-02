@@ -63,41 +63,39 @@ export class PusherConnector extends Connector {
      * Get a private channel instance by name.
      */
     privateChannel(name: string): PusherChannel {
-        if (!this.channels['private-' + name]) {
-            this.channels['private-' + name] = new PusherPrivateChannel(this.pusher, 'private-' + name, this.options);
+        name = 'private-' + name;
+
+        if (!this.channels[name]) {
+            this.channels[name] = new PusherPrivateChannel(this.pusher, name, this.options);
         }
 
-        return this.channels['private-' + name];
+        return this.channels[name];
     }
 
     /**
      * Get a private encrypted channel instance by name.
      */
     encryptedPrivateChannel(name: string): PusherChannel {
-        if (!this.channels['private-encrypted-' + name]) {
-            this.channels['private-encrypted-' + name] = new PusherEncryptedPrivateChannel(
-                this.pusher,
-                'private-encrypted-' + name,
-                this.options
-            );
+        name = 'private-encrypted-' + name;
+
+        if (!this.channels[name]) {
+            this.channels[name] = new PusherEncryptedPrivateChannel(this.pusher, name, this.options);
         }
 
-        return this.channels['private-encrypted-' + name];
+        return this.channels[name];
     }
 
     /**
      * Get a presence channel instance by name.
      */
     presenceChannel(name: string): PresenceChannel {
-        if (!this.channels['presence-' + name]) {
-            this.channels['presence-' + name] = new PusherPresenceChannel(
-                this.pusher,
-                'presence-' + name,
-                this.options
-            );
+        name = 'presence-' + name;
+
+        if (!this.channels[name]) {
+            this.channels[name] = new PusherPresenceChannel(this.pusher, name, this.options);
         }
 
-        return this.channels['presence-' + name];
+        return this.channels[name];
     }
 
     /**

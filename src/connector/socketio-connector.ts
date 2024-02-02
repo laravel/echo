@@ -69,26 +69,26 @@ export class SocketIoConnector extends Connector {
      * Get a private channel instance by name.
      */
     privateChannel(name: string): SocketIoPrivateChannel {
-        if (!this.channels['private-' + name]) {
-            this.channels['private-' + name] = new SocketIoPrivateChannel(this.socket, 'private-' + name, this.options);
+        name = 'private-' + name;
+
+        if (!this.channels[name]) {
+            this.channels[name] = new SocketIoPrivateChannel(this.socket, name, this.options);
         }
 
-        return this.channels['private-' + name] as SocketIoPrivateChannel;
+        return this.channels[name] as SocketIoPrivateChannel;
     }
 
     /**
      * Get a presence channel instance by name.
      */
     presenceChannel(name: string): SocketIoPresenceChannel {
-        if (!this.channels['presence-' + name]) {
-            this.channels['presence-' + name] = new SocketIoPresenceChannel(
-                this.socket,
-                'presence-' + name,
-                this.options
-            );
+        name = 'presence-' + name;
+
+        if (!this.channels[name]) {
+            this.channels[name] = new SocketIoPresenceChannel(this.socket, name, this.options);
         }
 
-        return this.channels['presence-' + name] as SocketIoPresenceChannel;
+        return this.channels[name] as SocketIoPresenceChannel;
     }
 
     /**
