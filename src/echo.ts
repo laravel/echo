@@ -38,7 +38,9 @@ export default class Echo {
      * Create a new connection.
      */
     connect(): void {
-        if (this.options.broadcaster == 'pusher') {
+        if (this.options.broadcaster == 'reverb') {
+            this.connector = new PusherConnector({ ...this.options, cluster: '' });
+        } else if (this.options.broadcaster == 'pusher') {
             this.connector = new PusherConnector(this.options);
         } else if (this.options.broadcaster == 'socket.io') {
             this.connector = new SocketIoConnector(this.options);
