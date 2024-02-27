@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v1.15.3...master)
+## [Unreleased](https://github.com/laravel/echo/compare/v1.16.0...master)
+
+## [v1.16.0](https://github.com/laravel/echo/compare/v1.15.3...v1.16.0) - 2024-02-20
+
+* Adds support for Reverb as an Echo broadcaster by [@joedixon](https://github.com/joedixon) in https://github.com/laravel/echo/pull/391
 
 ## [v1.15.3](https://github.com/laravel/echo/compare/v1.15.2...v1.15.3) - 2023-08-29
 
