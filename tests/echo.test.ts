@@ -11,8 +11,8 @@ describe('Echo', () => {
         );
 
         expect(() => new Echo({ broadcaster: 'socket.io' })).not.toThrowError(
-            'Broadcaster string socket.io is not supported')
-            ;
+            'Broadcaster string socket.io is not supported'
+        );
 
         expect(() => new Echo({ broadcaster: 'null' })).not.toThrowError('Broadcaster string null is not supported');
 
