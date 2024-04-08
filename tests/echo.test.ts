@@ -16,6 +16,7 @@ describe('Echo', () => {
 
         expect(() => new Echo({ broadcaster: 'null' })).not.toThrowError('Broadcaster string null is not supported');
 
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         expect(() => new Echo({ broadcaster: () => {} })).not.toThrowError('Broadcaster function is not supported');
     });
 
