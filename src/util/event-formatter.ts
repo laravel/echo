@@ -13,8 +13,8 @@ export class EventFormatter {
      * Format the given event name.
      */
     format(event: string): string {
-        if (event.charAt(0) === '.' || event.charAt(0) === '\\') {
-            return event.substr(1);
+        if (['.', '\\'].includes(event.charAt(0))) {
+            return event.substring(1);
         } else if (this.namespace) {
             event = this.namespace + '.' + event;
         }
