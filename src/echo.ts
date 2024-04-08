@@ -40,15 +40,22 @@ export default class Echo {
     connect(): void {
         if (this.options.broadcaster == 'reverb') {
             this.connector = new PusherConnector({ ...this.options, cluster: '' });
+            return;
         } else if (this.options.broadcaster == 'pusher') {
             this.connector = new PusherConnector(this.options);
+            return;
         } else if (this.options.broadcaster == 'socket.io') {
             this.connector = new SocketIoConnector(this.options);
+            return;
         } else if (this.options.broadcaster == 'null') {
             this.connector = new NullConnector(this.options);
+            return;
         } else if (typeof this.options.broadcaster == 'function') {
             this.connector = new this.options.broadcaster(this.options);
+            return;
         }
+
+        throw new Error(`Broadcaster ${typeof this.options.broadcaster} ${this.options.broadcaster} is not supported`);
     }
 
     /**
