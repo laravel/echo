@@ -49,7 +49,9 @@ export default class Echo {
         } else if (typeof this.options.broadcaster == 'function') {
             this.connector = new this.options.broadcaster(this.options);
         } else {
-            throw new Error(`Broadcaster ${typeof this.options.broadcaster} ${this.options.broadcaster} is not supported`);
+            throw new Error(
+                `Broadcaster ${typeof this.options.broadcaster} ${this.options.broadcaster} is not supported`
+            );
         }
     }
 
