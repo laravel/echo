@@ -1,24 +1,24 @@
-import { Channel, PresenceChannel } from './channel';
+import { Channel, NullChannel, NullPresenceChannel, NullPrivateChannel, PresenceChannel, PusherChannel, PusherPresenceChannel, PusherPrivateChannel, SocketIoChannel, SocketIoPresenceChannel, SocketIoPrivateChannel } from './channel';
 import { Connector, PusherConnector, SocketIoConnector, NullConnector } from './connector';
 
 /**
  * This class is the primary API for interacting with broadcasting.
  */
-export default class Echo {
+export default class Echo<T extends keyof Broadcaster> {
     /**
      * The broadcasting connector.
      */
-    connector: any;
+    connector: Broadcaster[T]['connector'];
 
     /**
      * The Echo options.
      */
-    options: any;
+    options: EchoOptions<T>;
 
     /**
      * Create a new class instance.
      */
-    constructor(options: any) {
+    constructor(options: EchoOptions<T>) {
         this.options = options;
         this.connect();
 
@@ -30,7 +30,7 @@ export default class Echo {
     /**
      * Get a channel instance by name.
      */
-    channel(channel: string): Channel {
+    channel(channel: string): Broadcaster[T]['public'] {
         return this.connector.channel(channel);
     }
 
@@ -47,7 +47,7 @@ export default class Echo {
         } else if (this.options.broadcaster == 'null') {
             this.connector = new NullConnector(this.options);
         } else if (typeof this.options.broadcaster == 'function') {
-            this.connector = new this.options.broadcaster(this.options);
+            this.connector = new this.options.broadcaster(this.options as EchoOptions<'function'>);
         } else {
             throw new Error(
                 `Broadcaster ${typeof this.options.broadcaster} ${this.options.broadcaster} is not supported.`
@@ -65,7 +65,7 @@ export default class Echo {
     /**
      * Get a presence channel instance by name.
      */
-    join(channel: string): PresenceChannel {
+    join(channel: string): Broadcaster[T]['presence'] {
         return this.connector.presenceChannel(channel);
     }
 
@@ -102,7 +102,7 @@ export default class Echo {
     /**
      * Get a private channel instance by name.
      */
-    private(channel: string): Channel {
+    private(channel: string): Broadcaster[T]['private'] {
         return this.connector.privateChannel(channel);
     }
 
@@ -197,3 +197,49 @@ export default class Echo {
 export { Connector, Channel, PresenceChannel };
 
 export { EventFormatter } from './util';
+
+/**
+ * Specifies the broadcaster
+ */
+type Broadcaster = {
+    'reverb': {
+        connector: PusherConnector,
+        public: PusherChannel,
+        private: PusherPrivateChannel,
+        presence: PusherPresenceChannel,
+    },
+    'pusher': {
+        connector: PusherConnector,
+        public: PusherChannel,
+        private: PusherPrivateChannel,
+        presence: PusherPresenceChannel,
+    },
+    'socket.io': {
+        connector: SocketIoConnector,
+        public: SocketIoChannel,
+        private: SocketIoPrivateChannel,
+        presence: SocketIoPresenceChannel,
+    },
+    'null': {
+        connector: NullConnector,
+        public: NullChannel,
+        private: NullPrivateChannel,
+        presence: NullPresenceChannel,
+    },
+    'function': {
+        connector: any,
+        public: any,
+        private: any,
+        presence: any,
+    }
+};
+
+type EchoOptions<T extends keyof Broadcaster> = {
+
+    /**
+     * The broadcast connector.
+     */
+    broadcaster: T extends 'function' ? ((options: EchoOptions<'function'>) => void) : T,
+
+    [key: string]: any,
+};
