@@ -48,7 +48,7 @@ export class NullConnector extends Connector {
     /**
      * Get a presence channel instance by name.
      */
-    presenceChannel(name: string): PresenceChannel {
+    presenceChannel(name: string): NullPresenceChannel {
         return new NullPresenceChannel();
     }
 
