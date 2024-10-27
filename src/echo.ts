@@ -234,9 +234,9 @@ type Broadcaster = {
     },
     'function': {
         connector: any,
-        public: any,
-        private: any,
-        presence: any,
+        public: Channel,
+        private: Channel,
+        presence: Channel,
     }
 };
 
@@ -245,7 +245,7 @@ type EchoOptions<T extends keyof Broadcaster> = {
     /**
      * The broadcast connector.
      */
-    broadcaster: T extends 'function' ? ((options: EchoOptions<'function'>) => void) : T,
+    broadcaster: T extends 'function' ? ((options: EchoOptions<T>) => void) : T,
 
     [key: string]: any,
 };
