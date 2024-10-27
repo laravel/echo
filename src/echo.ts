@@ -109,7 +109,13 @@ export default class Echo<T extends keyof Broadcaster> {
     /**
      * Get a private encrypted channel instance by name.
      */
-    encryptedPrivate(channel: string): Channel {
+    encryptedPrivate(channel: string): Broadcaster[T]['private'] {
+        if ((this.connector as any) instanceof SocketIoChannel) {
+            throw new Error(
+                `Broadcaster ${typeof this.options.broadcaster} ${this.options.broadcaster} does not support encrypted private channels.`
+            );
+        }
+
         return this.connector.encryptedPrivateChannel(channel);
     }
 
