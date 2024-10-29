@@ -1,4 +1,4 @@
-import { Channel, NullChannel, NullPresenceChannel, NullPrivateChannel, PresenceChannel, PusherChannel, PusherPresenceChannel, PusherPrivateChannel, SocketIoChannel, SocketIoPresenceChannel, SocketIoPrivateChannel } from './channel';
+import { Channel, NullChannel, NullEncryptedPrivateChannel, NullPresenceChannel, NullPrivateChannel, NullPublicChannel, PresenceChannel, PusherChannel, PusherEncryptedPrivateChannel, PusherPresenceChannel, PusherPrivateChannel, PusherPublicChannel, SocketIoChannel, SocketIoPresenceChannel, SocketIoPrivateChannel, SocketIoPublicChannel } from './channel';
 import { Connector, PusherConnector, SocketIoConnector, NullConnector } from './connector';
 
 /**
@@ -95,7 +95,7 @@ export default class Echo<T extends keyof Broadcaster> {
     /**
      * Listen for an event on a channel instance.
      */
-    listen(channel: string, event: string, callback: Function): Channel {
+    listen(channel: string, event: string, callback: Function): Broadcaster[T]['public'] {
         return this.connector.listen(channel, event, callback);
     }
 
@@ -109,7 +109,7 @@ export default class Echo<T extends keyof Broadcaster> {
     /**
      * Get a private encrypted channel instance by name.
      */
-    encryptedPrivate(channel: string): Broadcaster[T]['private'] {
+    encryptedPrivate(channel: string): Broadcaster[T]['encrypted'] {
         if ((this.connector as any) instanceof SocketIoChannel) {
             throw new Error(
                 `Broadcaster ${typeof this.options.broadcaster} ${this.options.broadcaster} does not support encrypted private channels.`
@@ -210,33 +210,38 @@ export { EventFormatter } from './util';
 type Broadcaster = {
     'reverb': {
         connector: PusherConnector,
-        public: PusherChannel,
+        public: PusherPublicChannel,
         private: PusherPrivateChannel,
+        encrypted: PusherEncryptedPrivateChannel,
         presence: PusherPresenceChannel,
     },
     'pusher': {
         connector: PusherConnector,
-        public: PusherChannel,
+        public: PusherPublicChannel,
         private: PusherPrivateChannel,
+        encrypted: PusherEncryptedPrivateChannel,
         presence: PusherPresenceChannel,
     },
     'socket.io': {
         connector: SocketIoConnector,
-        public: SocketIoChannel,
+        public: SocketIoPublicChannel,
         private: SocketIoPrivateChannel,
+        encrypted: any,
         presence: SocketIoPresenceChannel,
     },
     'null': {
         connector: NullConnector,
-        public: NullChannel,
+        public: NullPublicChannel,
         private: NullPrivateChannel,
+        encrypted: NullEncryptedPrivateChannel,
         presence: NullPresenceChannel,
     },
     'function': {
         connector: any,
-        public: Channel,
-        private: Channel,
-        presence: Channel,
+        public: Channel<any>,
+        private: Channel<any>,
+        encrypted: Channel<any>,
+        presence: Channel<any>,
     }
 };
 

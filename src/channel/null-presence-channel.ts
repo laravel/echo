@@ -1,10 +1,11 @@
 import { NullChannel } from './null-channel';
+import { NullPrivateChannel } from './null-private-channel';
 import { PresenceChannel } from './presence-channel';
 
 /**
  * This class represents a null presence channel.
  */
-export class NullPresenceChannel extends NullChannel implements PresenceChannel {
+export class NullPresenceChannel extends NullChannel<NullPrivateChannel> implements PresenceChannel<NullPrivateChannel> {
     /**
      * Register a callback to be called anytime the member list changes.
      */

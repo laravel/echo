@@ -1,10 +1,11 @@
 import { PusherChannel } from './pusher-channel';
 import { PresenceChannel } from './presence-channel';
+import { PusherPrivateChannel } from './pusher-private-channel';
 
 /**
  * This class represents a Pusher presence channel.
  */
-export class PusherPresenceChannel extends PusherChannel implements PresenceChannel {
+export class PusherPresenceChannel extends PusherChannel<PusherPrivateChannel> implements PresenceChannel<PusherPrivateChannel> {
     /**
      * Register a callback to be called anytime the member list changes.
      */

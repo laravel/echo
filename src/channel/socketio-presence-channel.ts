@@ -1,10 +1,11 @@
 import { PresenceChannel } from './presence-channel';
+import { SocketIoChannel } from './socketio-channel';
 import { SocketIoPrivateChannel } from './socketio-private-channel';
 
 /**
  * This class represents a Socket.io presence channel.
  */
-export class SocketIoPresenceChannel extends SocketIoPrivateChannel implements PresenceChannel {
+export class SocketIoPresenceChannel extends SocketIoChannel<SocketIoPrivateChannel> implements PresenceChannel<SocketIoPrivateChannel> {
     /**
      * Register a callback to be called anytime the member list changes.
      */

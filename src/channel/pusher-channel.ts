@@ -4,7 +4,7 @@ import { Channel } from './channel';
 /**
  * This class represents a Pusher channel.
  */
-export class PusherChannel extends Channel {
+export abstract class PusherChannel<T> extends Channel<T> {
     /**
      * The Pusher client instance.
      */
@@ -61,16 +61,16 @@ export class PusherChannel extends Channel {
     /**
      * Listen for an event on the channel instance.
      */
-    listen(event: string, callback: Function): PusherChannel {
+    listen(event: string, callback: Function): T {
         this.on(this.eventFormatter.format(event), callback);
 
-        return this;
+        return this as unknown as T;
     }
 
     /**
      * Listen for all events on the channel instance.
      */
-    listenToAll(callback: Function): PusherChannel {
+    listenToAll(callback: Function): T {
         this.subscription.bind_global((event, data) => {
             if (event.startsWith('pusher:')) {
                 return;
@@ -83,63 +83,63 @@ export class PusherChannel extends Channel {
             callback(formattedEvent, data);
         });
 
-        return this;
+        return this as unknown as T;
     }
 
     /**
      * Stop listening for an event on the channel instance.
      */
-    stopListening(event: string, callback?: Function): PusherChannel {
+    stopListening(event: string, callback?: Function): T {
         if (callback) {
             this.subscription.unbind(this.eventFormatter.format(event), callback);
         } else {
             this.subscription.unbind(this.eventFormatter.format(event));
         }
 
-        return this;
+        return this as unknown as T;
     }
 
     /**
      * Stop listening for all events on the channel instance.
      */
-    stopListeningToAll(callback?: Function): PusherChannel {
+    stopListeningToAll(callback?: Function): T {
         if (callback) {
             this.subscription.unbind_global(callback);
         } else {
             this.subscription.unbind_global();
         }
 
-        return this;
+        return this as unknown as T;
     }
 
     /**
      * Register a callback to be called anytime a subscription succeeds.
      */
-    subscribed(callback: Function): PusherChannel {
+    subscribed(callback: Function): T {
         this.on('pusher:subscription_succeeded', () => {
             callback();
         });
 
-        return this;
+        return this as unknown as T;
     }
 
     /**
      * Register a callback to be called anytime a subscription error occurs.
      */
-    error(callback: Function): PusherChannel {
+    error(callback: Function): T {
         this.on('pusher:subscription_error', (status) => {
             callback(status);
         });
 
-        return this;
+        return this as unknown as T;
     }
 
     /**
      * Bind a channel to an event.
      */
-    on(event: string, callback: Function): PusherChannel {
+    on(event: string, callback: Function): T {
         this.subscription.bind(event, callback);
 
-        return this;
+        return this as unknown as T;
     }
 }

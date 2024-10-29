@@ -3,7 +3,7 @@ import { PusherChannel } from './pusher-channel';
 /**
  * This class represents a Pusher private channel.
  */
-export class PusherPrivateChannel extends PusherChannel {
+export class PusherPrivateChannel extends PusherChannel<PusherPrivateChannel> {
     /**
      * Send a whisper event to other clients in the channel.
      */
