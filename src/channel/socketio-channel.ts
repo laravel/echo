@@ -1,5 +1,10 @@
 import { EventFormatter } from '../util';
 import { Channel } from './channel';
+import { SocketIoPresenceChannel } from './socketio-presence-channel';
+import { SocketIoPrivateChannel } from './socketio-private-channel';
+import { SocketIoPublicChannel } from './socketio-public-channel';
+
+export type SocketIoChannels = SocketIoPublicChannel | SocketIoPrivateChannel | SocketIoPresenceChannel;
 
 /**
  * This class represents a Socket.io channel.

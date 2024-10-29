@@ -1,10 +1,10 @@
 import { Connector } from './connector';
-import { SocketIoChannel, SocketIoPrivateChannel, SocketIoPresenceChannel } from './../channel';
+import { SocketIoChannel, SocketIoPrivateChannel, SocketIoPresenceChannel, SocketIoPublicChannel, SocketIoChannels } from './../channel';
 
 /**
  * This class creates a connnector to a Socket.io server.
  */
-export class SocketIoConnector extends Connector {
+export class SocketIoConnector extends Connector<SocketIoPublicChannel, SocketIoPrivateChannel, SocketIoPresenceChannel> {
     /**
      * The Socket.io connection instance.
      */
@@ -13,7 +13,7 @@ export class SocketIoConnector extends Connector {
     /**
      * All of the subscribed channel names.
      */
-    channels: { [name: string]: SocketIoChannel } = {};
+    channels: { [name: string]: SocketIoChannels } = {};
 
     /**
      * Create a fresh Socket.io connection.
@@ -50,14 +50,14 @@ export class SocketIoConnector extends Connector {
     /**
      * Listen for an event on a channel instance.
      */
-    listen(name: string, event: string, callback: Function): SocketIoChannel {
+    listen(name: string, event: string, callback: Function): SocketIoChannel<SocketIoChannels> {
         return this.channel(name).listen(event, callback);
     }
 
     /**
      * Get a channel instance by name.
      */
-    channel(name: string): SocketIoChannel {
+    channel(name: string): SocketIoChannel<SocketIoChannels> {
         if (!this.channels[name]) {
             this.channels[name] = new SocketIoChannel(this.socket, name, this.options);
         }

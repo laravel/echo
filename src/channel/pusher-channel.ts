@@ -1,10 +1,16 @@
 import { EventFormatter } from '../util';
 import { Channel } from './channel';
+import { PusherEncryptedPrivateChannel } from './pusher-encrypted-private-channel';
+import { PusherPresenceChannel } from './pusher-presence-channel';
+import { PusherPrivateChannel } from './pusher-private-channel';
+import { PusherPublicChannel } from './pusher-public-channel';
+
+export type PusherChannels = PusherPublicChannel | PusherPrivateChannel | PusherEncryptedPrivateChannel | PusherPresenceChannel;
 
 /**
  * This class represents a Pusher channel.
  */
-export abstract class PusherChannel<T> extends Channel<T> {
+export class PusherChannel<T extends PusherChannels> extends Channel<T> {
     /**
      * The Pusher client instance.
      */

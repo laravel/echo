@@ -4,13 +4,14 @@ import {
     PusherPrivateChannel,
     PusherEncryptedPrivateChannel,
     PusherPresenceChannel,
-    PresenceChannel,
+    PusherPublicChannel,
+    PusherChannels,
 } from './../channel';
 
 /**
  * This class creates a connector to Pusher.
  */
-export class PusherConnector extends Connector {
+export class PusherConnector extends Connector<PusherPublicChannel, PusherPrivateChannel, PusherPresenceChannel> {
     /**
      * The Pusher instance.
      */
@@ -44,14 +45,14 @@ export class PusherConnector extends Connector {
     /**
      * Listen for an event on a channel instance.
      */
-    listen(name: string, event: string, callback: Function): PusherChannel {
+    listen(name: string, event: string, callback: Function): PusherChannel<PusherChannels> {
         return this.channel(name).listen(event, callback);
     }
 
     /**
      * Get a channel instance by name.
      */
-    channel(name: string): PusherChannel {
+    channel(name: string): PusherChannel<PusherChannels> {
         if (!this.channels[name]) {
             this.channels[name] = new PusherChannel(this.pusher, name, this.options);
         }

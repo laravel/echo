@@ -1,6 +1,4 @@
-import { Channel, PresenceChannel } from './../channel';
-
-export abstract class Connector {
+export abstract class Connector<TPublic, TPrivate, TPresence> {
     /**
      * Default connector options.
      */
@@ -86,17 +84,17 @@ export abstract class Connector {
     /**
      * Get a channel instance by name.
      */
-    abstract channel(channel: string): Channel;
+    abstract channel(channel: string): TPublic;
 
     /**
      * Get a private channel instance by name.
      */
-    abstract privateChannel(channel: string): Channel;
+    abstract privateChannel(channel: string): TPrivate;
 
     /**
      * Get a presence channel instance by name.
      */
-    abstract presenceChannel(channel: string): PresenceChannel;
+    abstract presenceChannel(channel: string): TPresence;
 
     /**
      * Leave the given channel, as well as its private and presence variants.

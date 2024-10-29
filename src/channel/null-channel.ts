@@ -1,4 +1,10 @@
 import { Channel } from './channel';
+import { NullEncryptedPrivateChannel } from './null-encrypted-private-channel';
+import { NullPresenceChannel } from './null-presence-channel';
+import { NullPrivateChannel } from './null-private-channel';
+import { NullPublicChannel } from './null-public-channel';
+
+export type NullChannels = NullPublicChannel | NullPrivateChannel | NullEncryptedPrivateChannel | NullPresenceChannel;
 
 /**
  * This class represents a null channel.
