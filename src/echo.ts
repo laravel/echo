@@ -250,7 +250,7 @@ type EchoOptions<T extends keyof Broadcaster> = {
     /**
      * The broadcast connector.
      */
-    broadcaster: T extends 'function' ? ((options: EchoOptions<T>) => void) : T,
+    broadcaster: T extends 'function' ? ((options: EchoOptions<T>) => any) : T,
 
     [key: string]: any,
 };
