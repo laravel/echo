@@ -21,6 +21,7 @@ describe('Echo', () => {
     });
 
     test('it will throw error for unsupported driver', () => {
+        // @ts-ignore
         expect(() => new Echo({ broadcaster: 'foo' })).toThrowError('Broadcaster string foo is not supported.');
     });
 });

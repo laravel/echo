@@ -47,7 +47,7 @@ export default class Echo<T extends keyof Broadcaster> {
         } else if (this.options.broadcaster == 'null') {
             this.connector = new NullConnector(this.options);
         } else if (typeof this.options.broadcaster == 'function') {
-            this.connector = new this.options.broadcaster(this.options as EchoOptions<'function'>);
+            this.connector = this.options.broadcaster(this.options as EchoOptions<'function'>);
         } else {
             throw new Error(
                 `Broadcaster ${typeof this.options.broadcaster} ${this.options.broadcaster} is not supported.`
@@ -226,7 +226,7 @@ type Broadcaster = {
         connector: SocketIoConnector,
         public: SocketIoPublicChannel,
         private: SocketIoPrivateChannel,
-        encrypted: any,
+        encrypted: never,
         presence: SocketIoPresenceChannel,
     },
     'null': {
