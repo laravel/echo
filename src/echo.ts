@@ -1,4 +1,4 @@
-import { Channel, NullChannel, NullEncryptedPrivateChannel, NullPresenceChannel, NullPrivateChannel, NullPublicChannel, PresenceChannel, PusherChannel, PusherEncryptedPrivateChannel, PusherPresenceChannel, PusherPrivateChannel, PusherPublicChannel, SocketIoChannel, SocketIoPresenceChannel, SocketIoPrivateChannel, SocketIoPublicChannel } from './channel';
+import { Channel, NullEncryptedPrivateChannel, NullPresenceChannel, NullPrivateChannel, NullPublicChannel, PresenceChannel, PusherEncryptedPrivateChannel, PusherPresenceChannel, PusherPrivateChannel, PusherPublicChannel, SocketIoPresenceChannel, SocketIoPrivateChannel, SocketIoPublicChannel } from './channel';
 import { Connector, PusherConnector, SocketIoConnector, NullConnector } from './connector';
 
 /**
@@ -110,7 +110,7 @@ export default class Echo<T extends keyof Broadcaster> {
      * Get a private encrypted channel instance by name.
      */
     encryptedPrivate(channel: string): Broadcaster[T]['encrypted'] {
-        if ((this.connector as any) instanceof SocketIoChannel) {
+        if ((this.connector as any) instanceof SocketIoConnector) {
             throw new Error(
                 `Broadcaster ${typeof this.options.broadcaster} ${this.options.broadcaster} does not support encrypted private channels.`
             );
@@ -238,10 +238,10 @@ type Broadcaster = {
     },
     'function': {
         connector: any,
-        public: Channel<any>,
-        private: Channel<any>,
-        encrypted: Channel<any>,
-        presence: Channel<any>,
+        public: any,
+        private: any,
+        encrypted: any,
+        presence: any,
     }
 };
 
