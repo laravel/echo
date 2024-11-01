@@ -64,7 +64,7 @@ export class PusherChannel extends Channel {
     listen(event: string, callback: Function): this {
         this.on(this.eventFormatter.format(event), callback);
 
-        return this as unknown as this;
+        return this;
     }
 
     /**
