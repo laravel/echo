@@ -1,15 +1,14 @@
 import { PresenceChannel } from './presence-channel';
-import { SocketIoChannel } from './socketio-channel';
 import { SocketIoPrivateChannel } from './socketio-private-channel';
 
 /**
  * This class represents a Socket.io presence channel.
  */
-export class SocketIoPresenceChannel extends SocketIoChannel<SocketIoPrivateChannel> implements PresenceChannel<SocketIoPrivateChannel> {
+export class SocketIoPresenceChannel extends SocketIoPrivateChannel implements PresenceChannel {
     /**
      * Register a callback to be called anytime the member list changes.
      */
-    here(callback: Function): SocketIoPresenceChannel {
+    here(callback: Function): this {
         this.on('presence:subscribed', (members: any[]) => {
             callback(members.map((m) => m.user_info));
         });
@@ -20,7 +19,7 @@ export class SocketIoPresenceChannel extends SocketIoChannel<SocketIoPrivateChan
     /**
      * Listen for someone joining the channel.
      */
-    joining(callback: Function): SocketIoPresenceChannel {
+    joining(callback: Function): this {
         this.on('presence:joining', (member) => callback(member.user_info));
 
         return this;
@@ -29,7 +28,7 @@ export class SocketIoPresenceChannel extends SocketIoChannel<SocketIoPrivateChan
     /**
      * Send a whisper event to other clients in the channel.
      */
-    whisper(eventName: string, data: any): SocketIoPresenceChannel {
+    whisper(eventName: string, data: any): this {
         this.socket.emit('client event', {
             channel: this.name,
             event: `client-${eventName}`,
@@ -42,7 +41,7 @@ export class SocketIoPresenceChannel extends SocketIoChannel<SocketIoPrivateChan
     /**
      * Listen for someone leaving the channel.
      */
-    leaving(callback: Function): SocketIoPresenceChannel {
+    leaving(callback: Function): this {
         this.on('presence:leaving', (member) => callback(member.user_info));
 
         return this;

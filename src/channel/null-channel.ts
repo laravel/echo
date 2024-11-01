@@ -1,15 +1,9 @@
 import { Channel } from './channel';
-import { NullEncryptedPrivateChannel } from './null-encrypted-private-channel';
-import { NullPresenceChannel } from './null-presence-channel';
-import { NullPrivateChannel } from './null-private-channel';
-import { NullPublicChannel } from './null-public-channel';
-
-export type NullChannels = NullPublicChannel | NullPrivateChannel | NullEncryptedPrivateChannel | NullPresenceChannel;
 
 /**
  * This class represents a null channel.
  */
-export class NullChannel<T> extends Channel<T> {
+export class NullChannel extends Channel {
     /**
      * Subscribe to a channel.
      */
@@ -27,42 +21,42 @@ export class NullChannel<T> extends Channel<T> {
     /**
      * Listen for an event on the channel instance.
      */
-    listen(event: string, callback: Function): T {
-        return this as unknown as T;
+    listen(event: string, callback: Function): this {
+        return this;
     }
 
     /**
      * Listen for all events on the channel instance.
      */
-    listenToAll(callback: Function): T {
-        return this as unknown as T;
+    listenToAll(callback: Function): this {
+        return this;
     }
 
     /**
      * Stop listening for an event on the channel instance.
      */
-    stopListening(event: string, callback?: Function): T {
-        return this as unknown as T;
+    stopListening(event: string, callback?: Function): this {
+        return this;
     }
 
     /**
      * Register a callback to be called anytime a subscription succeeds.
      */
-    subscribed(callback: Function): T {
-        return this as unknown as T;
+    subscribed(callback: Function): this {
+        return this;
     }
 
     /**
      * Register a callback to be called anytime an error occurs.
      */
-    error(callback: Function): T {
-        return this as unknown as T;
+    error(callback: Function): this {
+        return this;
     }
 
     /**
      * Bind a channel to an event.
      */
-    on(event: string, callback: Function): T {
-        return this as unknown as T;
+    on(event: string, callback: Function): this {
+        return this;
     }
 }

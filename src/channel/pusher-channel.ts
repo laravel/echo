@@ -1,16 +1,10 @@
 import { EventFormatter } from '../util';
 import { Channel } from './channel';
-import { PusherEncryptedPrivateChannel } from './pusher-encrypted-private-channel';
-import { PusherPresenceChannel } from './pusher-presence-channel';
-import { PusherPrivateChannel } from './pusher-private-channel';
-import { PusherPublicChannel } from './pusher-public-channel';
-
-export type PusherChannels = PusherPublicChannel | PusherPrivateChannel | PusherEncryptedPrivateChannel | PusherPresenceChannel;
 
 /**
  * This class represents a Pusher channel.
  */
-export class PusherChannel<T extends PusherChannels> extends Channel<T> {
+export class PusherChannel extends Channel {
     /**
      * The Pusher client instance.
      */
@@ -67,16 +61,16 @@ export class PusherChannel<T extends PusherChannels> extends Channel<T> {
     /**
      * Listen for an event on the channel instance.
      */
-    listen(event: string, callback: Function): T {
+    listen(event: string, callback: Function): this {
         this.on(this.eventFormatter.format(event), callback);
 
-        return this as unknown as T;
+        return this as unknown as this;
     }
 
     /**
      * Listen for all events on the channel instance.
      */
-    listenToAll(callback: Function): T {
+    listenToAll(callback: Function): this {
         this.subscription.bind_global((event, data) => {
             if (event.startsWith('pusher:')) {
                 return;
@@ -89,63 +83,63 @@ export class PusherChannel<T extends PusherChannels> extends Channel<T> {
             callback(formattedEvent, data);
         });
 
-        return this as unknown as T;
+        return this;
     }
 
     /**
      * Stop listening for an event on the channel instance.
      */
-    stopListening(event: string, callback?: Function): T {
+    stopListening(event: string, callback?: Function): this {
         if (callback) {
             this.subscription.unbind(this.eventFormatter.format(event), callback);
         } else {
             this.subscription.unbind(this.eventFormatter.format(event));
         }
 
-        return this as unknown as T;
+        return this;
     }
 
     /**
      * Stop listening for all events on the channel instance.
      */
-    stopListeningToAll(callback?: Function): T {
+    stopListeningToAll(callback?: Function): this {
         if (callback) {
             this.subscription.unbind_global(callback);
         } else {
             this.subscription.unbind_global();
         }
 
-        return this as unknown as T;
+        return this;
     }
 
     /**
      * Register a callback to be called anytime a subscription succeeds.
      */
-    subscribed(callback: Function): T {
+    subscribed(callback: Function): this {
         this.on('pusher:subscription_succeeded', () => {
             callback();
         });
 
-        return this as unknown as T;
+        return this;
     }
 
     /**
      * Register a callback to be called anytime a subscription error occurs.
      */
-    error(callback: Function): T {
+    error(callback: Function): this {
         this.on('pusher:subscription_error', (status) => {
             callback(status);
         });
 
-        return this as unknown as T;
+        return this;
     }
 
     /**
      * Bind a channel to an event.
      */
-    on(event: string, callback: Function): T {
+    on(event: string, callback: Function): this {
         this.subscription.bind(event, callback);
 
-        return this as unknown as T;
+        return this;
     }
 }

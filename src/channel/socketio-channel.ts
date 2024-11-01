@@ -1,15 +1,10 @@
 import { EventFormatter } from '../util';
 import { Channel } from './channel';
-import { SocketIoPresenceChannel } from './socketio-presence-channel';
-import { SocketIoPrivateChannel } from './socketio-private-channel';
-import { SocketIoPublicChannel } from './socketio-public-channel';
-
-export type SocketIoChannels = SocketIoPublicChannel | SocketIoPrivateChannel | SocketIoPresenceChannel;
 
 /**
  * This class represents a Socket.io channel.
  */
-export class SocketIoChannel<T> extends Channel<T> {
+export class SocketIoChannel extends Channel {
     /**
      * The Socket.io client instance.
      */
@@ -79,43 +74,43 @@ export class SocketIoChannel<T> extends Channel<T> {
     /**
      * Listen for an event on the channel instance.
      */
-    listen(event: string, callback: Function): T {
+    listen(event: string, callback: Function): this {
         this.on(this.eventFormatter.format(event), callback);
 
-        return this as unknown as T;
+        return this;
     }
 
     /**
      * Stop listening for an event on the channel instance.
      */
-    stopListening(event: string, callback?: Function): T {
+    stopListening(event: string, callback?: Function): this {
         this.unbindEvent(this.eventFormatter.format(event), callback);
 
-        return this as unknown as T;
+        return this;
     }
 
     /**
      * Register a callback to be called anytime a subscription succeeds.
      */
-    subscribed(callback: Function): T {
+    subscribed(callback: Function): this {
         this.on('connect', (socket) => {
             callback(socket);
         });
 
-        return this as unknown as T;
+        return this;
     }
 
     /**
      * Register a callback to be called anytime an error occurs.
      */
-    error(callback: Function): T {
-        return this as unknown as T;
+    error(callback: Function): this {
+        return this;
     }
 
     /**
      * Bind the channel's socket to an event and store the callback.
      */
-    on(event: string, callback: Function): T {
+    on(event: string, callback: Function): this {
         this.listeners[event] = this.listeners[event] || [];
 
         if (!this.events[event]) {
@@ -130,7 +125,7 @@ export class SocketIoChannel<T> extends Channel<T> {
 
         this.listeners[event].push(callback);
 
-        return this as unknown as T;
+        return this;
     }
 
     /**

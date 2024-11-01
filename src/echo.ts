@@ -1,4 +1,4 @@
-import { Channel, NullEncryptedPrivateChannel, NullPresenceChannel, NullPrivateChannel, NullPublicChannel, PresenceChannel, PusherEncryptedPrivateChannel, PusherPresenceChannel, PusherPrivateChannel, PusherPublicChannel, SocketIoPresenceChannel, SocketIoPrivateChannel, SocketIoPublicChannel } from './channel';
+import { Channel, NullChannel, NullEncryptedPrivateChannel, NullPresenceChannel, NullPrivateChannel, PresenceChannel, PusherChannel, PusherEncryptedPrivateChannel, PusherPresenceChannel, PusherPrivateChannel, SocketIoChannel, SocketIoPresenceChannel, SocketIoPrivateChannel } from './channel';
 import { Connector, PusherConnector, SocketIoConnector, NullConnector } from './connector';
 
 /**
@@ -210,28 +210,28 @@ export { EventFormatter } from './util';
 type Broadcaster = {
     'reverb': {
         connector: PusherConnector,
-        public: PusherPublicChannel,
+        public: PusherChannel,
         private: PusherPrivateChannel,
         encrypted: PusherEncryptedPrivateChannel,
         presence: PusherPresenceChannel,
     },
     'pusher': {
         connector: PusherConnector,
-        public: PusherPublicChannel,
+        public: PusherChannel,
         private: PusherPrivateChannel,
         encrypted: PusherEncryptedPrivateChannel,
         presence: PusherPresenceChannel,
     },
     'socket.io': {
         connector: SocketIoConnector,
-        public: SocketIoPublicChannel,
+        public: SocketIoChannel,
         private: SocketIoPrivateChannel,
         encrypted: never,
         presence: SocketIoPresenceChannel,
     },
     'null': {
         connector: NullConnector,
-        public: NullPublicChannel,
+        public: NullChannel,
         private: NullPrivateChannel,
         encrypted: NullEncryptedPrivateChannel,
         presence: NullPresenceChannel,

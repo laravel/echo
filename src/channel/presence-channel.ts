@@ -3,24 +3,24 @@ import { Channel } from './channel';
 /**
  * This interface represents a presence channel.
  */
-export interface PresenceChannel<T> extends Channel<T> {
+export interface PresenceChannel extends Channel {
     /**
      * Register a callback to be called anytime the member list changes.
      */
-    here(callback: Function): T;
+    here(callback: Function): this;
 
     /**
      * Listen for someone joining the channel.
      */
-    joining(callback: Function): T;
+    joining(callback: Function): this;
 
     /**
      * Send a whisper event to other clients in the channel.
      */
-    whisper(eventName: string, data: any): T;
+    whisper(eventName: string, data: any): this;
 
     /**
      * Listen for someone leaving the channel.
      */
-    leaving(callback: Function): T;
+    leaving(callback: Function): this;
 }

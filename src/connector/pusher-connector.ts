@@ -1,17 +1,12 @@
 import { Connector } from './connector';
-import {
-    PusherChannel,
-    PusherPrivateChannel,
-    PusherEncryptedPrivateChannel,
-    PusherPresenceChannel,
-    PusherPublicChannel,
-    PusherChannels,
-} from './../channel';
+import { PusherChannel, PusherPrivateChannel, PusherEncryptedPrivateChannel, PusherPresenceChannel } from './../channel';
+
+type AnyPusherChannel = PusherChannel | PusherPrivateChannel | PusherEncryptedPrivateChannel | PusherPresenceChannel;
 
 /**
  * This class creates a connector to Pusher.
  */
-export class PusherConnector extends Connector<PusherPublicChannel, PusherPrivateChannel, PusherPresenceChannel> {
+export class PusherConnector extends Connector<PusherChannel, PusherPrivateChannel, PusherPresenceChannel> {
     /**
      * The Pusher instance.
      */
@@ -45,14 +40,14 @@ export class PusherConnector extends Connector<PusherPublicChannel, PusherPrivat
     /**
      * Listen for an event on a channel instance.
      */
-    listen(name: string, event: string, callback: Function): PusherChannel<PusherChannels> {
+    listen(name: string, event: string, callback: Function): AnyPusherChannel {
         return this.channel(name).listen(event, callback);
     }
 
     /**
      * Get a channel instance by name.
      */
-    channel(name: string): PusherChannel<PusherChannels> {
+    channel(name: string): AnyPusherChannel {
         if (!this.channels[name]) {
             this.channels[name] = new PusherChannel(this.pusher, name, this.options);
         }
