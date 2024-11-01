@@ -1,4 +1,4 @@
-import { Channel, PresenceChannel } from "../channel";
+import { Channel, PresenceChannel } from '../channel';
 
 export abstract class Connector<TPublic extends Channel, TPrivate extends Channel, TPresence extends PresenceChannel> {
     /**
