@@ -1,5 +1,10 @@
 import { Connector } from './connector';
-import { PusherChannel, PusherPrivateChannel, PusherEncryptedPrivateChannel, PusherPresenceChannel } from './../channel';
+import {
+    PusherChannel,
+    PusherPrivateChannel,
+    PusherEncryptedPrivateChannel,
+    PusherPresenceChannel,
+} from './../channel';
 
 type AnyPusherChannel = PusherChannel | PusherPrivateChannel | PusherEncryptedPrivateChannel | PusherPresenceChannel;
 

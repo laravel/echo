@@ -1,4 +1,18 @@
-import { Channel, NullChannel, NullEncryptedPrivateChannel, NullPresenceChannel, NullPrivateChannel, PresenceChannel, PusherChannel, PusherEncryptedPrivateChannel, PusherPresenceChannel, PusherPrivateChannel, SocketIoChannel, SocketIoPresenceChannel, SocketIoPrivateChannel } from './channel';
+import {
+    Channel,
+    NullChannel,
+    NullEncryptedPrivateChannel,
+    NullPresenceChannel,
+    NullPrivateChannel,
+    PresenceChannel,
+    PusherChannel,
+    PusherEncryptedPrivateChannel,
+    PusherPresenceChannel,
+    PusherPrivateChannel,
+    SocketIoChannel,
+    SocketIoPresenceChannel,
+    SocketIoPrivateChannel,
+} from './channel';
 import { Connector, PusherConnector, SocketIoConnector, NullConnector } from './connector';
 
 /**
@@ -112,7 +126,9 @@ export default class Echo<T extends keyof Broadcaster> {
     encryptedPrivate(channel: string): Broadcaster[T]['encrypted'] {
         if ((this.connector as any) instanceof SocketIoConnector) {
             throw new Error(
-                `Broadcaster ${typeof this.options.broadcaster} ${this.options.broadcaster} does not support encrypted private channels.`
+                `Broadcaster ${typeof this.options.broadcaster} ${
+                    this.options.broadcaster
+                } does not support encrypted private channels.`
             );
         }
 
@@ -208,49 +224,48 @@ export { EventFormatter } from './util';
  * Specifies the broadcaster
  */
 type Broadcaster = {
-    'reverb': {
-        connector: PusherConnector,
-        public: PusherChannel,
-        private: PusherPrivateChannel,
-        encrypted: PusherEncryptedPrivateChannel,
-        presence: PusherPresenceChannel,
-    },
-    'pusher': {
-        connector: PusherConnector,
-        public: PusherChannel,
-        private: PusherPrivateChannel,
-        encrypted: PusherEncryptedPrivateChannel,
-        presence: PusherPresenceChannel,
-    },
+    reverb: {
+        connector: PusherConnector;
+        public: PusherChannel;
+        private: PusherPrivateChannel;
+        encrypted: PusherEncryptedPrivateChannel;
+        presence: PusherPresenceChannel;
+    };
+    pusher: {
+        connector: PusherConnector;
+        public: PusherChannel;
+        private: PusherPrivateChannel;
+        encrypted: PusherEncryptedPrivateChannel;
+        presence: PusherPresenceChannel;
+    };
     'socket.io': {
-        connector: SocketIoConnector,
-        public: SocketIoChannel,
-        private: SocketIoPrivateChannel,
-        encrypted: never,
-        presence: SocketIoPresenceChannel,
-    },
-    'null': {
-        connector: NullConnector,
-        public: NullChannel,
-        private: NullPrivateChannel,
-        encrypted: NullEncryptedPrivateChannel,
-        presence: NullPresenceChannel,
-    },
-    'function': {
-        connector: any,
-        public: any,
-        private: any,
-        encrypted: any,
-        presence: any,
-    }
+        connector: SocketIoConnector;
+        public: SocketIoChannel;
+        private: SocketIoPrivateChannel;
+        encrypted: never;
+        presence: SocketIoPresenceChannel;
+    };
+    null: {
+        connector: NullConnector;
+        public: NullChannel;
+        private: NullPrivateChannel;
+        encrypted: NullEncryptedPrivateChannel;
+        presence: NullPresenceChannel;
+    };
+    function: {
+        connector: any;
+        public: any;
+        private: any;
+        encrypted: any;
+        presence: any;
+    };
 };
 
 type EchoOptions<T extends keyof Broadcaster> = {
-
     /**
      * The broadcast connector.
      */
-    broadcaster: T extends 'function' ? ((options: EchoOptions<T>) => any) : T,
+    broadcaster: T extends 'function' ? (options: EchoOptions<T>) => any : T;
 
-    [key: string]: any,
+    [key: string]: any;
 };
