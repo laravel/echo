@@ -61,7 +61,7 @@ export class PusherChannel extends Channel {
     /**
      * Listen for an event on the channel instance.
      */
-    listen(event: string, callback: Function): PusherChannel {
+    listen(event: string, callback: Function): this {
         this.on(this.eventFormatter.format(event), callback);
 
         return this;
@@ -70,7 +70,7 @@ export class PusherChannel extends Channel {
     /**
      * Listen for all events on the channel instance.
      */
-    listenToAll(callback: Function): PusherChannel {
+    listenToAll(callback: Function): this {
         this.subscription.bind_global((event, data) => {
             if (event.startsWith('pusher:')) {
                 return;
@@ -89,7 +89,7 @@ export class PusherChannel extends Channel {
     /**
      * Stop listening for an event on the channel instance.
      */
-    stopListening(event: string, callback?: Function): PusherChannel {
+    stopListening(event: string, callback?: Function): this {
         if (callback) {
             this.subscription.unbind(this.eventFormatter.format(event), callback);
         } else {
@@ -102,7 +102,7 @@ export class PusherChannel extends Channel {
     /**
      * Stop listening for all events on the channel instance.
      */
-    stopListeningToAll(callback?: Function): PusherChannel {
+    stopListeningToAll(callback?: Function): this {
         if (callback) {
             this.subscription.unbind_global(callback);
         } else {
@@ -115,7 +115,7 @@ export class PusherChannel extends Channel {
     /**
      * Register a callback to be called anytime a subscription succeeds.
      */
-    subscribed(callback: Function): PusherChannel {
+    subscribed(callback: Function): this {
         this.on('pusher:subscription_succeeded', () => {
             callback();
         });
@@ -126,7 +126,7 @@ export class PusherChannel extends Channel {
     /**
      * Register a callback to be called anytime a subscription error occurs.
      */
-    error(callback: Function): PusherChannel {
+    error(callback: Function): this {
         this.on('pusher:subscription_error', (status) => {
             callback(status);
         });
@@ -137,7 +137,7 @@ export class PusherChannel extends Channel {
     /**
      * Bind a channel to an event.
      */
-    on(event: string, callback: Function): PusherChannel {
+    on(event: string, callback: Function): this {
         this.subscription.bind(event, callback);
 
         return this;

@@ -1,10 +1,10 @@
 import { Connector } from './connector';
-import { NullChannel, NullPrivateChannel, NullPresenceChannel, PresenceChannel } from './../channel';
+import { NullChannel, NullPrivateChannel, NullPresenceChannel, NullEncryptedPrivateChannel } from './../channel';
 
 /**
  * This class creates a null connector.
  */
-export class NullConnector extends Connector {
+export class NullConnector extends Connector<NullChannel, NullPrivateChannel, NullPresenceChannel> {
     /**
      * All of the subscribed channel names.
      */
@@ -41,14 +41,14 @@ export class NullConnector extends Connector {
     /**
      * Get a private encrypted channel instance by name.
      */
-    encryptedPrivateChannel(name: string): NullPrivateChannel {
-        return new NullPrivateChannel();
+    encryptedPrivateChannel(name: string): NullEncryptedPrivateChannel {
+        return new NullEncryptedPrivateChannel();
     }
 
     /**
      * Get a presence channel instance by name.
      */
-    presenceChannel(name: string): PresenceChannel {
+    presenceChannel(name: string): NullPresenceChannel {
         return new NullPresenceChannel();
     }
 

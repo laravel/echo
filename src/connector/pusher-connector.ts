@@ -1,16 +1,12 @@
 import { Connector } from './connector';
-import {
-    PusherChannel,
-    PusherPrivateChannel,
-    PusherEncryptedPrivateChannel,
-    PusherPresenceChannel,
-    PresenceChannel,
-} from './../channel';
+import { PusherChannel, PusherPrivateChannel, PusherEncryptedPrivateChannel, PusherPresenceChannel } from './../channel';
+
+type AnyPusherChannel = PusherChannel | PusherPrivateChannel | PusherEncryptedPrivateChannel | PusherPresenceChannel;
 
 /**
  * This class creates a connector to Pusher.
  */
-export class PusherConnector extends Connector {
+export class PusherConnector extends Connector<PusherChannel, PusherPrivateChannel, PusherPresenceChannel> {
     /**
      * The Pusher instance.
      */
@@ -44,14 +40,14 @@ export class PusherConnector extends Connector {
     /**
      * Listen for an event on a channel instance.
      */
-    listen(name: string, event: string, callback: Function): PusherChannel {
+    listen(name: string, event: string, callback: Function): AnyPusherChannel {
         return this.channel(name).listen(event, callback);
     }
 
     /**
      * Get a channel instance by name.
      */
-    channel(name: string): PusherChannel {
+    channel(name: string): AnyPusherChannel {
         if (!this.channels[name]) {
             this.channels[name] = new PusherChannel(this.pusher, name, this.options);
         }
@@ -62,7 +58,7 @@ export class PusherConnector extends Connector {
     /**
      * Get a private channel instance by name.
      */
-    privateChannel(name: string): PusherChannel {
+    privateChannel(name: string): PusherPrivateChannel {
         if (!this.channels['private-' + name]) {
             this.channels['private-' + name] = new PusherPrivateChannel(this.pusher, 'private-' + name, this.options);
         }
@@ -73,7 +69,7 @@ export class PusherConnector extends Connector {
     /**
      * Get a private encrypted channel instance by name.
      */
-    encryptedPrivateChannel(name: string): PusherChannel {
+    encryptedPrivateChannel(name: string): PusherEncryptedPrivateChannel {
         if (!this.channels['private-encrypted-' + name]) {
             this.channels['private-encrypted-' + name] = new PusherEncryptedPrivateChannel(
                 this.pusher,
@@ -88,7 +84,7 @@ export class PusherConnector extends Connector {
     /**
      * Get a presence channel instance by name.
      */
-    presenceChannel(name: string): PresenceChannel {
+    presenceChannel(name: string): PusherPresenceChannel {
         if (!this.channels['presence-' + name]) {
             this.channels['presence-' + name] = new PusherPresenceChannel(
                 this.pusher,

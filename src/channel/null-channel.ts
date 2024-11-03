@@ -21,42 +21,42 @@ export class NullChannel extends Channel {
     /**
      * Listen for an event on the channel instance.
      */
-    listen(event: string, callback: Function): NullChannel {
+    listen(event: string, callback: Function): this {
         return this;
     }
 
     /**
      * Listen for all events on the channel instance.
      */
-    listenToAll(callback: Function): NullChannel {
+    listenToAll(callback: Function): this {
         return this;
     }
 
     /**
      * Stop listening for an event on the channel instance.
      */
-    stopListening(event: string, callback?: Function): NullChannel {
+    stopListening(event: string, callback?: Function): this {
         return this;
     }
 
     /**
      * Register a callback to be called anytime a subscription succeeds.
      */
-    subscribed(callback: Function): NullChannel {
+    subscribed(callback: Function): this {
         return this;
     }
 
     /**
      * Register a callback to be called anytime an error occurs.
      */
-    error(callback: Function): NullChannel {
+    error(callback: Function): this {
         return this;
     }
 
     /**
      * Bind a channel to an event.
      */
-    on(event: string, callback: Function): NullChannel {
+    on(event: string, callback: Function): this {
         return this;
     }
 }
