@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v1.16.1...master)
+## [Unreleased](https://github.com/laravel/echo/compare/v1.17.0...master)
+
+## [v1.17.0](https://github.com/laravel/echo/compare/v1.16.1...v1.17.0) - 2024-11-12
+
+* Replace dead link in Security Policy by [@Jubeki](https://github.com/Jubeki) in https://github.com/laravel/echo/pull/400
+* Update logo to support dark/light theme by [@milewski](https://github.com/milewski) in https://github.com/laravel/echo/pull/402
+* Fix types for the echo library by [@dennisprudlo](https://github.com/dennisprudlo) in https://github.com/laravel/echo/pull/403
 
 ## [v1.16.1](https://github.com/laravel/echo/compare/v1.16.0...v1.16.1) - 2024-04-09
 
