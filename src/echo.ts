@@ -14,7 +14,7 @@ import {
     SocketIoPrivateChannel,
 } from './channel';
 import { Connector, PusherConnector, SocketIoConnector, NullConnector } from './connector';
-import {isConstructor} from "./util";
+import { isConstructor } from "./util";
 
 /**
  * This class is the primary API for interacting with broadcasting.
