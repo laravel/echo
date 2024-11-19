@@ -1,5 +1,5 @@
 import Echo from '../src/echo';
-import { NullConnector } from "../src/connector";
+import { NullConnector } from '../src/connector';
 
 describe('Echo', () => {
     test('it will not throw error for supported driver', () => {

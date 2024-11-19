@@ -7,5 +7,5 @@ function isConstructor(obj: any): obj is new (...args: any[]) => any {
     return true;
 }
 
-export {isConstructor};
+export { isConstructor };
 export * from './event-formatter';
