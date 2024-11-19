@@ -1,4 +1,5 @@
 import Echo from '../src/echo';
+import {PusherConnector} from "../src/connector";
 
 describe('Echo', () => {
     test('it will not throw error for supported driver', () => {
@@ -10,12 +11,18 @@ describe('Echo', () => {
             'Broadcaster string pusher is not supported.'
         );
 
+        expect(() => new Echo({ broadcaster: PusherConnector })).not.toThrowError(
+            'Broadcaster string pusher is not supported.'
+        );
+
         expect(() => new Echo({ broadcaster: 'socket.io' })).not.toThrowError(
             'Broadcaster string socket.io is not supported.'
         );
 
         expect(() => new Echo({ broadcaster: 'null' })).not.toThrowError('Broadcaster string null is not supported.');
 
+        // eslint-disable-next-line
+        // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         expect(() => new Echo({ broadcaster: () => {} })).not.toThrowError('Broadcaster function is not supported.');
     });
