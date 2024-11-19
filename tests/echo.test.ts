@@ -1,4 +1,5 @@
 import Echo from '../src/echo';
+import { NullConnector } from '../src/connector';
 
 describe('Echo', () => {
     test('it will not throw error for supported driver', () => {
@@ -15,7 +16,10 @@ describe('Echo', () => {
         );
 
         expect(() => new Echo({ broadcaster: 'null' })).not.toThrowError('Broadcaster string null is not supported.');
+        expect(() => new Echo({ broadcaster: NullConnector })).not.toThrowError();
 
+        // eslint-disable-next-line
+        // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         expect(() => new Echo({ broadcaster: () => {} })).not.toThrowError('Broadcaster function is not supported.');
     });

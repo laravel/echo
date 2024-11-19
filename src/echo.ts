@@ -14,6 +14,7 @@ import {
     SocketIoPrivateChannel,
 } from './channel';
 import { Connector, PusherConnector, SocketIoConnector, NullConnector } from './connector';
+import { isConstructor } from './util';
 
 /**
  * This class is the primary API for interacting with broadcasting.
@@ -60,8 +61,8 @@ export default class Echo<T extends keyof Broadcaster> {
             this.connector = new SocketIoConnector(this.options);
         } else if (this.options.broadcaster == 'null') {
             this.connector = new NullConnector(this.options);
-        } else if (typeof this.options.broadcaster == 'function') {
-            this.connector = this.options.broadcaster(this.options as EchoOptions<'function'>);
+        } else if (typeof this.options.broadcaster == 'function' && isConstructor(this.options.broadcaster)) {
+            this.connector = new this.options.broadcaster(this.options as EchoOptions<'function'>);
         } else {
             throw new Error(
                 `Broadcaster ${typeof this.options.broadcaster} ${this.options.broadcaster} is not supported.`
@@ -261,11 +262,13 @@ type Broadcaster = {
     };
 };
 
+type Constructor<T = {}> = new (...args: any[]) => T;
+
 type EchoOptions<T extends keyof Broadcaster> = {
     /**
      * The broadcast connector.
      */
-    broadcaster: T extends 'function' ? (options: EchoOptions<T>) => any : T;
+    broadcaster: T extends 'function' ? Constructor<InstanceType<Broadcaster[T]['connector']>> : T;
 
     [key: string]: any;
 };
