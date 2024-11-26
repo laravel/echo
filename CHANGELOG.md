@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v1.17.0...master)
+## [Unreleased](https://github.com/laravel/echo/compare/v1.17.1...master)
+
+## [v1.17.1](https://github.com/laravel/echo/compare/v1.17.0...v1.17.1) - 2024-11-26
+
+* Fix custom broadcaster usages by [@bytestream](https://github.com/bytestream) in https://github.com/laravel/echo/pull/404
 
 ## [v1.17.0](https://github.com/laravel/echo/compare/v1.16.1...v1.17.0) - 2024-11-12
 
