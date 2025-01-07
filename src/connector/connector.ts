@@ -5,10 +5,10 @@ export abstract class Connector<TPublic extends Channel, TPrivate extends Channe
      * Default connector options.
      */
     private _defaultOptions: any = {
-        auth: {
+        channelAuthorization: {
+            endpoint: '/broadcasting/auth',
             headers: {},
         },
-        authEndpoint: '/broadcasting/auth',
         userAuthentication: {
             endpoint: '/broadcasting/user-auth',
             headers: {},
@@ -43,14 +43,14 @@ export abstract class Connector<TPublic extends Channel, TPrivate extends Channe
         let token = this.csrfToken();
 
         if (token) {
-            this.options.auth.headers['X-CSRF-TOKEN'] = token;
+            this.options.channelAuthorization.headers['X-CSRF-TOKEN'] = token;
             this.options.userAuthentication.headers['X-CSRF-TOKEN'] = token;
         }
 
         token = this.options.bearerToken;
 
         if (token) {
-            this.options.auth.headers['Authorization'] = 'Bearer ' + token;
+            this.options.channelAuthorization.headers['Authorization'] = 'Bearer ' + token;
             this.options.userAuthentication.headers['Authorization'] = 'Bearer ' + token;
         }
 
