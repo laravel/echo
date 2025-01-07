@@ -5,10 +5,10 @@ export abstract class Connector<TPublic extends Channel, TPrivate extends Channe
      * Default connector options.
      */
     private _defaultOptions: any = {
-        auth: {
+        channelAuthorization: {
+            endpoint: '/broadcasting/auth',
             headers: {},
         },
-        authEndpoint: '/broadcasting/auth',
         userAuthentication: {
             endpoint: '/broadcasting/user-auth',
             headers: {},
