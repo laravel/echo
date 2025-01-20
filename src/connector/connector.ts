@@ -5,10 +5,6 @@ export abstract class Connector<TPublic extends Channel, TPrivate extends Channe
      * Default connector options.
      */
     private _defaultOptions: any = {
-        /**
-         * @deprecated Use `channelAuthorization.endpoint` instead.
-         */
-        authEndpoint: null,
         channelAuthorization: {
             endpoint: '/broadcasting/auth',
             headers: {},
@@ -42,29 +38,7 @@ export abstract class Connector<TPublic extends Channel, TPrivate extends Channe
      * Merge the custom options with the defaults.
      */
     protected setOptions(options: any): any {
-        this.options = Object.assign(this._defaultOptions, options);
-
-        let token = this.csrfToken();
-
-        // Backward compatibility for the authEndpoint option.
-        if (this.options.authEndpoint !== null) {
-            this.options.channelAuthorization.endpoint = this.options.authEndpoint;
-            this.options.authEndpoint = null;
-        }
-
-        if (token) {
-            this.options.channelAuthorization.headers['X-CSRF-TOKEN'] = token;
-            this.options.userAuthentication.headers['X-CSRF-TOKEN'] = token;
-        }
-
-        token = this.options.bearerToken;
-
-        if (token) {
-            this.options.channelAuthorization.headers['Authorization'] = 'Bearer ' + token;
-            this.options.userAuthentication.headers['Authorization'] = 'Bearer ' + token;
-        }
-
-        return options;
+        return Object.assign(this._defaultOptions, options);
     }
 
     /**
