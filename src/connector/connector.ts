@@ -1,5 +1,5 @@
 import { Channel, PresenceChannel } from '../channel';
-import { resolveCsrf } from '../util/csrf'
+import { resolveCsrf } from '../util/csrf';
 
 export abstract class Connector<TPublic extends Channel, TPrivate extends Channel, TPresence extends PresenceChannel> {
     /**

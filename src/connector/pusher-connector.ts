@@ -5,7 +5,7 @@ import {
     PusherEncryptedPrivateChannel,
     PusherPresenceChannel,
 } from './../channel';
-import { convertDeprecatedOptions, setAuthOptions } from '../util/pusher'
+import { convertDeprecatedOptions, setAuthOptions } from '../util/pusher';
 
 type AnyPusherChannel = PusherChannel | PusherPrivateChannel | PusherEncryptedPrivateChannel | PusherPresenceChannel;
 
