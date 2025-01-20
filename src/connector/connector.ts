@@ -8,7 +8,7 @@ export abstract class Connector<TPublic extends Channel, TPrivate extends Channe
         /**
          * @deprecated Use `channelAuthorization.endpoint` instead.
          */
-        authEndpoint: '/broadcasting/auth',
+        authEndpoint: null,
         channelAuthorization: {
             endpoint: '/broadcasting/auth',
             headers: {},
@@ -47,7 +47,7 @@ export abstract class Connector<TPublic extends Channel, TPrivate extends Channe
         let token = this.csrfToken();
 
         // Backward compatibility for the authEndpoint option.
-        if (this.options.authEndpoint) {
+        if (this.options.authEndpoint !== null) {
             this.options.channelAuthorization.endpoint = this.options.authEndpoint;
             this.options.authEndpoint = null;
         }
