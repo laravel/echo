@@ -10,9 +10,9 @@ export function resolveCsrf(fallback: string | null = null): string | null {
     }
 
     if (
-      typeof document !== 'undefined' &&
-      typeof document.querySelector === 'function' &&
-      (selector = document.querySelector('meta[name="csrf-token"]'))
+        typeof document !== 'undefined' &&
+        typeof document.querySelector === 'function' &&
+        (selector = document.querySelector('meta[name="csrf-token"]'))
     ) {
         return selector?.getAttribute('content') || null;
     }
