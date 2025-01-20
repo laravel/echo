@@ -1,6 +1,13 @@
 import { resolveCsrf } from './csrf'
+import { deprecationWarning, setDeprecationWarnings } from './warning'
 
 export function convertDeprecatedOptions(options: Record<any, any>) {
+  setDeprecationWarnings(
+    typeof options.deprecationWarnings !== 'undefined'
+        ? options.deprecationWarnings
+        : true
+  );
+
   if (typeof options.authorizer !== 'undefined') {
     // We cannot use the channelAuthorization.customHandler if the authorizer is set,
     // sync the authorizer is build inside the Pusher (https://github.com/pusher/pusher-js/blob/37b057c45c403af27c79303123344c42f6da6a25/src/core/config.ts#L167)
@@ -15,7 +22,7 @@ export function convertDeprecatedOptions(options: Record<any, any>) {
 
     delete options.channelAuthorization;
 
-    console.warn(
+    deprecationWarning(
       'The authorizer option is deprecated and will be removed in the next major version. ' +
       'Please use the channelAuthorization.customHandler option instead.'
     );
@@ -29,7 +36,7 @@ export function convertDeprecatedOptions(options: Record<any, any>) {
     options.channelAuthorization.endpoint = options.authEndpoint;
     options.authEndpoint = null;
 
-    console.warn(
+    deprecationWarning(
       'The authEndpoint option is deprecated and will be removed in the next major version. ' +
       'Please use the channelAuthorization.endpoint option instead.'
     );
@@ -41,7 +48,7 @@ export function convertDeprecatedOptions(options: Record<any, any>) {
     options.channelAuthorization.transport = options.authTransport;
     options.authTransport = null;
 
-    console.warn(
+    deprecationWarning(
       'The authTransport option is deprecated and will be removed in the next major version. ' +
       'Please use the channelAuthorization.transport option instead.'
     );
@@ -54,7 +61,7 @@ export function convertDeprecatedOptions(options: Record<any, any>) {
     options.channelAuthorization.params = options.auth.params || {};
     options.auth = null;
 
-    console.warn(
+    deprecationWarning(
       'The auth option is deprecated and will be removed in the next major version. ' +
       'Please use the channelAuthorization.headers and channelAuthorization.params options instead.'
     );
