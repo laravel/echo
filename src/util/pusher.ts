@@ -21,7 +21,7 @@ export function convertDeprecatedOptions(options: Record<any, any>) {
 
         deprecationWarning(
             'The authorizer option is deprecated and will be removed in the next major version. ' +
-            'Please use the channelAuthorization.customHandler option instead.'
+                'Please use the channelAuthorization.customHandler option instead.'
         );
 
         return;
@@ -35,7 +35,7 @@ export function convertDeprecatedOptions(options: Record<any, any>) {
 
         deprecationWarning(
             'The authEndpoint option is deprecated and will be removed in the next major version. ' +
-               'Please use the channelAuthorization.endpoint option instead.'
+                'Please use the channelAuthorization.endpoint option instead.'
         );
     }
 
@@ -47,7 +47,7 @@ export function convertDeprecatedOptions(options: Record<any, any>) {
 
         deprecationWarning(
             'The authTransport option is deprecated and will be removed in the next major version. ' +
-               'Please use the channelAuthorization.transport option instead.'
+                'Please use the channelAuthorization.transport option instead.'
         );
     }
 
@@ -60,7 +60,7 @@ export function convertDeprecatedOptions(options: Record<any, any>) {
 
         deprecationWarning(
             'The auth option is deprecated and will be removed in the next major version. ' +
-               'Please use the channelAuthorization.headers and channelAuthorization.params options instead.'
+                'Please use the channelAuthorization.headers and channelAuthorization.params options instead.'
         );
     }
 
