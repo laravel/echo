@@ -2,11 +2,11 @@ export function resolveCsrf(fallback: string | null = null): string | null {
     let selector;
 
     if (typeof window !== 'undefined' && window['Laravel'] && window['Laravel'].csrfToken) {
-      return window['Laravel'].csrfToken;
+        return window['Laravel'].csrfToken;
     }
 
     if (fallback) {
-      return fallback;
+        return fallback;
     }
 
     if (
@@ -14,7 +14,7 @@ export function resolveCsrf(fallback: string | null = null): string | null {
       typeof document.querySelector === 'function' &&
       (selector = document.querySelector('meta[name="csrf-token"]'))
     ) {
-      return selector?.getAttribute('content') || null;
+        return selector?.getAttribute('content') || null;
     }
 
     return null;
