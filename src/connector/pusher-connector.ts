@@ -78,8 +78,8 @@ export class PusherConnector extends Connector<PusherChannel, PusherPrivateChann
         const options = this.options;
 
         const channelAuthKey = Object.prototype.hasOwnProperty.call(options, 'channelAuthorization')
-          ? 'channelAuthorization'
-          : 'auth';
+            ? 'channelAuthorization'
+            : 'auth';
 
         const csrfToken = this.csrfToken();
         if (csrfToken) {
