@@ -13,6 +13,11 @@ export function convertDeprecatedOptions(options: Record<any, any>) {
 
     delete options.channelAuthorization;
 
+    console.warn(
+      'The authorizer option is deprecated and will be removed in the next major version. ' +
+      'Please use the channelAuthorization.customHandler option instead.'
+    );
+
     return;
   }
 
@@ -21,6 +26,11 @@ export function convertDeprecatedOptions(options: Record<any, any>) {
   if (typeof options.authEndpoint !== 'undefined') {
     options.channelAuthorization.endpoint = options.authEndpoint;
     options.authEndpoint = null;
+
+    console.warn(
+      'The authEndpoint option is deprecated and will be removed in the next major version. ' +
+      'Please use the channelAuthorization.endpoint option instead.'
+    );
   }
 
   // Backward compatibility for the authTransport option.
@@ -28,6 +38,11 @@ export function convertDeprecatedOptions(options: Record<any, any>) {
   if (typeof options.authTransport !== 'undefined') {
     options.channelAuthorization.transport = options.authTransport;
     options.authTransport = null;
+
+    console.warn(
+      'The authTransport option is deprecated and will be removed in the next major version. ' +
+      'Please use the channelAuthorization.transport option instead.'
+    );
   }
 
   // Backward compatibility for the auth option.
@@ -36,6 +51,11 @@ export function convertDeprecatedOptions(options: Record<any, any>) {
     options.channelAuthorization.headers = options.auth.headers || {};
     options.channelAuthorization.params = options.auth.params || {};
     options.auth = null;
+
+    console.warn(
+      'The auth option is deprecated and will be removed in the next major version. ' +
+      'Please use the channelAuthorization.headers and channelAuthorization.params options instead.'
+    );
   }
 
   return options;
