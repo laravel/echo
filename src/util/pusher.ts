@@ -1,3 +1,5 @@
+import { resolveCsrf } from './csrf'
+
 export function convertDeprecatedOptions(options: Record<any, any>) {
   if (typeof options.authorizer !== 'undefined') {
     // We cannot use the channelAuthorization.customHandler if the authorizer is set,
@@ -66,7 +68,7 @@ export function setAuthOptions(options: Record<any, any>) {
     ? 'channelAuthorization'
     : 'auth';
 
-  const csrfToken = this.csrfToken();
+  const csrfToken = resolveCsrf(options.csrfToken);
   if (csrfToken) {
     options[channelAuthKey].headers['X-CSRF-TOKEN'] = csrfToken;
     options.userAuthentication.headers['X-CSRF-TOKEN'] = csrfToken;

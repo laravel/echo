@@ -1,4 +1,5 @@
 import { Channel, PresenceChannel } from '../channel';
+import { resolveCsrf } from '../util/csrf'
 
 export abstract class Connector<TPublic extends Channel, TPrivate extends Channel, TPresence extends PresenceChannel> {
     /**
@@ -45,21 +46,7 @@ export abstract class Connector<TPublic extends Channel, TPrivate extends Channe
      * Extract the CSRF token from the page.
      */
     protected csrfToken(): null | string {
-        let selector;
-
-        if (typeof window !== 'undefined' && window['Laravel'] && window['Laravel'].csrfToken) {
-            return window['Laravel'].csrfToken;
-        } else if (this.options.csrfToken) {
-            return this.options.csrfToken;
-        } else if (
-            typeof document !== 'undefined' &&
-            typeof document.querySelector === 'function' &&
-            (selector = document.querySelector('meta[name="csrf-token"]'))
-        ) {
-            return selector.getAttribute('content');
-        }
-
-        return null;
+        return resolveCsrf(this.options.csrfToken);
     }
 
     /**
