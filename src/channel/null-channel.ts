@@ -7,7 +7,7 @@ export class NullChannel extends Channel {
     /**
      * Subscribe to a channel.
      */
-    subscribe(): any {
+    subscribe(): void {
         //
     }
 

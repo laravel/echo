@@ -1,5 +1,8 @@
 import { EventFormatter } from '../util';
 import { Channel } from './channel';
+import type { Socket } from "socket.io-client";
+import {EchoOptionsWithDefaults} from "../connector";
+import {BroadcastDriver} from "../echo";
 
 /**
  * This class represents a Socket.io channel.
@@ -8,17 +11,12 @@ export class SocketIoChannel extends Channel {
     /**
      * The Socket.io client instance.
      */
-    socket: any;
+    socket: Socket;
 
     /**
      * The name of the channel.
      */
-    name: any;
-
-    /**
-     * Channel options.
-     */
-    options: any;
+    name: string;
 
     /**
      * The event formatter.
@@ -28,17 +26,17 @@ export class SocketIoChannel extends Channel {
     /**
      * The event callbacks applied to the socket.
      */
-    events: any = {};
+    events: Record<string, any> = {};
 
     /**
      * User supplied callbacks for events on this channel.
      */
-    private listeners: any = {};
+    private listeners: Record<string, Function[]> = {};
 
     /**
      * Create a new class instance.
      */
-    constructor(socket: any, name: string, options: any) {
+    constructor(socket: Socket, name: string, options: EchoOptionsWithDefaults<BroadcastDriver>) {
         super();
 
         this.name = name;
@@ -93,7 +91,7 @@ export class SocketIoChannel extends Channel {
      * Register a callback to be called anytime a subscription succeeds.
      */
     subscribed(callback: Function): this {
-        this.on('connect', (socket) => {
+        this.on('connect', (socket: Socket) => {
             callback(socket);
         });
 
@@ -114,7 +112,7 @@ export class SocketIoChannel extends Channel {
         this.listeners[event] = this.listeners[event] || [];
 
         if (!this.events[event]) {
-            this.events[event] = (channel, data) => {
+            this.events[event] = (channel: string, data: any) => {
                 if (this.name === channel && this.listeners[event]) {
                     this.listeners[event].forEach((cb) => cb(data));
                 }

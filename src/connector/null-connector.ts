@@ -1,10 +1,10 @@
 import { Connector } from './connector';
-import { NullChannel, NullPrivateChannel, NullPresenceChannel, NullEncryptedPrivateChannel } from './../channel';
+import { NullChannel, NullPrivateChannel, NullPresenceChannel, NullEncryptedPrivateChannel } from '../channel';
 
 /**
  * This class creates a null connector.
  */
-export class NullConnector extends Connector<NullChannel, NullPrivateChannel, NullPresenceChannel> {
+export class NullConnector extends Connector<'null', NullChannel, NullPrivateChannel, NullPresenceChannel> {
     /**
      * All of the subscribed channel names.
      */

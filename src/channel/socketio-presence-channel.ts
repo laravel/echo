@@ -9,7 +9,7 @@ export class SocketIoPresenceChannel extends SocketIoPrivateChannel implements P
      * Register a callback to be called anytime the member list changes.
      */
     here(callback: Function): this {
-        this.on('presence:subscribed', (members: any[]) => {
+        this.on('presence:subscribed', (members: Record<string, any>[]) => {
             callback(members.map((m) => m.user_info));
         });
 
@@ -20,7 +20,7 @@ export class SocketIoPresenceChannel extends SocketIoPrivateChannel implements P
      * Listen for someone joining the channel.
      */
     joining(callback: Function): this {
-        this.on('presence:joining', (member) => callback(member.user_info));
+        this.on('presence:joining', (member: Record<string, any>) => callback(member.user_info));
 
         return this;
     }
@@ -42,7 +42,7 @@ export class SocketIoPresenceChannel extends SocketIoPrivateChannel implements P
      * Listen for someone leaving the channel.
      */
     leaving(callback: Function): this {
-        this.on('presence:leaving', (member) => callback(member.user_info));
+        this.on('presence:leaving', (member: Record<string, any>) => callback(member.user_info));
 
         return this;
     }

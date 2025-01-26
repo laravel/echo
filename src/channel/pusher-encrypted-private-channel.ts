@@ -1,13 +1,14 @@
 import { PusherChannel } from './pusher-channel';
+import {BroadcastDriver} from "../echo";
 
 /**
  * This class represents a Pusher private channel.
  */
-export class PusherEncryptedPrivateChannel extends PusherChannel {
+export class PusherEncryptedPrivateChannel<TBroadcastDriver extends BroadcastDriver> extends PusherChannel<TBroadcastDriver> {
     /**
      * Send a whisper event to other clients in the channel.
      */
-    whisper(eventName: string, data: any): this {
+    whisper(eventName: string, data: Record<any, any>): this {
         this.pusher.channels.channels[this.name].trigger(`client-${eventName}`, data);
 
         return this;

@@ -1,3 +1,5 @@
+import {EchoOptionsWithDefaults} from "../connector";
+import {BroadcastDriver} from "../echo";
 /**
  * This class represents a basic channel.
  */
@@ -5,7 +7,7 @@ export abstract class Channel {
     /**
      * The Echo options.
      */
-    options: any;
+    options: EchoOptionsWithDefaults<BroadcastDriver>;
 
     /**
      * Listen for an event on the channel instance.

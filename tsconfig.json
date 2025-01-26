@@ -6,8 +6,10 @@
         "outDir": "./dist",
         "sourceMap": false,
         "target": "es6",
+        "strictPropertyInitialization": false,
         "isolatedModules": false,
         "esModuleInterop": true,
+        "strict": true,
         "typeRoots": [
             "node_modules/@types"
         ],

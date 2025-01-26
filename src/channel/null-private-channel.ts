@@ -7,7 +7,7 @@ export class NullPrivateChannel extends NullChannel {
     /**
      * Send a whisper event to other clients in the channel.
      */
-    whisper(eventName: string, data: any): this {
+    whisper(eventName: string, data: Record<any, any>): this {
         return this;
     }
 }

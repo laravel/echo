@@ -1,24 +1,23 @@
-import { EventFormatter } from '../util';
-import { Channel } from './channel';
+import {EventFormatter} from '../util';
+import {Channel} from './channel';
+import type Pusher from 'pusher-js';
+import type { Channel as BasePusherChannel } from 'pusher-js';
+import {EchoOptionsWithDefaults} from "../connector";
+import {BroadcastDriver} from "../echo";
 
 /**
  * This class represents a Pusher channel.
  */
-export class PusherChannel extends Channel {
+export class PusherChannel<TBroadcastDriver extends BroadcastDriver> extends Channel {
     /**
      * The Pusher client instance.
      */
-    pusher: any;
+    pusher: Pusher;
 
     /**
      * The name of the channel.
      */
-    name: any;
-
-    /**
-     * Channel options.
-     */
-    options: any;
+    name: string;
 
     /**
      * The event formatter.
@@ -28,12 +27,12 @@ export class PusherChannel extends Channel {
     /**
      * The subscription of the channel.
      */
-    subscription: any;
+    subscription: BasePusherChannel;
 
     /**
      * Create a new class instance.
      */
-    constructor(pusher: any, name: any, options: any) {
+    constructor(pusher: Pusher, name: string, options: EchoOptionsWithDefaults<TBroadcastDriver>) {
         super();
 
         this.name = name;
@@ -47,7 +46,7 @@ export class PusherChannel extends Channel {
     /**
      * Subscribe to a Pusher channel.
      */
-    subscribe(): any {
+    subscribe(): void {
         this.subscription = this.pusher.subscribe(this.name);
     }
 
@@ -71,12 +70,12 @@ export class PusherChannel extends Channel {
      * Listen for all events on the channel instance.
      */
     listenToAll(callback: Function): this {
-        this.subscription.bind_global((event, data) => {
+        this.subscription.bind_global((event: string, data: any) => {
             if (event.startsWith('pusher:')) {
                 return;
             }
 
-            let namespace = this.options.namespace.replace(/\./g, '\\');
+            let namespace = String(this.options.namespace ?? '').replace(/\./g, '\\');
 
             let formattedEvent = event.startsWith(namespace) ? event.substring(namespace.length + 1) : '.' + event;
 
@@ -127,7 +126,7 @@ export class PusherChannel extends Channel {
      * Register a callback to be called anytime a subscription error occurs.
      */
     error(callback: Function): this {
-        this.on('pusher:subscription_error', (status) => {
+        this.on('pusher:subscription_error', (status: Record<string, any>) => {
             callback(status);
         });
 
