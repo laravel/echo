@@ -60,7 +60,7 @@ export class PusherChannel<TBroadcastDriver extends BroadcastDriver> extends Cha
     /**
      * Listen for an event on the channel instance.
      */
-    listen(event: string, callback: Function): this {
+    listen(event: string, callback: CallableFunction): this {
         this.on(this.eventFormatter.format(event), callback);
 
         return this;
@@ -69,8 +69,8 @@ export class PusherChannel<TBroadcastDriver extends BroadcastDriver> extends Cha
     /**
      * Listen for all events on the channel instance.
      */
-    listenToAll(callback: Function): this {
-        this.subscription.bind_global((event: string, data: any) => {
+    listenToAll(callback: CallableFunction): this {
+        this.subscription.bind_global((event: string, data: unknown) => {
             if (event.startsWith('pusher:')) {
                 return;
             }
@@ -88,7 +88,7 @@ export class PusherChannel<TBroadcastDriver extends BroadcastDriver> extends Cha
     /**
      * Stop listening for an event on the channel instance.
      */
-    stopListening(event: string, callback?: Function): this {
+    stopListening(event: string, callback?: CallableFunction): this {
         if (callback) {
             this.subscription.unbind(this.eventFormatter.format(event), callback);
         } else {
@@ -101,7 +101,7 @@ export class PusherChannel<TBroadcastDriver extends BroadcastDriver> extends Cha
     /**
      * Stop listening for all events on the channel instance.
      */
-    stopListeningToAll(callback?: Function): this {
+    stopListeningToAll(callback?: CallableFunction): this {
         if (callback) {
             this.subscription.unbind_global(callback);
         } else {
@@ -114,7 +114,7 @@ export class PusherChannel<TBroadcastDriver extends BroadcastDriver> extends Cha
     /**
      * Register a callback to be called anytime a subscription succeeds.
      */
-    subscribed(callback: Function): this {
+    subscribed(callback: CallableFunction): this {
         this.on('pusher:subscription_succeeded', () => {
             callback();
         });
@@ -125,7 +125,7 @@ export class PusherChannel<TBroadcastDriver extends BroadcastDriver> extends Cha
     /**
      * Register a callback to be called anytime a subscription error occurs.
      */
-    error(callback: Function): this {
+    error(callback: CallableFunction): this {
         this.on('pusher:subscription_error', (status: Record<string, any>) => {
             callback(status);
         });
@@ -136,7 +136,7 @@ export class PusherChannel<TBroadcastDriver extends BroadcastDriver> extends Cha
     /**
      * Bind a channel to an event.
      */
-    on(event: string, callback: Function): this {
+    on(event: string, callback: CallableFunction): this {
         this.subscription.bind(event, callback);
 
         return this;

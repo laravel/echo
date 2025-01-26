@@ -20,49 +20,49 @@ export class NullConnector extends Connector<'null', NullChannel, NullPrivateCha
     /**
      * Listen for an event on a channel instance.
      */
-    listen(name: string, event: string, callback: Function): NullChannel {
+    listen(_name: string, _event: string, _callback: CallableFunction): NullChannel {
         return new NullChannel();
     }
 
     /**
      * Get a channel instance by name.
      */
-    channel(name: string): NullChannel {
+    channel(_name: string): NullChannel {
         return new NullChannel();
     }
 
     /**
      * Get a private channel instance by name.
      */
-    privateChannel(name: string): NullPrivateChannel {
+    privateChannel(_name: string): NullPrivateChannel {
         return new NullPrivateChannel();
     }
 
     /**
      * Get a private encrypted channel instance by name.
      */
-    encryptedPrivateChannel(name: string): NullEncryptedPrivateChannel {
+    encryptedPrivateChannel(_name: string): NullEncryptedPrivateChannel {
         return new NullEncryptedPrivateChannel();
     }
 
     /**
      * Get a presence channel instance by name.
      */
-    presenceChannel(name: string): NullPresenceChannel {
+    presenceChannel(_name: string): NullPresenceChannel {
         return new NullPresenceChannel();
     }
 
     /**
      * Leave the given channel, as well as its private and presence variants.
      */
-    leave(name: string): void {
+    leave(_name: string): void {
         //
     }
 
     /**
      * Leave the given channel.
      */
-    leaveChannel(name: string): void {
+    leaveChannel(_name: string): void {
         //
     }
 

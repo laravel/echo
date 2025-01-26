@@ -8,28 +8,28 @@ export class NullPresenceChannel extends NullPrivateChannel implements PresenceC
     /**
      * Register a callback to be called anytime the member list changes.
      */
-    here(callback: Function): this {
+    here(_callback: CallableFunction): this {
         return this;
     }
 
     /**
      * Listen for someone joining the channel.
      */
-    joining(callback: Function): this {
+    joining(_callback: CallableFunction): this {
         return this;
     }
 
     /**
      * Send a whisper event to other clients in the channel.
      */
-    whisper(eventName: string, data: Record<any, any>): this {
+    whisper(_eventName: string, _data: Record<any, any>): this {
         return this;
     }
 
     /**
      * Listen for someone leaving the channel.
      */
-    leaving(callback: Function): this {
+    leaving(_callback: CallableFunction): this {
         return this;
     }
 }

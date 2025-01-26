@@ -4,7 +4,7 @@ import {
     NullEncryptedPrivateChannel,
     NullPresenceChannel,
     NullPrivateChannel,
-    PresenceChannel,
+    type PresenceChannel,
     PusherChannel,
     PusherEncryptedPrivateChannel,
     PusherPresenceChannel,
@@ -23,7 +23,7 @@ export default class Echo<T extends keyof Broadcaster> {
     /**
      * The broadcasting connector.
      */
-    connector: Broadcaster[T]['connector'];
+    connector: Broadcaster[Exclude<T, 'function'>]['connector'];
 
     /**
      * The Echo options.
@@ -68,7 +68,7 @@ export default class Echo<T extends keyof Broadcaster> {
             this.connector = new this.options.broadcaster(this.options as EchoOptions<'function'>);
         } else {
             throw new Error(
-                `Broadcaster ${typeof this.options.broadcaster} ${this.options.broadcaster} is not supported.`
+                `Broadcaster ${typeof this.options.broadcaster} ${String(this.options.broadcaster)} is not supported.`
             );
         }
     }
@@ -113,7 +113,7 @@ export default class Echo<T extends keyof Broadcaster> {
     /**
      * Listen for an event on a channel instance.
      */
-    listen(channel: string, event: string, callback: Function): Broadcaster[T]['public'] {
+    listen(channel: string, event: string, callback: CallableFunction): Broadcaster[T]['public'] {
         return this.connector.listen(channel, event, callback);
     }
 
@@ -128,21 +128,25 @@ export default class Echo<T extends keyof Broadcaster> {
      * Get a private encrypted channel instance by name.
      */
     encryptedPrivate(channel: string): Broadcaster[T]['encrypted'] {
-        if ((this.connector as any) instanceof SocketIoConnector) {
-            throw new Error(
-                `Broadcaster ${typeof this.options.broadcaster} ${
-                    this.options.broadcaster
-                } does not support encrypted private channels.`
-            );
+        if (this.connectorSupportsEncryptedPrivateChannels(this.connector)) {
+            return this.connector.encryptedPrivateChannel(channel);
         }
 
-        return this.connector.encryptedPrivateChannel(channel);
+        throw new Error(
+            `Broadcaster ${typeof this.options.broadcaster} ${
+                String(this.options.broadcaster)
+            } does not support encrypted private channels.`
+        );
+    }
+
+    private connectorSupportsEncryptedPrivateChannels(connector: unknown): connector is (PusherConnector<any> | NullConnector) {
+        return connector instanceof PusherConnector || connector instanceof NullConnector;
     }
 
     /**
      * Get the Socket ID for the connection.
      */
-    socketId(): string {
+    socketId(): string | undefined {
         return this.connector.socketId();
     }
 
@@ -172,7 +176,7 @@ export default class Echo<T extends keyof Broadcaster> {
      * Register a Vue HTTP interceptor to add the X-Socket-ID header.
      */
     registerVueRequestInterceptor(): void {
-        Vue.http.interceptors.push((request: any, next: any) => {
+        Vue.http.interceptors.push((request: Record<any, any>, next: CallableFunction) => {
             if (this.socketId()) {
                 request.headers.set('X-Socket-ID', this.socketId());
             }
@@ -185,7 +189,7 @@ export default class Echo<T extends keyof Broadcaster> {
      * Register an Axios HTTP interceptor to add the X-Socket-ID header.
      */
     registerAxiosRequestInterceptor(): void {
-        axios.interceptors.request.use((config: any) => {
+        axios.interceptors.request.use((config: Record<any, any>) => {
             if (this.socketId()) {
                 config.headers['X-Socket-Id'] = this.socketId();
             }
@@ -199,7 +203,7 @@ export default class Echo<T extends keyof Broadcaster> {
      */
     registerjQueryAjaxSetup(): void {
         if (typeof jQuery.ajax != 'undefined') {
-            jQuery.ajaxPrefilter((options: any, originalOptions: any, xhr: any) => {
+            jQuery.ajaxPrefilter((_options: any, _originalOptions: any, xhr: Record<any, any>) => {
                 if (this.socketId()) {
                     xhr.setRequestHeader('X-Socket-Id', this.socketId());
                 }
@@ -211,7 +215,7 @@ export default class Echo<T extends keyof Broadcaster> {
      * Register the Turbo Request interceptor to add the X-Socket-ID header.
      */
     registerTurboRequestInterceptor(): void {
-        document.addEventListener('turbo:before-fetch-request', (event: any) => {
+        document.addEventListener('turbo:before-fetch-request', (event: Record<any, any>) => {
             event.detail.fetchOptions.headers['X-Socket-Id'] = this.socketId();
         });
     }
@@ -220,7 +224,7 @@ export default class Echo<T extends keyof Broadcaster> {
 /**
  * Export channel classes for TypeScript.
  */
-export { Connector, Channel, PresenceChannel };
+export { Connector, Channel, type PresenceChannel };
 
 export { EventFormatter } from './util';
 
@@ -287,7 +291,7 @@ export type EchoOptions<TBroadcaster extends keyof Broadcaster> = {
     bearerToken?: string | null;
     host?: string | null;
     key?: string | null;
-    namespace?: string;
+    namespace?: string | false;
 
     [key: string]: any;
 };

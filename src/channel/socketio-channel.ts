@@ -31,7 +31,7 @@ export class SocketIoChannel extends Channel {
     /**
      * User supplied callbacks for events on this channel.
      */
-    private listeners: Record<string, Function[]> = {};
+    private listeners: Record<string, CallableFunction[]> = {};
 
     /**
      * Create a new class instance.
@@ -72,7 +72,7 @@ export class SocketIoChannel extends Channel {
     /**
      * Listen for an event on the channel instance.
      */
-    listen(event: string, callback: Function): this {
+    listen(event: string, callback: CallableFunction): this {
         this.on(this.eventFormatter.format(event), callback);
 
         return this;
@@ -81,7 +81,7 @@ export class SocketIoChannel extends Channel {
     /**
      * Stop listening for an event on the channel instance.
      */
-    stopListening(event: string, callback?: Function): this {
+    stopListening(event: string, callback?: CallableFunction): this {
         this.unbindEvent(this.eventFormatter.format(event), callback);
 
         return this;
@@ -90,7 +90,7 @@ export class SocketIoChannel extends Channel {
     /**
      * Register a callback to be called anytime a subscription succeeds.
      */
-    subscribed(callback: Function): this {
+    subscribed(callback: CallableFunction): this {
         this.on('connect', (socket: Socket) => {
             callback(socket);
         });
@@ -101,18 +101,18 @@ export class SocketIoChannel extends Channel {
     /**
      * Register a callback to be called anytime an error occurs.
      */
-    error(callback: Function): this {
+    error(_callback: CallableFunction): this {
         return this;
     }
 
     /**
      * Bind the channel's socket to an event and store the callback.
      */
-    on(event: string, callback: Function): this {
+    on(event: string, callback: CallableFunction): this {
         this.listeners[event] = this.listeners[event] || [];
 
         if (!this.events[event]) {
-            this.events[event] = (channel: string, data: any) => {
+            this.events[event] = (channel: string, data: unknown) => {
                 if (this.name === channel && this.listeners[event]) {
                     this.listeners[event].forEach((cb) => cb(data));
                 }
@@ -138,7 +138,7 @@ export class SocketIoChannel extends Channel {
     /**
      * Unbind the listeners for the given event.
      */
-    protected unbindEvent(event: string, callback?: Function): void {
+    protected unbindEvent(event: string, callback?: CallableFunction): void {
         this.listeners[event] = this.listeners[event] || [];
 
         if (callback) {

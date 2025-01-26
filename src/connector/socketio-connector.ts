@@ -38,7 +38,7 @@ export class SocketIoConnector extends Connector<'socket.io', SocketIoChannel, S
      */
     getSocketIO(): typeof io {
         if (typeof this.options.client !== 'undefined') {
-            return this.options.client;
+            return this.options.client as typeof io;
         }
 
         if (typeof window !== 'undefined' && typeof window.io !== 'undefined') {
@@ -51,7 +51,7 @@ export class SocketIoConnector extends Connector<'socket.io', SocketIoChannel, S
     /**
      * Listen for an event on a channel instance.
      */
-    listen(name: string, event: string, callback: Function): AnySocketIoChannel {
+    listen(name: string, event: string, callback: CallableFunction): AnySocketIoChannel {
         return this.channel(name).listen(event, callback);
     }
 

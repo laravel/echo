@@ -1,4 +1,4 @@
-import {Connector, EchoOptionsWithDefaults} from './connector';
+import { Connector, type EchoOptionsWithDefaults } from './connector';
 import {
     PusherChannel,
     PusherPrivateChannel,
@@ -7,7 +7,7 @@ import {
 } from '../channel';
 import type Pusher from 'pusher-js';
 import type { Options as PusherOptions } from 'pusher-js';
-import type {BroadcastDriver} from "../echo";
+import type { BroadcastDriver } from "../echo";
 
 type AnyPusherChannel = PusherChannel<BroadcastDriver> | PusherPrivateChannel<BroadcastDriver> | PusherEncryptedPrivateChannel<BroadcastDriver> | PusherPresenceChannel<BroadcastDriver>;
 
@@ -35,7 +35,7 @@ export class PusherConnector<TBroadcastDriver extends BroadcastDriver> extends C
      */
     connect(): void {
         if (typeof this.options.client !== 'undefined') {
-            this.pusher = this.options.client;
+            this.pusher = this.options.client as Pusher;
         } else if (this.options.Pusher) {
             this.pusher = new this.options.Pusher(this.options.key, this.options);
         } else if (typeof window !== 'undefined' && typeof window.Pusher !== 'undefined') {
@@ -55,7 +55,7 @@ export class PusherConnector<TBroadcastDriver extends BroadcastDriver> extends C
     /**
      * Listen for an event on a channel instance.
      */
-    listen(name: string, event: string, callback: Function): AnyPusherChannel {
+    listen(name: string, event: string, callback: CallableFunction): AnyPusherChannel {
         return this.channel(name).listen(event, callback);
     }
 
@@ -117,7 +117,7 @@ export class PusherConnector<TBroadcastDriver extends BroadcastDriver> extends C
     leave(name: string): void {
         let channels = [name, 'private-' + name, 'private-encrypted-' + name, 'presence-' + name];
 
-        channels.forEach((name: string, index: number) => {
+        channels.forEach((name: string) => {
             this.leaveChannel(name);
         });
     }

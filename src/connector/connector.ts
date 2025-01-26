@@ -15,7 +15,7 @@ export type EchoOptionsWithDefaults<TBroadcaster extends BroadcastDriver> = {
     bearerToken: string | null;
     host: string | null;
     key: string | null;
-    namespace: string;
+    namespace: string | false;
 
     [key: string]: any;
 };
@@ -29,7 +29,7 @@ export abstract class Connector<
     /**
      * Default connector options.
      */
-    private _defaultOptions = {
+    public static readonly _defaultOptions = {
         auth: {
             headers: {},
         },
@@ -43,7 +43,7 @@ export abstract class Connector<
         host: null,
         key: null,
         namespace: 'App.Events',
-    };
+    } as const;
 
     /**
      * Connector options.
@@ -63,7 +63,7 @@ export abstract class Connector<
      */
     protected setOptions(options: EchoOptions<TBroadcastDriver>): void {
         this.options = {
-            ...this._defaultOptions,
+            ...Connector._defaultOptions,
             ...options,
             broadcaster: options.broadcaster as TBroadcastDriver,
         };

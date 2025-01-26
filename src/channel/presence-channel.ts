@@ -7,12 +7,12 @@ export interface PresenceChannel extends Channel {
     /**
      * Register a callback to be called anytime the member list changes.
      */
-    here(callback: Function): this;
+    here(callback: CallableFunction): this;
 
     /**
      * Listen for someone joining the channel.
      */
-    joining(callback: Function): this;
+    joining(callback: CallableFunction): this;
 
     /**
      * Send a whisper event to other clients in the channel.
@@ -22,5 +22,5 @@ export interface PresenceChannel extends Channel {
     /**
      * Listen for someone leaving the channel.
      */
-    leaving(callback: Function): this;
+    leaving(callback: CallableFunction): this;
 }

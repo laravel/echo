@@ -9,7 +9,7 @@ export class PusherPresenceChannel<TBroadcastDriver extends BroadcastDriver> ext
     /**
      * Register a callback to be called anytime the member list changes.
      */
-    here(callback: Function): this {
+    here(callback: CallableFunction): this {
         this.on('pusher:subscription_succeeded', (data: Record<any, any>) => {
             callback(Object.keys(data.members).map((k) => data.members[k]));
         });
@@ -20,7 +20,7 @@ export class PusherPresenceChannel<TBroadcastDriver extends BroadcastDriver> ext
     /**
      * Listen for someone joining the channel.
      */
-    joining(callback: Function): this {
+    joining(callback: CallableFunction): this {
         this.on('pusher:member_added', (member: Record<any, any>) => {
             callback(member.info);
         });
@@ -40,7 +40,7 @@ export class PusherPresenceChannel<TBroadcastDriver extends BroadcastDriver> ext
     /**
      * Listen for someone leaving the channel.
      */
-    leaving(callback: Function): this {
+    leaving(callback: CallableFunction): this {
         this.on('pusher:member_removed', (member: Record<any, any>) => {
             callback(member.info);
         });

@@ -1,7 +1,7 @@
 import { EventFormatter } from '../../src/util';
 
 describe('EventFormatter', () => {
-    let eventFormatter;
+    let eventFormatter: EventFormatter;
 
     beforeEach(() => {
         eventFormatter = new EventFormatter('App.Events');
