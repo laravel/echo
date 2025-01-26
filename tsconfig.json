@@ -10,6 +10,7 @@
         "target": "ES2020",
         "verbatimModuleSyntax": true,
         "skipLibCheck": true,
+        "importHelpers": true,
         "strictPropertyInitialization": false,
         "allowSyntheticDefaultImports": true,
         "isolatedModules": true,

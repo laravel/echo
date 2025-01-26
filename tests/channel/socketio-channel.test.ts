@@ -11,13 +11,11 @@ describe('SocketIoChannel', () => {
         let listeners: any[] = [];
         socket = {
             emit: (event: any, data: unknown) => {
-                listeners
-                    .filter(([e]) => e === event)
-                    .forEach(([, fn]) => fn(channelName, data));
+                listeners.filter(([e]) => e === event).forEach(([, fn]) => fn(channelName, data));
             },
             on: (event: any, fn): any => listeners.push([event, fn]),
             removeListener: (event: any, fn: any) => {
-                listeners = listeners.filter(([e, f]) => (! fn ? e !== event : e !== event || f !== fn));
+                listeners = listeners.filter(([e, f]) => (!fn ? e !== event : e !== event || f !== fn));
             },
         } as Socket;
 

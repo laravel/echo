@@ -7,7 +7,8 @@ import type { BroadcastDriver } from '../echo';
  */
 export class PusherPresenceChannel<TBroadcastDriver extends BroadcastDriver>
     extends PusherPrivateChannel<TBroadcastDriver>
-    implements PresenceChannel {
+    implements PresenceChannel
+{
     /**
      * Register a callback to be called anytime the member list changes.
      */

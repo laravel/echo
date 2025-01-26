@@ -4,7 +4,8 @@ import type Pusher from 'pusher-js';
 import type { Options as PusherOptions } from 'pusher-js';
 import type { BroadcastDriver } from '../echo';
 
-type AnyPusherChannel = PusherChannel<BroadcastDriver>
+type AnyPusherChannel =
+    | PusherChannel<BroadcastDriver>
     | PusherPrivateChannel<BroadcastDriver>
     | PusherEncryptedPrivateChannel<BroadcastDriver>
     | PusherPresenceChannel<BroadcastDriver>;

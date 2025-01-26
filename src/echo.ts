@@ -68,9 +68,7 @@ export default class Echo<T extends keyof Broadcaster> {
             this.connector = new this.options.broadcaster(this.options as EchoOptions<'function'>);
         } else {
             throw new Error(
-                `Broadcaster ${typeof this.options.broadcaster} ${
-                    String(this.options.broadcaster)
-                } is not supported.`
+                `Broadcaster ${typeof this.options.broadcaster} ${String(this.options.broadcaster)} is not supported.`
             );
         }
     }
@@ -135,15 +133,15 @@ export default class Echo<T extends keyof Broadcaster> {
         }
 
         throw new Error(
-            `Broadcaster ${typeof this.options.broadcaster} ${
-                String(this.options.broadcaster)
-            } does not support encrypted private channels.`
+            `Broadcaster ${typeof this.options.broadcaster} ${String(
+                this.options.broadcaster
+            )} does not support encrypted private channels.`
         );
     }
 
     private connectorSupportsEncryptedPrivateChannels(
         connector: unknown
-    ): connector is (PusherConnector<any> | NullConnector) {
+    ): connector is PusherConnector<any> | NullConnector {
         return connector instanceof PusherConnector || connector instanceof NullConnector;
     }
 
