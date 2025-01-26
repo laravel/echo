@@ -1,8 +1,4 @@
 function isConstructor(obj: unknown): obj is new (...args: any[]) => any {
-    if (typeof obj !== 'function') {
-        return false;
-    }
-
     try {
         new (obj as new (...args: any[]) => any)();
     } catch (err) {
