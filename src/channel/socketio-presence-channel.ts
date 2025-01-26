@@ -1,4 +1,4 @@
-import { PresenceChannel } from './presence-channel';
+import type { PresenceChannel } from './presence-channel';
 import { SocketIoPrivateChannel } from './socketio-private-channel';
 
 /**

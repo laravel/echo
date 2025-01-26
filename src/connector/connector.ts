@@ -1,5 +1,5 @@
-import { Channel, PresenceChannel } from '../channel';
-import {BroadcastDriver, EchoOptions} from "../echo";
+import type { Channel, PresenceChannel } from '../channel';
+import type { BroadcastDriver, EchoOptions } from "../echo";
 
 export type EchoOptionsWithDefaults<TBroadcaster extends BroadcastDriver> = {
     broadcaster: TBroadcaster;

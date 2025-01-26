@@ -1,8 +1,8 @@
 import { EventFormatter } from '../util';
 import { Channel } from './channel';
 import type { Socket } from "socket.io-client";
-import {EchoOptionsWithDefaults} from "../connector";
-import {BroadcastDriver} from "../echo";
+import type { EchoOptionsWithDefaults } from "../connector";
+import type { BroadcastDriver } from "../echo";
 
 /**
  * This class represents a Socket.io channel.

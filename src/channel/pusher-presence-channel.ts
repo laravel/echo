@@ -1,6 +1,6 @@
-import { PresenceChannel } from './presence-channel';
+import type { PresenceChannel } from './presence-channel';
 import { PusherPrivateChannel } from './pusher-private-channel';
-import {BroadcastDriver} from "../echo";
+import type { BroadcastDriver } from "../echo";
 
 /**
  * This class represents a Pusher presence channel.

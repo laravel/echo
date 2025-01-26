@@ -1,5 +1,5 @@
 import { PusherChannel } from './pusher-channel';
-import {BroadcastDriver} from "../echo";
+import type { BroadcastDriver } from "../echo";
 
 /**
  * This class represents a Pusher private channel.

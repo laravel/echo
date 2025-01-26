@@ -1,5 +1,5 @@
 import { NullPrivateChannel } from './null-private-channel';
-import { PresenceChannel } from './presence-channel';
+import type { PresenceChannel } from './presence-channel';
 
 /**
  * This class represents a null presence channel.

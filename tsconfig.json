@@ -7,6 +7,7 @@
         "sourceMap": false,
         "target": "es6",
         "strictPropertyInitialization": false,
+        "importsNotUsedAsValues": "error",
         "isolatedModules": false,
         "esModuleInterop": true,
         "strict": true,
