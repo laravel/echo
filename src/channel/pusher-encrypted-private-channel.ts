@@ -1,10 +1,12 @@
 import { PusherChannel } from './pusher-channel';
-import type { BroadcastDriver } from "../echo";
+import type { BroadcastDriver } from '../echo';
 
 /**
  * This class represents a Pusher private channel.
  */
-export class PusherEncryptedPrivateChannel<TBroadcastDriver extends BroadcastDriver> extends PusherChannel<TBroadcastDriver> {
+export class PusherEncryptedPrivateChannel<
+    TBroadcastDriver extends BroadcastDriver
+> extends PusherChannel<TBroadcastDriver> {
     /**
      * Send a whisper event to other clients in the channel.
      */

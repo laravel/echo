@@ -1,13 +1,18 @@
 import { Connector } from './connector';
 import { SocketIoChannel, SocketIoPrivateChannel, SocketIoPresenceChannel } from '../channel';
-import type {io, ManagerOptions, Socket, SocketOptions} from "socket.io-client";
+import type { io, ManagerOptions, Socket, SocketOptions } from 'socket.io-client';
 
 type AnySocketIoChannel = SocketIoChannel | SocketIoPrivateChannel | SocketIoPresenceChannel;
 
 /**
  * This class creates a connector to a Socket.io server.
  */
-export class SocketIoConnector extends Connector<'socket.io', SocketIoChannel, SocketIoPrivateChannel, SocketIoPresenceChannel> {
+export class SocketIoConnector extends Connector<
+    'socket.io',
+    SocketIoChannel,
+    SocketIoPrivateChannel,
+    SocketIoPresenceChannel
+> {
     /**
      * The Socket.io connection instance.
      */

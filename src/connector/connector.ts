@@ -1,5 +1,5 @@
 import type { Channel, PresenceChannel } from '../channel';
-import type { BroadcastDriver, EchoOptions } from "../echo";
+import type { BroadcastDriver, EchoOptions } from '../echo';
 
 export type EchoOptionsWithDefaults<TBroadcaster extends BroadcastDriver> = {
     broadcaster: TBroadcaster;
@@ -24,7 +24,7 @@ export abstract class Connector<
     TBroadcastDriver extends BroadcastDriver,
     TPublic extends Channel,
     TPrivate extends Channel,
-    TPresence extends PresenceChannel,
+    TPresence extends PresenceChannel
 > {
     /**
      * Default connector options.

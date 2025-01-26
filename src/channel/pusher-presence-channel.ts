@@ -1,11 +1,13 @@
 import type { PresenceChannel } from './presence-channel';
 import { PusherPrivateChannel } from './pusher-private-channel';
-import type { BroadcastDriver } from "../echo";
+import type { BroadcastDriver } from '../echo';
 
 /**
  * This class represents a Pusher presence channel.
  */
-export class PusherPresenceChannel<TBroadcastDriver extends BroadcastDriver> extends PusherPrivateChannel<TBroadcastDriver> implements PresenceChannel {
+export class PusherPresenceChannel<TBroadcastDriver extends BroadcastDriver>
+    extends PusherPrivateChannel<TBroadcastDriver>
+    implements PresenceChannel {
     /**
      * Register a callback to be called anytime the member list changes.
      */

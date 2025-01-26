@@ -1,6 +1,6 @@
 import { SocketIoChannel } from '../../src/channel';
-import type { Socket } from "socket.io-client";
-import { Connector } from "../../src/connector";
+import type { Socket } from 'socket.io-client';
+import { Connector } from '../../src/connector';
 
 describe('SocketIoChannel', () => {
     let channel: SocketIoChannel;
@@ -10,10 +10,14 @@ describe('SocketIoChannel', () => {
         const channelName = 'some.channel';
         let listeners: any[] = [];
         socket = {
-            emit: (event: any, data: unknown) => listeners.filter(([e]) => e === event).forEach(([, fn]) => fn(channelName, data)),
+            emit: (event: any, data: unknown) => {
+                listeners
+                    .filter(([e]) => e === event)
+                    .forEach(([, fn]) => fn(channelName, data));
+            },
             on: (event: any, fn): any => listeners.push([event, fn]),
             removeListener: (event: any, fn: any) => {
-                listeners = listeners.filter(([e, f]) => (!fn ? e !== event : e !== event || f !== fn));
+                listeners = listeners.filter(([e, f]) => (! fn ? e !== event : e !== event || f !== fn));
             },
         } as Socket;
 

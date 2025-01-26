@@ -1,20 +1,23 @@
 import { Connector, type EchoOptionsWithDefaults } from './connector';
-import {
-    PusherChannel,
-    PusherPrivateChannel,
-    PusherEncryptedPrivateChannel,
-    PusherPresenceChannel,
-} from '../channel';
+import { PusherChannel, PusherPrivateChannel, PusherEncryptedPrivateChannel, PusherPresenceChannel } from '../channel';
 import type Pusher from 'pusher-js';
 import type { Options as PusherOptions } from 'pusher-js';
-import type { BroadcastDriver } from "../echo";
+import type { BroadcastDriver } from '../echo';
 
-type AnyPusherChannel = PusherChannel<BroadcastDriver> | PusherPrivateChannel<BroadcastDriver> | PusherEncryptedPrivateChannel<BroadcastDriver> | PusherPresenceChannel<BroadcastDriver>;
+type AnyPusherChannel = PusherChannel<BroadcastDriver>
+    | PusherPrivateChannel<BroadcastDriver>
+    | PusherEncryptedPrivateChannel<BroadcastDriver>
+    | PusherPresenceChannel<BroadcastDriver>;
 
 /**
  * This class creates a connector to Pusher.
  */
-export class PusherConnector<TBroadcastDriver extends BroadcastDriver> extends Connector<TBroadcastDriver, PusherChannel<TBroadcastDriver>, PusherPrivateChannel<TBroadcastDriver>, PusherPresenceChannel<TBroadcastDriver>> {
+export class PusherConnector<TBroadcastDriver extends BroadcastDriver> extends Connector<
+    TBroadcastDriver,
+    PusherChannel<TBroadcastDriver>,
+    PusherPrivateChannel<TBroadcastDriver>,
+    PusherPresenceChannel<TBroadcastDriver>
+> {
     /**
      * The Pusher instance.
      */
@@ -26,8 +29,8 @@ export class PusherConnector<TBroadcastDriver extends BroadcastDriver> extends C
     channels: Record<string, AnyPusherChannel> = {};
 
     options: EchoOptionsWithDefaults<TBroadcastDriver> & {
-        key: string,
-        Pusher?: typeof Pusher,
+        key: string;
+        Pusher?: typeof Pusher;
     } & PusherOptions;
 
     /**

@@ -2,8 +2,8 @@ import { EventFormatter } from '../util';
 import { Channel } from './channel';
 import type Pusher from 'pusher-js';
 import type { Channel as BasePusherChannel } from 'pusher-js';
-import type { EchoOptionsWithDefaults } from "../connector";
-import type { BroadcastDriver } from "../echo";
+import type { EchoOptionsWithDefaults } from '../connector';
+import type { BroadcastDriver } from '../echo';
 
 /**
  * This class represents a Pusher channel.

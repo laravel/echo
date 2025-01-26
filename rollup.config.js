@@ -29,7 +29,7 @@ export default [
                 ],
             }),
         ],
-        external: ["jquery", "axios", "vue", "@hotwired/turbo"], // Compatible packages not included in the bundle
+        external: ['jquery', 'axios', 'vue', '@hotwired/turbo'], // Compatible packages not included in the bundle
     },
     {
         input: './src/index.iife.ts',
@@ -45,6 +45,6 @@ export default [
                 exclude: 'node_modules/**',
             }),
         ],
-        external: ["jquery", "axios", "vue", "@hotwired/turbo"], // Compatible packages not included in the bundle
+        external: ['jquery', 'axios', 'vue', '@hotwired/turbo'], // Compatible packages not included in the bundle
     },
 ];

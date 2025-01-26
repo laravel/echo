@@ -1,5 +1,5 @@
-import type { EchoOptionsWithDefaults } from "../connector";
-import type { BroadcastDriver } from "../echo";
+import type { EchoOptionsWithDefaults } from '../connector';
+import type { BroadcastDriver } from '../echo';
 
 /**
  * This class represents a basic channel.

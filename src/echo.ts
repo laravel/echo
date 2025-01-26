@@ -68,7 +68,9 @@ export default class Echo<T extends keyof Broadcaster> {
             this.connector = new this.options.broadcaster(this.options as EchoOptions<'function'>);
         } else {
             throw new Error(
-                `Broadcaster ${typeof this.options.broadcaster} ${String(this.options.broadcaster)} is not supported.`
+                `Broadcaster ${typeof this.options.broadcaster} ${
+                    String(this.options.broadcaster)
+                } is not supported.`
             );
         }
     }
@@ -139,7 +141,9 @@ export default class Echo<T extends keyof Broadcaster> {
         );
     }
 
-    private connectorSupportsEncryptedPrivateChannels(connector: unknown): connector is (PusherConnector<any> | NullConnector) {
+    private connectorSupportsEncryptedPrivateChannels(
+        connector: unknown
+    ): connector is (PusherConnector<any> | NullConnector) {
         return connector instanceof PusherConnector || connector instanceof NullConnector;
     }
 
@@ -277,7 +281,9 @@ export type EchoOptions<TBroadcaster extends keyof Broadcaster> = {
     /**
      * The broadcast connector.
      */
-    broadcaster: TBroadcaster extends 'function' ? Constructor<InstanceType<Broadcaster[TBroadcaster]['connector']>> : TBroadcaster;
+    broadcaster: TBroadcaster extends 'function'
+        ? Constructor<InstanceType<Broadcaster[TBroadcaster]['connector']>>
+        : TBroadcaster;
 
     auth?: {
         headers: Record<string, string>;
