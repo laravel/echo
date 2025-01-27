@@ -5,7 +5,7 @@ export class EventFormatter {
     /**
      * Create a new class instance.
      */
-    constructor(private namespace: string | boolean) {
+    constructor(private namespace: string | boolean | undefined) {
         //
     }
 

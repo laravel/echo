@@ -1,23 +1,37 @@
 {
     "compilerOptions": {
         "declaration": true,
-        "module": "es6",
-        "moduleResolution": "node",
+        "declarationDir": "./dist",
+        "emitDeclarationOnly": true,
+        "module": "ES2020",
+        "moduleResolution": "bundler",
         "outDir": "./dist",
         "sourceMap": false,
-        "target": "es6",
-        "isolatedModules": false,
+        "target": "ES2020",
+        "verbatimModuleSyntax": true,
+        "skipLibCheck": true,
+        "importHelpers": true,
+        "strictPropertyInitialization": false,
+        "allowSyntheticDefaultImports": true,
+        "isolatedModules": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
         "esModuleInterop": true,
+        "strict": true,
         "typeRoots": [
             "node_modules/@types"
         ],
         "lib": [
-            "es2017",
-            "dom"
+            "dom",
+            "es2020"
         ]
     },
     "include": [
-        "./typings/*.ts",
-        "./src/*.ts"
+        "./typings/**/*.ts",
+        "./src/**/*.ts"
+    ],
+    "exclude": [
+        "./node_modules",
+        "./tests/**/*.ts"
     ]
 }

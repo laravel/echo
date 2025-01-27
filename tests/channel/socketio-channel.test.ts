@@ -1,21 +1,27 @@
 import { SocketIoChannel } from '../../src/channel';
+import type { Socket } from 'socket.io-client';
+import { Connector } from '../../src/connector';
 
 describe('SocketIoChannel', () => {
-    let channel;
-    let socket;
+    let channel: SocketIoChannel;
+    let socket: Socket;
 
     beforeEach(() => {
         const channelName = 'some.channel';
-        let listeners = [];
+        let listeners: any[] = [];
         socket = {
-            emit: (event, data) => listeners.filter(([e]) => e === event).forEach(([, fn]) => fn(channelName, data)),
-            on: (event, fn) => listeners.push([event, fn]),
-            removeListener: (event, fn) => {
+            emit: (event: any, data: unknown) => {
+                listeners.filter(([e]) => e === event).forEach(([, fn]) => fn(channelName, data));
+            },
+            on: (event: any, fn): any => listeners.push([event, fn]),
+            removeListener: (event: any, fn: any) => {
                 listeners = listeners.filter(([e, f]) => (!fn ? e !== event : e !== event || f !== fn));
             },
-        };
+        } as Socket;
 
         channel = new SocketIoChannel(socket, channelName, {
+            broadcaster: 'socket.io',
+            ...Connector._defaultOptions,
             namespace: false,
         });
     });

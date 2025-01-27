@@ -4,7 +4,7 @@ import {
     NullEncryptedPrivateChannel,
     NullPresenceChannel,
     NullPrivateChannel,
-    PresenceChannel,
+    type PresenceChannel,
     PusherChannel,
     PusherEncryptedPrivateChannel,
     PusherPresenceChannel,
@@ -23,7 +23,7 @@ export default class Echo<T extends keyof Broadcaster> {
     /**
      * The broadcasting connector.
      */
-    connector: Broadcaster[T]['connector'];
+    connector: Broadcaster[Exclude<T, 'function'>]['connector'];
 
     /**
      * The Echo options.
@@ -53,19 +53,22 @@ export default class Echo<T extends keyof Broadcaster> {
      * Create a new connection.
      */
     connect(): void {
-        if (this.options.broadcaster == 'reverb') {
-            this.connector = new PusherConnector({ ...this.options, cluster: '' });
-        } else if (this.options.broadcaster == 'pusher') {
-            this.connector = new PusherConnector(this.options);
-        } else if (this.options.broadcaster == 'socket.io') {
-            this.connector = new SocketIoConnector(this.options);
-        } else if (this.options.broadcaster == 'null') {
-            this.connector = new NullConnector(this.options);
-        } else if (typeof this.options.broadcaster == 'function' && isConstructor(this.options.broadcaster)) {
+        if (this.options.broadcaster === 'reverb') {
+            this.connector = new PusherConnector({
+                ...this.options,
+                cluster: '',
+            } as EchoOptions<'reverb'>);
+        } else if (this.options.broadcaster === 'pusher') {
+            this.connector = new PusherConnector(this.options as EchoOptions<'pusher'>);
+        } else if (this.options.broadcaster === 'socket.io') {
+            this.connector = new SocketIoConnector(this.options as EchoOptions<'socket.io'>);
+        } else if (this.options.broadcaster === 'null') {
+            this.connector = new NullConnector(this.options as EchoOptions<'null'>);
+        } else if (typeof this.options.broadcaster === 'function' && isConstructor(this.options.broadcaster)) {
             this.connector = new this.options.broadcaster(this.options as EchoOptions<'function'>);
         } else {
             throw new Error(
-                `Broadcaster ${typeof this.options.broadcaster} ${this.options.broadcaster} is not supported.`
+                `Broadcaster ${typeof this.options.broadcaster} ${String(this.options.broadcaster)} is not supported.`
             );
         }
     }
@@ -110,7 +113,7 @@ export default class Echo<T extends keyof Broadcaster> {
     /**
      * Listen for an event on a channel instance.
      */
-    listen(channel: string, event: string, callback: Function): Broadcaster[T]['public'] {
+    listen(channel: string, event: string, callback: CallableFunction): Broadcaster[T]['public'] {
         return this.connector.listen(channel, event, callback);
     }
 
@@ -125,21 +128,27 @@ export default class Echo<T extends keyof Broadcaster> {
      * Get a private encrypted channel instance by name.
      */
     encryptedPrivate(channel: string): Broadcaster[T]['encrypted'] {
-        if ((this.connector as any) instanceof SocketIoConnector) {
-            throw new Error(
-                `Broadcaster ${typeof this.options.broadcaster} ${
-                    this.options.broadcaster
-                } does not support encrypted private channels.`
-            );
+        if (this.connectorSupportsEncryptedPrivateChannels(this.connector)) {
+            return this.connector.encryptedPrivateChannel(channel);
         }
 
-        return this.connector.encryptedPrivateChannel(channel);
+        throw new Error(
+            `Broadcaster ${typeof this.options.broadcaster} ${String(
+                this.options.broadcaster
+            )} does not support encrypted private channels.`
+        );
+    }
+
+    private connectorSupportsEncryptedPrivateChannels(
+        connector: unknown
+    ): connector is PusherConnector<any> | NullConnector {
+        return connector instanceof PusherConnector || connector instanceof NullConnector;
     }
 
     /**
      * Get the Socket ID for the connection.
      */
-    socketId(): string {
+    socketId(): string | undefined {
         return this.connector.socketId();
     }
 
@@ -169,7 +178,7 @@ export default class Echo<T extends keyof Broadcaster> {
      * Register a Vue HTTP interceptor to add the X-Socket-ID header.
      */
     registerVueRequestInterceptor(): void {
-        Vue.http.interceptors.push((request, next) => {
+        Vue.http.interceptors.push((request: Record<any, any>, next: CallableFunction) => {
             if (this.socketId()) {
                 request.headers.set('X-Socket-ID', this.socketId());
             }
@@ -182,7 +191,7 @@ export default class Echo<T extends keyof Broadcaster> {
      * Register an Axios HTTP interceptor to add the X-Socket-ID header.
      */
     registerAxiosRequestInterceptor(): void {
-        axios.interceptors.request.use((config) => {
+        axios.interceptors.request.use((config: Record<any, any>) => {
             if (this.socketId()) {
                 config.headers['X-Socket-Id'] = this.socketId();
             }
@@ -196,7 +205,7 @@ export default class Echo<T extends keyof Broadcaster> {
      */
     registerjQueryAjaxSetup(): void {
         if (typeof jQuery.ajax != 'undefined') {
-            jQuery.ajaxPrefilter((options, originalOptions, xhr) => {
+            jQuery.ajaxPrefilter((_options: any, _originalOptions: any, xhr: Record<any, any>) => {
                 if (this.socketId()) {
                     xhr.setRequestHeader('X-Socket-Id', this.socketId());
                 }
@@ -208,7 +217,7 @@ export default class Echo<T extends keyof Broadcaster> {
      * Register the Turbo Request interceptor to add the X-Socket-ID header.
      */
     registerTurboRequestInterceptor(): void {
-        document.addEventListener('turbo:before-fetch-request', (event: any) => {
+        document.addEventListener('turbo:before-fetch-request', (event: Record<any, any>) => {
             event.detail.fetchOptions.headers['X-Socket-Id'] = this.socketId();
         });
     }
@@ -217,27 +226,27 @@ export default class Echo<T extends keyof Broadcaster> {
 /**
  * Export channel classes for TypeScript.
  */
-export { Connector, Channel, PresenceChannel };
+export { Connector, Channel, type PresenceChannel };
 
 export { EventFormatter } from './util';
 
 /**
  * Specifies the broadcaster
  */
-type Broadcaster = {
+export type Broadcaster = {
     reverb: {
-        connector: PusherConnector;
-        public: PusherChannel;
-        private: PusherPrivateChannel;
-        encrypted: PusherEncryptedPrivateChannel;
-        presence: PusherPresenceChannel;
+        connector: PusherConnector<'reverb'>;
+        public: PusherChannel<'reverb'>;
+        private: PusherPrivateChannel<'reverb'>;
+        encrypted: PusherEncryptedPrivateChannel<'reverb'>;
+        presence: PusherPresenceChannel<'reverb'>;
     };
     pusher: {
-        connector: PusherConnector;
-        public: PusherChannel;
-        private: PusherPrivateChannel;
-        encrypted: PusherEncryptedPrivateChannel;
-        presence: PusherPresenceChannel;
+        connector: PusherConnector<'pusher'>;
+        public: PusherChannel<'pusher'>;
+        private: PusherPrivateChannel<'pusher'>;
+        encrypted: PusherEncryptedPrivateChannel<'pusher'>;
+        presence: PusherPresenceChannel<'pusher'>;
     };
     'socket.io': {
         connector: SocketIoConnector;
@@ -264,11 +273,29 @@ type Broadcaster = {
 
 type Constructor<T = {}> = new (...args: any[]) => T;
 
-type EchoOptions<T extends keyof Broadcaster> = {
+export type BroadcastDriver = Exclude<keyof Broadcaster, 'function'>;
+
+export type EchoOptions<TBroadcaster extends keyof Broadcaster> = {
     /**
      * The broadcast connector.
      */
-    broadcaster: T extends 'function' ? Constructor<InstanceType<Broadcaster[T]['connector']>> : T;
+    broadcaster: TBroadcaster extends 'function'
+        ? Constructor<InstanceType<Broadcaster[TBroadcaster]['connector']>>
+        : TBroadcaster;
+
+    auth?: {
+        headers: Record<string, string>;
+    };
+    authEndpoint?: string;
+    userAuthentication?: {
+        endpoint: string;
+        headers: Record<string, string>;
+    };
+    csrfToken?: string | null;
+    bearerToken?: string | null;
+    host?: string | null;
+    key?: string | null;
+    namespace?: string | false;
 
     [key: string]: any;
 };

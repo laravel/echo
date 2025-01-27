@@ -1,16 +1,22 @@
 import { Connector } from './connector';
-import { SocketIoChannel, SocketIoPrivateChannel, SocketIoPresenceChannel } from './../channel';
+import { SocketIoChannel, SocketIoPrivateChannel, SocketIoPresenceChannel } from '../channel';
+import type { io, ManagerOptions, Socket, SocketOptions } from 'socket.io-client';
 
 type AnySocketIoChannel = SocketIoChannel | SocketIoPrivateChannel | SocketIoPresenceChannel;
 
 /**
- * This class creates a connnector to a Socket.io server.
+ * This class creates a connector to a Socket.io server.
  */
-export class SocketIoConnector extends Connector<SocketIoChannel, SocketIoPrivateChannel, SocketIoPresenceChannel> {
+export class SocketIoConnector extends Connector<
+    'socket.io',
+    SocketIoChannel,
+    SocketIoPrivateChannel,
+    SocketIoPresenceChannel
+> {
     /**
      * The Socket.io connection instance.
      */
-    socket: any;
+    socket: Socket;
 
     /**
      * All of the subscribed channel names.
@@ -23,27 +29,25 @@ export class SocketIoConnector extends Connector<SocketIoChannel, SocketIoPrivat
     connect(): void {
         let io = this.getSocketIO();
 
-        this.socket = io(this.options.host, this.options);
+        this.socket = io(this.options.host ?? undefined, this.options as Partial<ManagerOptions & SocketOptions>);
 
         this.socket.on('reconnect', () => {
             Object.values(this.channels).forEach((channel) => {
                 channel.subscribe();
             });
         });
-
-        return this.socket;
     }
 
     /**
      * Get socket.io module from global scope or options.
      */
-    getSocketIO(): any {
+    getSocketIO(): typeof io {
         if (typeof this.options.client !== 'undefined') {
-            return this.options.client;
+            return this.options.client as typeof io;
         }
 
-        if (typeof io !== 'undefined') {
-            return io;
+        if (typeof window !== 'undefined' && typeof window.io !== 'undefined') {
+            return window.io;
         }
 
         throw new Error('Socket.io client not found. Should be globally available or passed via options.client');
@@ -52,7 +56,7 @@ export class SocketIoConnector extends Connector<SocketIoChannel, SocketIoPrivat
     /**
      * Listen for an event on a channel instance.
      */
-    listen(name: string, event: string, callback: Function): AnySocketIoChannel {
+    listen(name: string, event: string, callback: CallableFunction): AnySocketIoChannel {
         return this.channel(name).listen(event, callback);
     }
 
@@ -118,7 +122,7 @@ export class SocketIoConnector extends Connector<SocketIoChannel, SocketIoPrivat
     /**
      * Get the socket ID for the connection.
      */
-    socketId(): string {
+    socketId(): string | undefined {
         return this.socket.id;
     }
 

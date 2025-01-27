@@ -1,10 +1,35 @@
-import { Channel, PresenceChannel } from '../channel';
+import type { Channel, PresenceChannel } from '../channel';
+import type { BroadcastDriver, EchoOptions } from '../echo';
 
-export abstract class Connector<TPublic extends Channel, TPrivate extends Channel, TPresence extends PresenceChannel> {
+export type EchoOptionsWithDefaults<TBroadcaster extends BroadcastDriver> = {
+    broadcaster: TBroadcaster;
+    auth: {
+        headers: Record<string, string>;
+    };
+    authEndpoint: string;
+    userAuthentication: {
+        endpoint: string;
+        headers: Record<string, string>;
+    };
+    csrfToken: string | null;
+    bearerToken: string | null;
+    host: string | null;
+    key: string | null;
+    namespace: string | false;
+
+    [key: string]: any;
+};
+
+export abstract class Connector<
+    TBroadcastDriver extends BroadcastDriver,
+    TPublic extends Channel,
+    TPrivate extends Channel,
+    TPresence extends PresenceChannel
+> {
     /**
      * Default connector options.
      */
-    private _defaultOptions: any = {
+    public static readonly _defaultOptions = {
         auth: {
             headers: {},
         },
@@ -13,23 +38,22 @@ export abstract class Connector<TPublic extends Channel, TPrivate extends Channe
             endpoint: '/broadcasting/user-auth',
             headers: {},
         },
-        broadcaster: 'pusher',
         csrfToken: null,
         bearerToken: null,
         host: null,
         key: null,
         namespace: 'App.Events',
-    };
+    } as const;
 
     /**
      * Connector options.
      */
-    options: any;
+    options: EchoOptionsWithDefaults<TBroadcastDriver>;
 
     /**
      * Create a new class instance.
      */
-    constructor(options: any) {
+    constructor(options: EchoOptions<TBroadcastDriver>) {
         this.setOptions(options);
         this.connect();
     }
@@ -37,8 +61,12 @@ export abstract class Connector<TPublic extends Channel, TPrivate extends Channe
     /**
      * Merge the custom options with the defaults.
      */
-    protected setOptions(options: any): any {
-        this.options = Object.assign(this._defaultOptions, options);
+    protected setOptions(options: EchoOptions<TBroadcastDriver>): void {
+        this.options = {
+            ...Connector._defaultOptions,
+            ...options,
+            broadcaster: options.broadcaster as TBroadcastDriver,
+        };
 
         let token = this.csrfToken();
 
@@ -53,8 +81,6 @@ export abstract class Connector<TPublic extends Channel, TPrivate extends Channe
             this.options.auth.headers['Authorization'] = 'Bearer ' + token;
             this.options.userAuthentication.headers['Authorization'] = 'Bearer ' + token;
         }
-
-        return options;
     }
 
     /**
@@ -63,11 +89,15 @@ export abstract class Connector<TPublic extends Channel, TPrivate extends Channe
     protected csrfToken(): null | string {
         let selector;
 
-        if (typeof window !== 'undefined' && window['Laravel'] && window['Laravel'].csrfToken) {
-            return window['Laravel'].csrfToken;
-        } else if (this.options.csrfToken) {
+        if (typeof window !== 'undefined' && typeof window.Laravel !== 'undefined' && window.Laravel.csrfToken) {
+            return window.Laravel.csrfToken;
+        }
+
+        if (this.options.csrfToken) {
             return this.options.csrfToken;
-        } else if (
+        }
+
+        if (
             typeof document !== 'undefined' &&
             typeof document.querySelector === 'function' &&
             (selector = document.querySelector('meta[name="csrf-token"]'))
@@ -111,7 +141,7 @@ export abstract class Connector<TPublic extends Channel, TPrivate extends Channe
     /**
      * Get the socket_id of the connection.
      */
-    abstract socketId(): string;
+    abstract socketId(): string | undefined;
 
     /**
      * Disconnect from the Echo server.

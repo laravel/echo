@@ -1,5 +1,8 @@
 import { EventFormatter } from '../util';
 import { Channel } from './channel';
+import type { Socket } from 'socket.io-client';
+import type { EchoOptionsWithDefaults } from '../connector';
+import type { BroadcastDriver } from '../echo';
 
 /**
  * This class represents a Socket.io channel.
@@ -8,17 +11,12 @@ export class SocketIoChannel extends Channel {
     /**
      * The Socket.io client instance.
      */
-    socket: any;
+    socket: Socket;
 
     /**
      * The name of the channel.
      */
-    name: any;
-
-    /**
-     * Channel options.
-     */
-    options: any;
+    name: string;
 
     /**
      * The event formatter.
@@ -28,17 +26,17 @@ export class SocketIoChannel extends Channel {
     /**
      * The event callbacks applied to the socket.
      */
-    events: any = {};
+    events: Record<string, any> = {};
 
     /**
      * User supplied callbacks for events on this channel.
      */
-    private listeners: any = {};
+    private listeners: Record<string, CallableFunction[]> = {};
 
     /**
      * Create a new class instance.
      */
-    constructor(socket: any, name: string, options: any) {
+    constructor(socket: Socket, name: string, options: EchoOptionsWithDefaults<BroadcastDriver>) {
         super();
 
         this.name = name;
@@ -74,7 +72,7 @@ export class SocketIoChannel extends Channel {
     /**
      * Listen for an event on the channel instance.
      */
-    listen(event: string, callback: Function): this {
+    listen(event: string, callback: CallableFunction): this {
         this.on(this.eventFormatter.format(event), callback);
 
         return this;
@@ -83,7 +81,7 @@ export class SocketIoChannel extends Channel {
     /**
      * Stop listening for an event on the channel instance.
      */
-    stopListening(event: string, callback?: Function): this {
+    stopListening(event: string, callback?: CallableFunction): this {
         this.unbindEvent(this.eventFormatter.format(event), callback);
 
         return this;
@@ -92,8 +90,8 @@ export class SocketIoChannel extends Channel {
     /**
      * Register a callback to be called anytime a subscription succeeds.
      */
-    subscribed(callback: Function): this {
-        this.on('connect', (socket) => {
+    subscribed(callback: CallableFunction): this {
+        this.on('connect', (socket: Socket) => {
             callback(socket);
         });
 
@@ -103,18 +101,18 @@ export class SocketIoChannel extends Channel {
     /**
      * Register a callback to be called anytime an error occurs.
      */
-    error(callback: Function): this {
+    error(_callback: CallableFunction): this {
         return this;
     }
 
     /**
      * Bind the channel's socket to an event and store the callback.
      */
-    on(event: string, callback: Function): this {
+    on(event: string, callback: CallableFunction): this {
         this.listeners[event] = this.listeners[event] || [];
 
         if (!this.events[event]) {
-            this.events[event] = (channel, data) => {
+            this.events[event] = (channel: string, data: unknown) => {
                 if (this.name === channel && this.listeners[event]) {
                     this.listeners[event].forEach((cb) => cb(data));
                 }
@@ -140,7 +138,7 @@ export class SocketIoChannel extends Channel {
     /**
      * Unbind the listeners for the given event.
      */
-    protected unbindEvent(event: string, callback?: Function): void {
+    protected unbindEvent(event: string, callback?: CallableFunction): void {
         this.listeners[event] = this.listeners[event] || [];
 
         if (callback) {
