@@ -55,6 +55,10 @@
         "tslib": "^2.8.1",
         "typescript": "^5.7.0"
     },
+    "peerDependencies": {
+        "socket.io-client": "*",
+        "pusher-js": "*"
+    },
     "typesVersions": {
         "*": {
             "socket.io-client": [],
