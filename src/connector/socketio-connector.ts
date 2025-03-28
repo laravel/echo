@@ -4,6 +4,12 @@ import type { io, ManagerOptions, Socket, SocketOptions } from 'socket.io-client
 
 type AnySocketIoChannel = SocketIoChannel | SocketIoPrivateChannel | SocketIoPresenceChannel;
 
+declare global {
+    interface Window {
+        io?: typeof io;
+    }
+}
+
 /**
  * This class creates a connector to a Socket.io server.
  */

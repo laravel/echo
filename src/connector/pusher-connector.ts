@@ -10,6 +10,12 @@ type AnyPusherChannel =
     | PusherEncryptedPrivateChannel<BroadcastDriver>
     | PusherPresenceChannel<BroadcastDriver>;
 
+declare global {
+    interface Window {
+        Pusher?: typeof Pusher;
+    }
+}
+
 /**
  * This class creates a connector to Pusher.
  */

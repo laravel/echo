@@ -20,6 +20,14 @@ export type EchoOptionsWithDefaults<TBroadcaster extends BroadcastDriver> = {
     [key: string]: any;
 };
 
+declare global {
+    interface Window {
+        Laravel?: {
+            csrfToken?: string;
+        };
+    }
+}
+
 export abstract class Connector<
     TBroadcastDriver extends BroadcastDriver,
     TPublic extends Channel,
