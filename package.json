@@ -74,7 +74,17 @@
             "require": "./dist/echo.common.js",
             "types": "./dist/echo.d.ts"
         },
-        "./iife": "./dist/echo.iife.js"
+        "./iife": "./dist/echo.iife.js",
+        "./react": {
+            "import": "./dist/hooks/use-echo.js",
+            "require": "./dist/hooks/use-echo.js",
+            "types": "./dist/hooks/use-echo.d.ts"
+        },
+        "./vue": {
+            "import": "./dist/composables/useEcho.js",
+            "require": "./dist/composables/useEcho.js",
+            "types": "./dist/composables/useEcho.d.ts"
+        }
     },
     "overrides": {
         "glob": "^9.0.0"

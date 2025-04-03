@@ -29,7 +29,7 @@ export default [
                 ],
             }),
         ],
-        external: ['jquery', 'axios', 'vue', '@hotwired/turbo', 'tslib'], // Compatible packages not included in the bundle
+        external: ['jquery', 'axios', 'vue', '@hotwired/turbo', 'tslib', 'react', 'pusher-js'], // Compatible packages not included in the bundle
     },
     {
         input: './src/index.iife.ts',
@@ -46,5 +46,43 @@ export default [
             }),
         ],
         external: ['jquery', 'axios', 'vue', '@hotwired/turbo', 'tslib'], // Compatible packages not included in the bundle
+    },
+    {
+        input: './src/hooks/use-echo.ts',
+        output: [
+            { file: './dist/hooks/use-echo.js', format: 'esm' },
+        ],
+        plugins: [
+            resolve(),
+            typescript({
+                tsconfig: './tsconfig.json',
+            }),
+            babel({
+                babelHelpers: 'bundled',
+                extensions: ['.ts'],
+                exclude: 'node_modules/**',
+                presets: ['@babel/preset-env'],
+            }),
+        ],
+        external: ['react', 'pusher-js', 'laravel-echo'], // React and other dependencies should be external
+    },
+    {
+        input: './src/composables/useEcho.ts',
+        output: [
+            { file: './dist/composables/useEcho.js', format: 'esm' },
+        ],
+        plugins: [
+            resolve(),
+            typescript({
+                tsconfig: './tsconfig.json',
+            }),
+            babel({
+                babelHelpers: 'bundled',
+                extensions: ['.ts'],
+                exclude: 'node_modules/**',
+                presets: ['@babel/preset-env'],
+            }),
+        ],
+        external: ['vue', 'pusher-js', 'laravel-echo'], // Vue and other dependencies should be external
     },
 ];
