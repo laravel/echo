@@ -73,6 +73,11 @@ export default class Echo<T extends keyof Broadcaster> {
                 cluster: "",
                 broadcaster: "pusher",
             });
+        } else if (this.options.broadcaster === "sockudo") {
+            this.connector = new PusherConnector<"sockudo">({
+                ...this.options,
+                cluster: "",
+            });
         } else if (this.options.broadcaster === "socket.io") {
             this.connector = new SocketIoConnector(this.options);
         } else if (this.options.broadcaster === "null") {
@@ -304,6 +309,15 @@ export type Broadcaster = {
         encrypted: PusherEncryptedPrivateChannel<"pusher">;
         presence: PusherPresenceChannel<"pusher">;
         options: GenericOptions<"ably"> & Partial<PusherOptions<"ably">>;
+    };
+    sockudo: {
+        connector: PusherConnector<"sockudo">;
+        public: PusherChannel<"sockudo">;
+        private: PusherPrivateChannel<"sockudo">;
+        encrypted: PusherEncryptedPrivateChannel<"sockudo">;
+        presence: PusherPresenceChannel<"sockudo">;
+        options: GenericOptions<"sockudo"> &
+            Partial<CustomOmit<PusherOptions<"sockudo">, "cluster">>;
     };
     "socket.io": {
         connector: SocketIoConnector;

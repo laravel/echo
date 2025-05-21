@@ -16,6 +16,11 @@ describe("Echo", () => {
 
         expect(
             () =>
+                new Echo({ broadcaster: "sockudo", withoutInterceptors: true }),
+        ).not.toThrow("Broadcaster string sockudo is not supported.");
+
+        expect(
+            () =>
                 new Echo({
                     broadcaster: "socket.io",
                     withoutInterceptors: true,

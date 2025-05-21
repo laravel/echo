@@ -52,6 +52,16 @@ export const configureEcho = <T extends BroadcastDriver>(
             wssPort: import.meta.env.VITE_PUSHER_PORT,
             enabledTransports: ["ws", "wss"],
         },
+        sockudo: {
+            broadcaster: "sockudo",
+            key: import.meta.env.VITE_SOCKUDO_APP_KEY,
+            wsHost: import.meta.env.VITE_SOCKUDO_HOST,
+            wsPort: import.meta.env.VITE_SOCKUDO_PORT,
+            wssPort: import.meta.env.VITE_SOCKUDO_PORT,
+            forceTLS:
+                (import.meta.env.VITE_SOCKUDO_SCHEME ?? "https") === "https",
+            enabledTransports: ["ws", "wss"],
+        },
         "socket.io": {
             broadcaster: "socket.io",
             host: import.meta.env.VITE_SOCKET_IO_HOST,

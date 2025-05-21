@@ -83,6 +83,14 @@ const config: UserConfig = (() => {
                 "import.meta.env.VITE_SOCKET_IO_HOST",
             "import.meta.env.VITE_ABLY_PUBLIC_KEY":
                 "import.meta.env.VITE_ABLY_PUBLIC_KEY",
+            "import.meta.env.VITE_SOCKUDO_APP_KEY":
+                "import.meta.env.VITE_SOCKUDO_APP_KEY",
+            "import.meta.env.VITE_SOCKUDO_HOST":
+                "import.meta.env.VITE_SOCKUDO_HOST",
+            "import.meta.env.VITE_SOCKUDO_PORT":
+                "import.meta.env.VITE_SOCKUDO_PORT",
+            "import.meta.env.VITE_SOCKUDO_SCHEME":
+                "import.meta.env.VITE_SOCKUDO_SCHEME",
         },
         build: {
             lib: {

@@ -11,6 +11,11 @@ interface ImportMetaEnv {
     readonly VITE_REVERB_PORT: number;
     readonly VITE_REVERB_SCHEME: string;
 
+    readonly VITE_SOCKUDO_HOST: string;
+    readonly VITE_SOCKUDO_APP_KEY: string;
+    readonly VITE_SOCKUDO_PORT: number;
+    readonly VITE_SOCKUDO_SCHEME: string;
+
     readonly VITE_SOCKET_IO_HOST: string;
 
     readonly VITE_ABLY_PUBLIC_KEY: string;
