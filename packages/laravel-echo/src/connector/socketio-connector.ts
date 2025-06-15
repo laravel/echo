@@ -46,7 +46,7 @@ export class SocketIoConnector extends Connector<
             this.options as Partial<ManagerOptions & SocketOptions>,
         );
 
-        this.socket.on("reconnect", () => {
+        this.socket.io.on("reconnect", () => {
             Object.values(this.channels).forEach((channel) => {
                 channel.subscribe();
             });
