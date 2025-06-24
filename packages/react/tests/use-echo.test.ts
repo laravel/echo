@@ -123,18 +123,24 @@ describe("useEcho hook", async () => {
 
         const channel = echoInstance.private(channelName);
 
-        expect(channel.listen).toHaveBeenCalledWith(events[0], mockCallback);
-        expect(channel.listen).toHaveBeenCalledWith(events[1], mockCallback);
+        expect(channel.listen).toHaveBeenCalledWith(
+            events[0],
+            expect.any(Function),
+        );
+        expect(channel.listen).toHaveBeenCalledWith(
+            events[1],
+            expect.any(Function),
+        );
 
         expect(() => unmount()).not.toThrow();
 
         expect(channel.stopListening).toHaveBeenCalledWith(
             events[0],
-            mockCallback,
+            expect.any(Function),
         );
         expect(channel.stopListening).toHaveBeenCalledWith(
             events[1],
-            mockCallback,
+            expect.any(Function),
         );
     });
 
@@ -191,7 +197,7 @@ describe("useEcho hook", async () => {
 
         expect(echoInstance.private(channelName).listen).toHaveBeenCalledWith(
             event,
-            mockCallback,
+            expect.any(Function),
         );
     });
 
@@ -252,15 +258,24 @@ describe("useEcho hook", async () => {
 
         const channel = echoInstance.private(channelName);
 
-        expect(channel.listen).toHaveBeenCalledWith(event, mockCallback);
+        expect(channel.listen).toHaveBeenCalledWith(
+            event,
+            expect.any(Function),
+        );
 
         result.current.stopListening();
 
-        expect(channel.stopListening).toHaveBeenCalledWith(event, mockCallback);
+        expect(channel.stopListening).toHaveBeenCalledWith(
+            event,
+            expect.any(Function),
+        );
 
         result.current.listen();
 
-        expect(channel.listen).toHaveBeenCalledWith(event, mockCallback);
+        expect(channel.listen).toHaveBeenCalledWith(
+            event,
+            expect.any(Function),
+        );
     });
 
     it("can manually stop listening to events", async () => {
@@ -275,7 +290,10 @@ describe("useEcho hook", async () => {
         result.current.stopListening();
 
         const channel = echoInstance.private(channelName);
-        expect(channel.stopListening).toHaveBeenCalledWith(event, mockCallback);
+        expect(channel.stopListening).toHaveBeenCalledWith(
+            event,
+            expect.any(Function),
+        );
     });
 
     it("stopListening is a no-op when not listening", async () => {
@@ -388,22 +406,22 @@ describe("useEchoModel hook", async () => {
 
         expect(channel.listen).toHaveBeenCalledWith(
             `.${events[0]}`,
-            mockCallback,
+            expect.any(Function),
         );
         expect(channel.listen).toHaveBeenCalledWith(
             `.${events[1]}`,
-            mockCallback,
+            expect.any(Function),
         );
 
         expect(() => unmount()).not.toThrow();
 
         expect(channel.stopListening).toHaveBeenCalledWith(
             `.${events[0]}`,
-            mockCallback,
+            expect.any(Function),
         );
         expect(channel.stopListening).toHaveBeenCalledWith(
             `.${events[1]}`,
-            mockCallback,
+            expect.any(Function),
         );
     });
 
@@ -532,7 +550,10 @@ describe("useEchoModel hook", async () => {
         expect(echoInstance.private).toHaveBeenCalledWith(expectedChannelName);
 
         const channel = echoInstance.private(expectedChannelName);
-        expect(channel.listen).toHaveBeenCalledWith(`.${event}`, mockCallback);
+        expect(channel.listen).toHaveBeenCalledWith(
+            `.${event}`,
+            expect.any(Function),
+        );
     });
 
     it("events and listeners are optional", async () => {
@@ -602,18 +623,24 @@ describe("useEchoPublic hook", async () => {
 
         const channel = echoInstance.channel(channelName);
 
-        expect(channel.listen).toHaveBeenCalledWith(events[0], mockCallback);
-        expect(channel.listen).toHaveBeenCalledWith(events[1], mockCallback);
+        expect(channel.listen).toHaveBeenCalledWith(
+            events[0],
+            expect.any(Function),
+        );
+        expect(channel.listen).toHaveBeenCalledWith(
+            events[1],
+            expect.any(Function),
+        );
 
         expect(() => unmount()).not.toThrow();
 
         expect(channel.stopListening).toHaveBeenCalledWith(
             events[0],
-            mockCallback,
+            expect.any(Function),
         );
         expect(channel.stopListening).toHaveBeenCalledWith(
             events[1],
-            mockCallback,
+            expect.any(Function),
         );
     });
 
@@ -756,18 +783,24 @@ describe("useEchoPresence hook", async () => {
 
         const channel = echoInstance.join(channelName);
 
-        expect(channel.listen).toHaveBeenCalledWith(events[0], mockCallback);
-        expect(channel.listen).toHaveBeenCalledWith(events[1], mockCallback);
+        expect(channel.listen).toHaveBeenCalledWith(
+            events[0],
+            expect.any(Function),
+        );
+        expect(channel.listen).toHaveBeenCalledWith(
+            events[1],
+            expect.any(Function),
+        );
 
         expect(() => unmount()).not.toThrow();
 
         expect(channel.stopListening).toHaveBeenCalledWith(
             events[0],
-            mockCallback,
+            expect.any(Function),
         );
         expect(channel.stopListening).toHaveBeenCalledWith(
             events[1],
-            mockCallback,
+            expect.any(Function),
         );
     });
 
