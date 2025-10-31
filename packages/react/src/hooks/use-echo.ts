@@ -127,6 +127,10 @@ export const useEcho = <
         leaveChannel(channel, leaveAll);
     }, dependencies);
 
+    const leave = useCallback(() => {
+        tearDown(true);
+    }, dependencies);
+
     useEffect(() => {
         if (initialized.current) {
             subscription.current = resolveChannelSubscription<TDriver>(channel);
@@ -147,7 +151,7 @@ export const useEcho = <
         /**
          * Leave the channel and also its associated private and presence channels
          */
-        leave: () => tearDown(true),
+        leave,
         /**
          * Stop listening for event(s) without leaving the channel
          */
