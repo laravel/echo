@@ -40,7 +40,7 @@ export default class Echo<T extends keyof Broadcaster> {
     /**
      * Create a new class instance.
      */
-    constructor(options: EchoOptions<T>) {
+    constructor(options: EchoOptions<T> & { broadcaster: T }) {
         this.options = options;
         this.connect();
 
