@@ -1,6 +1,18 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v2.2.5...2.x)
+## [Unreleased](https://github.com/laravel/echo/compare/v2.2.6...2.x)
+
+## [v2.2.6](https://github.com/laravel/echo/compare/v2.2.5...v2.2.6) - 2025-11-04
+
+### What's Changed
+
+* feat: add broadcaster type inference to constructor by [@Willem-Jaap](https://github.com/Willem-Jaap) in https://github.com/laravel/echo/pull/465
+
+### New Contributors
+
+* [@Willem-Jaap](https://github.com/Willem-Jaap) made their first contribution in https://github.com/laravel/echo/pull/465
+
+**Full Changelog**: https://github.com/laravel/echo/compare/v2.2.5...v2.2.6
 
 ## [v2.2.5](https://github.com/laravel/echo/compare/v2.2.4...v2.2.5) - 2025-10-31
 
