@@ -287,7 +287,7 @@ export type Broadcaster = {
         encrypted: PusherEncryptedPrivateChannel<"reverb">;
         presence: PusherPresenceChannel<"reverb">;
         options: GenericOptions<"reverb"> &
-        Partial<CustomOmit<PusherOptions<"reverb">, "cluster">>;
+            Partial<CustomOmit<PusherOptions<"reverb">, "cluster">>;
     };
     pusher: {
         connector: PusherConnector<"pusher">;
@@ -340,8 +340,8 @@ type GenericOptions<TBroadcaster extends keyof Broadcaster> = {
      * The broadcast connector.
      */
     broadcaster: TBroadcaster extends "function"
-    ? Constructor<InstanceType<Broadcaster[TBroadcaster]["connector"]>>
-    : TBroadcaster;
+        ? Constructor<InstanceType<Broadcaster[TBroadcaster]["connector"]>>
+        : TBroadcaster;
 
     auth?: {
         headers: Record<string, string>;
