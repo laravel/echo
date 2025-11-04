@@ -1,6 +1,19 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v2.2.4...2.x)
+## [Unreleased](https://github.com/laravel/echo/compare/v2.2.5...2.x)
+
+## [v2.2.5](https://github.com/laravel/echo/compare/v2.2.4...v2.2.5) - 2025-10-31
+
+### What's Changed
+
+* Bump vite from 5.4.20 to 5.4.21 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/462
+* Add callback to memorize leave function. by [@AntonGreger](https://github.com/AntonGreger) in https://github.com/laravel/echo/pull/464
+
+### New Contributors
+
+* [@AntonGreger](https://github.com/AntonGreger) made their first contribution in https://github.com/laravel/echo/pull/464
+
+**Full Changelog**: https://github.com/laravel/echo/compare/v2.2.4...v2.2.5
 
 ## [v2.2.4](https://github.com/laravel/echo/compare/v2.2.3...v2.2.4) - 2025-09-26
 
