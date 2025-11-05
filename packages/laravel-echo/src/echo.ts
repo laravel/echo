@@ -176,7 +176,7 @@ export default class Echo<T extends keyof Broadcaster> {
     }
 
     /**
-     * Register 3rd party request interceptiors. These are used to automatically
+     * Register 3rd party request interceptors. These are used to automatically
      * send a connections socket id to a Laravel app with a X-Socket-Id header.
      */
     registerInterceptors(): void {
