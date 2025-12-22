@@ -10,6 +10,7 @@ import type {
     Socket,
     SocketOptions,
 } from "socket.io-client";
+import type { ConnectionStatus } from "../echo";
 
 type AnySocketIoChannel =
     | SocketIoChannel
@@ -153,6 +154,32 @@ export class SocketIoConnector extends Connector<
      */
     socketId(): string | undefined {
         return this.socket.id;
+    }
+
+    /**
+     * Get the current connection status.
+     */
+    connectionStatus(): ConnectionStatus {
+        if (this.socket.connected) {
+            return "connected";
+        }
+
+        // Check if socket is trying to reconnect
+        if (this.socket.io._reconnecting) {
+            return "reconnecting";
+        }
+
+        // Check if socket was previously connected (disconnected)
+        // or never connected (connecting/failed)
+        const wasConnected = this.socket.id !== undefined;
+
+        if (wasConnected) {
+            return "disconnected";
+        }
+
+        // Socket.io doesn't have explicit failed state, but we can infer
+        // if it's not connected and not reconnecting
+        return "connecting";
     }
 
     /**

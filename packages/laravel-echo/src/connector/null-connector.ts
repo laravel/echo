@@ -5,6 +5,7 @@ import {
     NullPresenceChannel,
     NullEncryptedPrivateChannel,
 } from "../channel";
+import type { ConnectionStatus } from "../echo";
 
 /**
  * This class creates a null connector.
@@ -85,6 +86,13 @@ export class NullConnector extends Connector<
      */
     socketId(): string {
         return "fake-socket-id";
+    }
+
+    /**
+     * Get the current connection status.
+     */
+    connectionStatus(): ConnectionStatus {
+        return "connected";
     }
 
     /**
