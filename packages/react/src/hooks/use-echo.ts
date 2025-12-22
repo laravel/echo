@@ -1,4 +1,4 @@
-import { type BroadcastDriver } from "laravel-echo";
+import { type BroadcastDriver, type ConnectionStatus } from "laravel-echo";
 import { useCallback, useEffect, useRef } from "react";
 import { echo } from "../config";
 import type {
@@ -311,4 +311,13 @@ export const useEchoModel = <
         dependencies,
         "private",
     );
+};
+
+/**
+ * Hook to get the current WebSocket connection status
+ *
+ * @returns ConnectionStatus - The current connection status
+ */
+export const useConnectionStatus = (): ConnectionStatus => {
+    return echo().connectionStatus();
 };

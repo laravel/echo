@@ -1,4 +1,4 @@
-import { type BroadcastDriver } from "laravel-echo";
+import { type BroadcastDriver, type ConnectionStatus } from "laravel-echo";
 import { onMounted, onUnmounted, ref, watch } from "vue";
 import { echo } from "../config";
 import type {
@@ -316,4 +316,13 @@ export const useEchoModel = <
         dependencies,
         "private",
     );
+};
+
+/**
+ * Composable to get the current WebSocket connection status
+ *
+ * @returns ConnectionStatus - The current connection status
+ */
+export const useConnectionStatus = (): ConnectionStatus => {
+    return echo().connectionStatus();
 };
