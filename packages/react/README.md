@@ -27,6 +27,51 @@ In the above example, the configuration would also fill in the following keys if
 }
 ```
 
+## Connection Status
+
+You can get the current WebSocket connection status using the `useConnectionStatus` hook or the `getConnectionStatus` utility function:
+
+```ts
+import { useConnectionStatus, getConnectionStatus } from "@laravel/echo-react";
+
+// Using the hook (recommended for React components)
+const status = useConnectionStatus(); // Returns: "connected" | "disconnected" | "connecting" | "reconnecting" | "failed"
+
+// Or using the utility function
+const status = getConnectionStatus(); // Same return type
+```
+
+The possible status values are:
+- `"connected"` - Successfully connected to the WebSocket server
+- `"disconnected"` - Not connected and not attempting to reconnect
+- `"connecting"` - Initial connection attempt in progress
+- `"reconnecting"` - Attempting to reconnect after a disconnection
+- `"failed"` - Connection failed and won't retry
+
+You can use this to show connection status indicators in your UI:
+
+```ts
+function ConnectionIndicator() {
+    const status = useConnectionStatus();
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case "connected": return "green";
+            case "connecting": return "yellow";
+            case "reconnecting": return "orange";
+            case "failed": return "red";
+            default: return "gray";
+        }
+    };
+
+    return (
+        <div style={{ color: getStatusColor(status) }}>
+            Connection: {status}
+        </div>
+    );
+}
+```
+
 ## `useEcho` Hook
 
 Connect to private channel:
