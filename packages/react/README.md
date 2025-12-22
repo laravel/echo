@@ -42,6 +42,7 @@ const status = getConnectionStatus(); // Same return type
 ```
 
 The possible status values are:
+
 - `"connected"` - Successfully connected to the WebSocket server
 - `"disconnected"` - Not connected and not attempting to reconnect
 - `"connecting"` - Initial connection attempt in progress

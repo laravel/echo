@@ -42,6 +42,7 @@ const status = getConnectionStatus(); // Same return type
 ```
 
 The possible status values are:
+
 - `"connected"` - Successfully connected to the WebSocket server
 - `"disconnected"` - Not connected and not attempting to reconnect
 - `"connecting"` - Initial connection attempt in progress
@@ -58,11 +59,16 @@ const status = useConnectionStatus();
 
 const getStatusColor = (status) => {
     switch (status) {
-        case "connected": return "green";
-        case "connecting": return "yellow";
-        case "reconnecting": return "orange";
-        case "failed": return "red";
-        default: return "gray";
+        case "connected":
+            return "green";
+        case "connecting":
+            return "yellow";
+        case "reconnecting":
+            return "orange";
+        case "failed":
+            return "red";
+        default:
+            return "gray";
     }
 };
 </script>

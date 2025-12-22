@@ -49,7 +49,10 @@ describe("Echo", () => {
     });
 
     test("it can get connection status", () => {
-        const echo = new Echo({ broadcaster: "null", withoutInterceptors: true });
+        const echo = new Echo({
+            broadcaster: "null",
+            withoutInterceptors: true,
+        });
         expect(echo.connectionStatus()).toBe("connected");
     });
 });

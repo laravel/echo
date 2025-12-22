@@ -6,4 +6,9 @@ export {
     useEchoPublic,
     useConnectionStatus,
 } from "./composables/useEcho";
-export { configureEcho, echo, echoIsConfigured, getConnectionStatus } from "./config/index";
+export {
+    configureEcho,
+    echo,
+    echoIsConfigured,
+    getConnectionStatus,
+} from "./config/index";
