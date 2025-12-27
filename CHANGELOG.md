@@ -1,6 +1,16 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v2.2.6...2.x)
+## [Unreleased](https://github.com/laravel/echo/compare/v2.2.7...2.x)
+
+## [v2.2.7](https://github.com/laravel/echo/compare/v2.2.6...v2.2.7) - 2025-12-27
+
+### What's Changed
+
+* Fix typo by [@SanderMuller](https://github.com/SanderMuller) in https://github.com/laravel/echo/pull/466
+* Events overloading by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/echo/pull/470
+* Security updates by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/echo/pull/471
+
+**Full Changelog**: https://github.com/laravel/echo/compare/v2.2.6...v2.2.7
 
 ## [v2.2.6](https://github.com/laravel/echo/compare/v2.2.5...v2.2.6) - 2025-11-04
 
