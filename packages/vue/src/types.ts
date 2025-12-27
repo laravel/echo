@@ -108,6 +108,7 @@ declare global {
 /**
  * Type alias for event names - helps with autocomplete suggestions
  */
+// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 export type EventName = keyof Events & string;
 
 /**
