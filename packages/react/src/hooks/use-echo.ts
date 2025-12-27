@@ -7,6 +7,8 @@ import type {
     ChannelData,
     ChannelReturnType,
     Connection,
+    EventName,
+    InferEventPayload,
     ModelEvents,
     ModelPayload,
 } from "../types";
@@ -69,7 +71,65 @@ const resolveChannelSubscription = <T extends BroadcastDriver>(
     return channelSubscription;
 };
 
-export const useEcho = <
+// Overload for automatic type inference from event name
+export function useEcho<
+    TEvent extends EventName = EventName,
+    TDriver extends BroadcastDriver = BroadcastDriver,
+    TVisibility extends Channel["visibility"] = "private",
+>(
+    channelName: string,
+    event: TEvent,
+    callback: (payload: InferEventPayload<TEvent>) => void,
+    dependencies?: any[],
+    visibility?: TVisibility,
+): {
+    leaveChannel: (leaveAll?: boolean) => void;
+    leave: () => void;
+    stopListening: () => void;
+    listen: () => void;
+    channel: () => ChannelReturnType<TDriver, TVisibility>;
+};
+
+// Overload for multiple events with automatic type inference
+export function useEcho<
+    TEvent extends EventName = EventName,
+    TDriver extends BroadcastDriver = BroadcastDriver,
+    TVisibility extends Channel["visibility"] = "private",
+>(
+    channelName: string,
+    event: TEvent[],
+    callback: (payload: InferEventPayload<TEvent>) => void,
+    dependencies?: any[],
+    visibility?: TVisibility,
+): {
+    leaveChannel: (leaveAll?: boolean) => void;
+    leave: () => void;
+    stopListening: () => void;
+    listen: () => void;
+    channel: () => ChannelReturnType<TDriver, TVisibility>;
+};
+
+// Overload for explicit payload type (backward compatibility)
+export function useEcho<
+    TPayload,
+    TDriver extends BroadcastDriver = BroadcastDriver,
+    TVisibility extends Channel["visibility"] = "private",
+>(
+    channelName: string,
+    event: string | string[],
+    callback: (payload: TPayload) => void,
+    dependencies?: any[],
+    visibility?: TVisibility,
+): {
+    leaveChannel: (leaveAll?: boolean) => void;
+    leave: () => void;
+    stopListening: () => void;
+    listen: () => void;
+    channel: () => ChannelReturnType<TDriver, TVisibility>;
+};
+
+// Implementation
+export function useEcho<
     TPayload,
     TDriver extends BroadcastDriver = BroadcastDriver,
     TVisibility extends Channel["visibility"] = "private",
@@ -79,7 +139,7 @@ export const useEcho = <
     callback: (payload: TPayload) => void = () => {},
     dependencies: any[] = [],
     visibility: TVisibility = "private" as TVisibility,
-) => {
+) {
     const channel: Channel = {
         name: channelName,
         id: ["private", "presence"].includes(visibility)
@@ -166,7 +226,7 @@ export const useEcho = <
         channel: () =>
             subscription.current as ChannelReturnType<TDriver, TVisibility>,
     };
-};
+}
 
 export const useEchoNotification = <
     TPayload,

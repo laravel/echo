@@ -67,3 +67,52 @@ type ModelEvent =
 export type ModelEvents<T extends string> =
     | `.${ModelName<T>}${ModelEvent}`
     | `${ModelName<T>}${ModelEvent}`;
+
+/**
+ * Global Events interface for type inference
+ * Users can extend this in their .d.ts files to define event payload types
+ *
+ * @example
+ * // In user's types/echo.d.ts file (simplest approach):
+ * interface Events {
+ *   OrganizationUpdated: {
+ *     id: number;
+ *     name: string;
+ *     updated_at: string;
+ *   };
+ *   UserCreated: {
+ *     id: number;
+ *     email: string;
+ *     name: string;
+ *   };
+ * }
+ *
+ * @example
+ * // Alternative: Module augmentation
+ * declare module '@laravel/echo-react' {
+ *   interface Events {
+ *     OrganizationUpdated: {
+ *       id: number;
+ *       name: string;
+ *       updated_at: string;
+ *     };
+ *   }
+ * }
+ */
+declare global {
+    interface Events {
+        // This interface is meant to be extended by users in their .d.ts files
+    }
+}
+
+/**
+ * Type alias for event names - helps with autocomplete suggestions
+ */
+// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+export type EventName = keyof Events & string;
+
+/**
+ * Type utility to infer payload type from event name
+ */
+export type InferEventPayload<TEvent extends string> =
+    TEvent extends keyof Events ? Events[TEvent] : unknown;
