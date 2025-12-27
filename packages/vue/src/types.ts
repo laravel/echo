@@ -106,6 +106,11 @@ declare global {
 }
 
 /**
+ * Type alias for event names - helps with autocomplete suggestions
+ */
+export type EventName = keyof Events & string;
+
+/**
  * Type utility to infer payload type from event name
  */
 export type InferEventPayload<TEvent extends string> =

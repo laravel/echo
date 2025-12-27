@@ -7,6 +7,7 @@ import type {
     ChannelData,
     ChannelReturnType,
     Connection,
+    EventName,
     InferEventPayload,
     ModelEvents,
     ModelPayload,
@@ -72,7 +73,7 @@ const leaveChannel = (channel: Channel, leaveAll: boolean = false): void => {
 
 // Overload for automatic type inference from event name
 export function useEcho<
-    TEvent extends keyof Events & string,
+    TEvent extends EventName = EventName,
     TDriver extends BroadcastDriver = BroadcastDriver,
     TVisibility extends Channel["visibility"] = "private",
 >(
@@ -91,7 +92,7 @@ export function useEcho<
 
 // Overload for multiple events with automatic type inference
 export function useEcho<
-    TEvent extends keyof Events & string,
+    TEvent extends EventName = EventName,
     TDriver extends BroadcastDriver = BroadcastDriver,
     TVisibility extends Channel["visibility"] = "private",
 >(
