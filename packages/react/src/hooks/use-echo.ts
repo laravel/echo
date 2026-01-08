@@ -146,14 +146,16 @@ export function useEcho<
     dependencies: DependencyList = [],
     visibility: TVisibility = "private" as TVisibility,
 ) {
-
-    const channel: Channel = useMemo(() => ({
-        name: channelName,
-        id: ["private", "presence"].includes(visibility)
-            ? `${visibility}-${channelName}`
-            : channelName,
-        visibility,
-    }), [channelName, visibility]);
+    const channel: Channel = useMemo(
+        () => ({
+            name: channelName,
+            id: ["private", "presence"].includes(visibility)
+                ? `${visibility}-${channelName}`
+                : channelName,
+            visibility,
+        }),
+        [channelName, visibility],
+    );
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const callbackFunc = useCallback(callback, dependencies);
@@ -221,29 +223,35 @@ export function useEcho<
         return tearDown;
     }, [listen, tearDown, channel]);
 
-    return useMemo(() => ({
-        /**
-         * Leave the channel
-         */
-        leaveChannel: tearDown,
-        /**
-         * Leave the channel and also its associated private and presence channels
-         */
-        leave,
-        /**
-         * Stop listeningRef for event(s) without leaving the channel
-         */
-        stopListening,
-        /**
-         * Listen for event(s)
-         */
-        listen,
-        /**
-         * Channel instance
-         */
-        channel: () =>
-            subscriptionRef.current as ChannelReturnType<TDriver, TVisibility>,
-    }), [leave, listen, stopListening, tearDown]);
+    return useMemo(
+        () => ({
+            /**
+             * Leave the channel
+             */
+            leaveChannel: tearDown,
+            /**
+             * Leave the channel and also its associated private and presence channels
+             */
+            leave,
+            /**
+             * Stop listeningRef for event(s) without leaving the channel
+             */
+            stopListening,
+            /**
+             * Listen for event(s)
+             */
+            listen,
+            /**
+             * Channel instance
+             */
+            channel: () =>
+                subscriptionRef.current as ChannelReturnType<
+                    TDriver,
+                    TVisibility
+                >,
+        }),
+        [leave, listen, stopListening, tearDown],
+    );
 }
 
 export const useEchoNotification = <

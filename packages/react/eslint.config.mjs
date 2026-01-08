@@ -1,5 +1,5 @@
 import tsPlugin from "@typescript-eslint/eslint-plugin";
-import reactHooks from 'eslint-plugin-react-hooks';
+import reactHooks from "eslint-plugin-react-hooks";
 import tsParser from "@typescript-eslint/parser";
 import eslintReact from "@eslint-react/eslint-plugin";
 
