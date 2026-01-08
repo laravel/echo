@@ -234,7 +234,7 @@ export function useEcho<
              */
             leave,
             /**
-             * Stop listeningRef for event(s) without leaving the channel
+             * Stop listening for event(s) without leaving the channel
              */
             stopListening,
             /**
