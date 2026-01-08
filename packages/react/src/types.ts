@@ -100,6 +100,7 @@ export type ModelEvents<T extends string> =
  * }
  */
 declare global {
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     interface Events {
         // This interface is meant to be extended by users in their .d.ts files
     }
