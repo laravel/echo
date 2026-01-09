@@ -157,11 +157,10 @@ export function useEcho<
         [channelName, visibility],
     );
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     const callbackFunc = useCallback(callback, dependencies);
-    const listeningRef = useRef(false);
-    const initializedRef = useRef(false);
-    const subscriptionRef = useRef<Connection<TDriver>>(
+    const listening = useRef(false);
+    const initialized = useRef(false);
+    const subscription = useRef<Connection<TDriver>>(
         resolveChannelSubscription<TDriver>(channel),
     );
 
@@ -174,27 +173,27 @@ export function useEcho<
     );
 
     const stopListening = useCallback(() => {
-        if (!listeningRef.current) {
+        if (!listening.current) {
             return;
         }
 
         events.forEach((e) => {
-            subscriptionRef.current.stopListening(e, callbackFunc);
+            subscription.current.stopListening(e, callbackFunc);
         });
 
-        listeningRef.current = false;
+        listening.current = false;
     }, [events, callbackFunc]);
 
     const listen = useCallback(() => {
-        if (listeningRef.current) {
+        if (listening.current) {
             return;
         }
 
         events.forEach((e) => {
-            subscriptionRef.current.listen(e, callbackFunc);
+            subscription.current.listen(e, callbackFunc);
         });
 
-        listeningRef.current = true;
+        listening.current = true;
     }, [events, callbackFunc]);
 
     const tearDown = useCallback(
@@ -211,12 +210,11 @@ export function useEcho<
     }, [tearDown]);
 
     useEffect(() => {
-        if (initializedRef.current) {
-            subscriptionRef.current =
-                resolveChannelSubscription<TDriver>(channel);
+        if (initialized.current) {
+            subscription.current = resolveChannelSubscription<TDriver>(channel);
         }
 
-        initializedRef.current = true;
+        initialized.current = true;
 
         listen();
 
@@ -245,10 +243,7 @@ export function useEcho<
              * Channel instance
              */
             channel: () =>
-                subscriptionRef.current as ChannelReturnType<
-                    TDriver,
-                    TVisibility
-                >,
+                subscription.current as ChannelReturnType<TDriver, TVisibility>,
         }),
         [leave, listen, stopListening, tearDown],
     );
@@ -285,7 +280,7 @@ export const useEchoNotification = <
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [eventKey]);
 
-    const listeningRef = useRef(false);
+    const listening = useRef(false);
     const initializedRef = useRef(false);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -293,7 +288,7 @@ export const useEchoNotification = <
 
     const cb = useCallback(
         (notification: BroadcastNotification<TPayload>) => {
-            if (!listeningRef.current) {
+            if (!listening.current) {
                 return;
             }
 
@@ -305,7 +300,7 @@ export const useEchoNotification = <
     );
 
     const listen = useCallback(() => {
-        if (listeningRef.current) {
+        if (listening.current) {
             return;
         }
 
@@ -313,18 +308,18 @@ export const useEchoNotification = <
             result.channel().notification(cb);
         }
 
-        listeningRef.current = true;
+        listening.current = true;
         initializedRef.current = true;
     }, [cb, result]);
 
     const stopListening = useCallback(() => {
-        if (!listeningRef.current) {
+        if (!listening.current) {
             return;
         }
 
         result.channel().stopListeningForNotification(cb);
 
-        listeningRef.current = false;
+        listening.current = false;
     }, [cb, result]);
 
     useEffect(() => {
