@@ -164,12 +164,9 @@ export function useEcho<
         resolveChannelSubscription<TDriver>(channel),
     );
 
-    const eventKey = Array.isArray(event) ? event.join("\0") : event;
     const events = useMemo(
         () => toArray(event),
-        // we use the eventKey to avoid array reference issues
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [eventKey],
+        [Array.isArray(event) ? JSON.stringify(event) : event],
     );
 
     const stopListening = useCallback(() => {
@@ -266,7 +263,6 @@ export const useEchoNotification = <
         "private",
     );
 
-    const eventKey = Array.isArray(event) ? event.join("\0") : event;
     const events = useMemo(() => {
         return toArray(event)
             .map((e) => {
@@ -278,7 +274,7 @@ export const useEchoNotification = <
             })
             .flat();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [eventKey]);
+    }, [Array.isArray(event) ? JSON.stringify(event) : event]);
 
     const listening = useRef(false);
     const initializedRef = useRef(false);
