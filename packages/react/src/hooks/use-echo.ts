@@ -157,6 +157,8 @@ export function useEcho<
         [channelName, visibility],
     );
 
+    // callback and dependencies are parameters meant to be used directly
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const callbackFunc = useCallback(callback, dependencies);
     const listening = useRef(false);
     const initialized = useRef(false);
@@ -165,6 +167,8 @@ export function useEcho<
     );
 
     const eventKey = Array.isArray(event) ? JSON.stringify(event) : event;
+    // Using eventKey instead of event to stabilize array dependencies
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const events = useMemo(() => toArray(event), [eventKey]);
 
     const stopListening = useCallback(() => {
