@@ -1,8 +1,4 @@
-import Echo, {
-    type BroadcastDriver,
-    type ConnectionStatus,
-    type EchoOptions,
-} from "laravel-echo";
+import Echo, { type BroadcastDriver, type EchoOptions } from "laravel-echo";
 import Pusher from "pusher-js";
 import type { ConfigDefaults } from "../types";
 
@@ -88,12 +84,3 @@ export const echo = <T extends BroadcastDriver>(): Echo<T> =>
     getEchoInstance<T>();
 
 export const echoIsConfigured = () => echoConfig !== null;
-
-/**
- * Get the current WebSocket connection status
- *
- * @returns ConnectionStatus - The current connection status
- */
-export const getConnectionStatus = (): ConnectionStatus => {
-    return getEchoInstance().connectionStatus();
-};
