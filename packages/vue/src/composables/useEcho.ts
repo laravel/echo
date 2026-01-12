@@ -1,5 +1,5 @@
 import { type BroadcastDriver, type ConnectionStatus } from "laravel-echo";
-import { onMounted, onUnmounted, ref, watch } from "vue";
+import { onMounted, onUnmounted, ref, watch, type Ref } from "vue";
 import { echo } from "../config";
 import type {
     BroadcastNotification,
@@ -321,8 +321,22 @@ export const useEchoModel = <
 /**
  * Composable to get the current WebSocket connection status
  *
- * @returns ConnectionStatus - The current connection status
+ * @returns Ref<ConnectionStatus> - A reactive ref containing the current connection status
  */
-export const useConnectionStatus = (): ConnectionStatus => {
-    return echo().connectionStatus();
+export const useConnectionStatus = (): Ref<ConnectionStatus> => {
+    const status = ref<ConnectionStatus>(echo().connectionStatus());
+
+    let unsubscribe: (() => void) | undefined;
+
+    onMounted(() => {
+        unsubscribe = echo().connector.onConnectionChange((newStatus) => {
+            status.value = newStatus;
+        });
+    });
+
+    onUnmounted(() => {
+        unsubscribe?.();
+    });
+
+    return status;
 };

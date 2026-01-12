@@ -96,6 +96,19 @@ export class NullConnector extends Connector<
     }
 
     /**
+     * Subscribe to connection status changes.
+     */
+    onConnectionChange(
+        _callback: (status: ConnectionStatus) => void,
+    ): () => void {
+        // Null connector always returns "connected" and never changes
+
+        return () => {
+            // No-op cleanup
+        };
+    }
+
+    /**
      * Disconnect the connection.
      */
     disconnect(): void {

@@ -1,5 +1,5 @@
 import { type BroadcastDriver, type ConnectionStatus } from "laravel-echo";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { echo } from "../config";
 import type {
     BroadcastNotification,
@@ -319,5 +319,17 @@ export const useEchoModel = <
  * @returns ConnectionStatus - The current connection status
  */
 export const useConnectionStatus = (): ConnectionStatus => {
-    return echo().connectionStatus();
+    const [status, setStatus] = useState<ConnectionStatus>(() =>
+        echo().connectionStatus(),
+    );
+
+    useEffect(() => {
+        return echo().connector.onConnectionChange(
+            (newStatus: ConnectionStatus) => {
+                setStatus(newStatus);
+            },
+        );
+    }, []);
+
+    return status;
 };

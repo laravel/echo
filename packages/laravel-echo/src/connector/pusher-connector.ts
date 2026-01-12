@@ -207,6 +207,29 @@ export class PusherConnector<
     }
 
     /**
+     * Subscribe to connection status changes.
+     */
+    onConnectionChange(
+        callback: (status: ConnectionStatus) => void,
+    ): () => void {
+        const updateStatus = () => {
+            callback(this.connectionStatus());
+        };
+
+        const events = ["state_change", "connected", "disconnected"];
+
+        events.forEach((event) => {
+            this.pusher.connection.bind(event, updateStatus);
+        });
+
+        return () => {
+            events.forEach((event) => {
+                this.pusher.connection.unbind(event, updateStatus);
+            });
+        };
+    }
+
+    /**
      * Disconnect Pusher connection.
      */
     disconnect(): void {

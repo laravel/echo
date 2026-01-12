@@ -181,6 +181,37 @@ export class SocketIoConnector extends Connector<
     }
 
     /**
+     * Subscribe to connection status changes.
+     */
+    onConnectionChange(
+        callback: (status: ConnectionStatus) => void,
+    ): () => void {
+        const updateStatus = () => {
+            callback(this.connectionStatus());
+        };
+
+        const events = [
+            "connect",
+            "disconnect",
+            "connect_error",
+            "reconnect_attempt",
+            "reconnect",
+            "reconnect_error",
+            "reconnect_failed",
+        ];
+
+        events.forEach((event) => {
+            this.socket.on(event, updateStatus);
+        });
+
+        return () => {
+            events.forEach((event) => {
+                this.socket.off(event, updateStatus);
+            });
+        };
+    }
+
+    /**
      * Disconnect Socketio connection.
      */
     disconnect(): void {

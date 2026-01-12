@@ -153,6 +153,16 @@ export abstract class Connector<
     abstract connectionStatus(): ConnectionStatus;
 
     /**
+     * Subscribe to connection status changes.
+     *
+     * @param callback - Function to call when connection status changes
+     * @returns Unsubscribe function
+     */
+    abstract onConnectionChange(
+        callback: (status: ConnectionStatus) => void,
+    ): () => void;
+
+    /**
      * Disconnect from the Echo server.
      */
     abstract disconnect(): void;
