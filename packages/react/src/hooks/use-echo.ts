@@ -323,17 +323,20 @@ export const useEchoNotification = <
         return () => stopListening();
     }, [listen, stopListening]);
 
-    return {
-        ...result,
-        /**
-         * Stop listening for notification events
-         */
-        stopListening,
-        /**
-         * Listen for notification events
-         */
-        listen,
-    };
+    return useMemo(
+        () => ({
+            ...result,
+            /**
+             * Stop listening for notification events
+             */
+            stopListening,
+            /**
+             * Listen for notification events
+             */
+            listen,
+        }),
+        [result, stopListening, listen],
+    );
 };
 
 export const useEchoPresence = <
