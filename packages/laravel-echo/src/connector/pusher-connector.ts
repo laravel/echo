@@ -196,11 +196,8 @@ export class PusherConnector<
 
         switch (state) {
             case "connected":
-                return "connected";
             case "connecting":
-                return "connecting";
-            case "disconnected":
-                return "disconnected";
+                return state;
             case "failed":
             case "unavailable":
                 return "failed";
