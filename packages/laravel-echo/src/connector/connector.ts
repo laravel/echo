@@ -1,7 +1,7 @@
 /// <reference types="window" />
 
 import type { Channel, PresenceChannel } from "../channel";
-import type { BroadcastDriver, EchoOptions, ConnectionStatus } from "../echo";
+import type { BroadcastDriver, ConnectionStatus, EchoOptions } from "../echo";
 
 export type EchoOptionsWithDefaults<TBroadcaster extends BroadcastDriver> = {
     broadcaster: TBroadcaster;

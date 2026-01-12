@@ -3,11 +3,11 @@ import Echo from "laravel-echo";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { defineComponent } from "vue";
 import {
+    useConnectionStatus,
     useEcho,
     useEchoNotification,
     useEchoPresence,
     useEchoPublic,
-    useConnectionStatus,
 } from "../src/composables/useEcho";
 import { configureEcho } from "../src/config/index";
 

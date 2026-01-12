@@ -5,10 +5,10 @@ export {
     getConnectionStatus,
 } from "./config/index";
 export {
+    useConnectionStatus,
     useEcho,
     useEchoModel,
     useEchoNotification,
     useEchoPresence,
     useEchoPublic,
-    useConnectionStatus,
 } from "./hooks/use-echo";

@@ -1,7 +1,7 @@
 import Echo, {
     type BroadcastDriver,
-    type EchoOptions,
     type ConnectionStatus,
+    type EchoOptions,
 } from "laravel-echo";
 import Pusher from "pusher-js";
 import type { ConfigDefaults } from "../types";

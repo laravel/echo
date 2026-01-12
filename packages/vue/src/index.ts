@@ -1,10 +1,10 @@
 export {
+    useConnectionStatus,
     useEcho,
     useEchoModel,
     useEchoNotification,
     useEchoPresence,
     useEchoPublic,
-    useConnectionStatus,
 } from "./composables/useEcho";
 export {
     configureEcho,

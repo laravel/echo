@@ -53,6 +53,7 @@ describe("Echo", () => {
             broadcaster: "null",
             withoutInterceptors: true,
         });
+
         expect(echo.connectionStatus()).toBe("connected");
     });
 });

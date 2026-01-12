@@ -1,11 +1,11 @@
-import { Connector } from "./connector";
 import {
     NullChannel,
-    NullPrivateChannel,
-    NullPresenceChannel,
     NullEncryptedPrivateChannel,
+    NullPresenceChannel,
+    NullPrivateChannel,
 } from "../channel";
 import type { ConnectionStatus } from "../echo";
+import { Connector } from "./connector";
 
 /**
  * This class creates a null connector.
