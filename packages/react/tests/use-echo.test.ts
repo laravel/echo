@@ -319,6 +319,109 @@ describe("useEcho hook", async () => {
         expect(result.current).toHaveProperty("channel");
         expect(result.current.channel).not.toBeNull();
     });
+
+    it("updates callback when dependencies change", async () => {
+        const channelName = "test-channel";
+        const event = "test-event";
+        let dependency = "value1";
+        const mockCallback1 = vi.fn();
+        const mockCallback2 = vi.fn();
+
+        const { rerender } = renderHook(
+            ({ deps, callback }) =>
+                echoModule.useEcho(channelName, event, callback, deps),
+            {
+                initialProps: {
+                    deps: [dependency],
+                    callback: mockCallback1,
+                },
+            },
+        );
+
+        const channel = echoInstance.private(channelName);
+        const firstCallback = vi.mocked(channel.listen).mock.calls[0][1];
+
+        expect(firstCallback).toBe(mockCallback1);
+
+        dependency = "value2";
+        rerender({ deps: [dependency], callback: mockCallback2 });
+
+        const secondCallback = vi.mocked(channel.listen).mock.calls[
+            vi.mocked(channel.listen).mock.calls.length - 1
+        ][1];
+
+        expect(secondCallback).toBe(mockCallback2);
+    });
+
+    it("maintains callback stability when dependencies don't change", async () => {
+        const channelName = "test-channel";
+        const event = "test-event";
+        const dependency = "stable-value";
+        const mockCallback = vi.fn();
+
+        const { result, rerender } = renderHook(
+            ({ deps, callback }) =>
+                echoModule.useEcho(channelName, event, callback, deps),
+            {
+                initialProps: {
+                    deps: [dependency],
+                    callback: mockCallback,
+                },
+            },
+        );
+
+        const firstResult = result.current;
+
+        rerender({ deps: [dependency], callback: mockCallback });
+
+        const secondResult = result.current;
+
+        expect(firstResult.listen).toBe(secondResult.listen);
+        expect(firstResult.stopListening).toBe(secondResult.stopListening);
+        expect(firstResult.leaveChannel).toBe(secondResult.leaveChannel);
+    });
+
+    it("maintains return value stability when props don't change", async () => {
+        const channelName = "test-channel";
+        const event = "test-event";
+        const mockCallback = vi.fn();
+        const dependencies = ["dep1", "dep2"];
+
+        const { result, rerender } = renderHook(() =>
+            echoModule.useEcho(channelName, event, mockCallback, dependencies),
+        );
+
+        const firstResult = result.current;
+
+        rerender();
+
+        const secondResult = result.current;
+
+        expect(firstResult).toBe(secondResult);
+    });
+
+    it("handles array event dependencies with stable eventKey", async () => {
+        const channelName = "test-channel";
+        const events = ["event1", "event2"];
+        const mockCallback = vi.fn();
+
+        const { rerender } = renderHook(
+            ({ eventArray }) =>
+                echoModule.useEcho(channelName, eventArray, mockCallback),
+            {
+                initialProps: { eventArray: events },
+            },
+        );
+
+        const channel = echoInstance.private(channelName);
+        const initialListenCalls = vi.mocked(channel.listen).mock.calls.length;
+
+        rerender({ eventArray: [...events] });
+
+        const afterRerenderCalls = vi.mocked(channel.listen).mock.calls.length;
+
+        expect(afterRerenderCalls).toBe(initialListenCalls);
+    });
 });
 
 describe("useEchoModel hook", async () => {
@@ -1146,6 +1249,87 @@ describe("useEchoNotification hook", async () => {
 
         expect(result.current).toHaveProperty("channel");
         expect(result.current.channel).not.toBeNull();
+    });
+
+    it("maintains callback stability when dependencies don't change", async () => {
+        const channelName = "test-channel";
+        const dependency = "stable-value";
+        const mockCallback = vi.fn();
+
+        const { result, rerender } = renderHook(
+            ({ deps, callback }) =>
+                echoModule.useEchoNotification(channelName, callback, [], deps),
+            {
+                initialProps: {
+                    deps: [dependency],
+                    callback: mockCallback,
+                },
+            },
+        );
+
+        const firstResult = result.current;
+
+        rerender({ deps: [dependency], callback: mockCallback });
+
+        const secondResult = result.current;
+
+        expect(firstResult.listen).toBe(secondResult.listen);
+        expect(firstResult.stopListening).toBe(secondResult.stopListening);
+        expect(firstResult.leaveChannel).toBe(secondResult.leaveChannel);
+    });
+
+    it("maintains return value stability when props don't change", async () => {
+        const channelName = "test-channel";
+        const mockCallback = vi.fn();
+        const dependencies = ["dep1", "dep2"];
+
+        const { result, rerender } = renderHook(() =>
+            echoModule.useEchoNotification(
+                channelName,
+                mockCallback,
+                [],
+                dependencies,
+            ),
+        );
+
+        const firstResult = result.current;
+
+        rerender();
+
+        const secondResult = result.current;
+
+        expect(firstResult).toBe(secondResult);
+        expect(firstResult.listen).toBe(secondResult.listen);
+        expect(firstResult.stopListening).toBe(secondResult.stopListening);
+    });
+
+    it("handles array event dependencies with stable eventKey", async () => {
+        const channelName = "test-channel";
+        const events = ["type1", "type2"];
+        const mockCallback = vi.fn();
+
+        const { rerender } = renderHook(
+            ({ eventArray }) =>
+                echoModule.useEchoNotification(
+                    channelName,
+                    mockCallback,
+                    eventArray,
+                ),
+            {
+                initialProps: { eventArray: events },
+            },
+        );
+
+        const channel = echoInstance.private(channelName);
+        const initialNotificationCalls = vi.mocked(channel.notification).mock
+            .calls.length;
+
+        rerender({ eventArray: [...events] });
+
+        const afterRerenderCalls = vi.mocked(channel.notification).mock.calls
+            .length;
+
+        expect(afterRerenderCalls).toBe(initialNotificationCalls);
     });
 });
 

@@ -1,7 +1,11 @@
 import tsPlugin from "@typescript-eslint/eslint-plugin";
+import reactHooks from "eslint-plugin-react-hooks";
 import tsParser from "@typescript-eslint/parser";
+import eslintReact from "@eslint-react/eslint-plugin";
 
 const config = [
+    eslintReact.configs["recommended-typescript"],
+    reactHooks.configs.flat.recommended,
     {
         ignores: ["dist/**/*"],
         files: ["src/**/*.ts"],
@@ -19,22 +23,6 @@ const config = [
         rules: {
             ...tsPlugin.configs.recommended.rules,
             ...tsPlugin.configs["recommended-requiring-type-checking"].rules,
-            "@typescript-eslint/ban-types": "off",
-            "@typescript-eslint/no-empty-object-type": "off",
-            "@typescript-eslint/no-explicit-any": "off",
-            "@typescript-eslint/no-floating-promises": "error",
-            "@typescript-eslint/no-unsafe-argument": "warn",
-            "@typescript-eslint/no-unsafe-assignment": "warn",
-            "@typescript-eslint/no-unsafe-call": "warn",
-            "@typescript-eslint/no-unsafe-function-type": "off",
-            "@typescript-eslint/no-unsafe-member-access": "warn",
-            "@typescript-eslint/no-unsafe-return": "warn",
-            "@typescript-eslint/no-unused-vars": [
-                "warn",
-                { argsIgnorePattern: "^_" },
-            ],
-            "no-console": "warn",
-            "prefer-const": "off",
         },
     },
 ];

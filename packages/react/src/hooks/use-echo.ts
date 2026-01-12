@@ -1,5 +1,12 @@
 import { type BroadcastDriver, type ConnectionStatus } from "laravel-echo";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+    type DependencyList,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 import { echo } from "../config";
 import type {
     BroadcastNotification,
@@ -7,6 +14,8 @@ import type {
     ChannelData,
     ChannelReturnType,
     Connection,
+    EventName,
+    InferEventPayload,
     ModelEvents,
     ModelPayload,
 } from "../types";
@@ -69,7 +78,65 @@ const resolveChannelSubscription = <T extends BroadcastDriver>(
     return channelSubscription;
 };
 
-export const useEcho = <
+// Overload for automatic type inference from event name
+export function useEcho<
+    TEvent extends EventName = EventName,
+    TDriver extends BroadcastDriver = BroadcastDriver,
+    TVisibility extends Channel["visibility"] = "private",
+>(
+    channelName: string,
+    event: TEvent,
+    callback: (payload: InferEventPayload<TEvent>) => void,
+    dependencies?: DependencyList,
+    visibility?: TVisibility,
+): {
+    leaveChannel: (leaveAll?: boolean) => void;
+    leave: () => void;
+    stopListening: () => void;
+    listen: () => void;
+    channel: () => ChannelReturnType<TDriver, TVisibility>;
+};
+
+// Overload for multiple events with automatic type inference
+export function useEcho<
+    TEvent extends EventName = EventName,
+    TDriver extends BroadcastDriver = BroadcastDriver,
+    TVisibility extends Channel["visibility"] = "private",
+>(
+    channelName: string,
+    event: TEvent[],
+    callback: (payload: InferEventPayload<TEvent>) => void,
+    dependencies?: DependencyList,
+    visibility?: TVisibility,
+): {
+    leaveChannel: (leaveAll?: boolean) => void;
+    leave: () => void;
+    stopListening: () => void;
+    listen: () => void;
+    channel: () => ChannelReturnType<TDriver, TVisibility>;
+};
+
+// Overload for explicit payload type (backward compatibility)
+export function useEcho<
+    TPayload,
+    TDriver extends BroadcastDriver = BroadcastDriver,
+    TVisibility extends Channel["visibility"] = "private",
+>(
+    channelName: string,
+    event: string | string[],
+    callback: (payload: TPayload) => void,
+    dependencies?: DependencyList,
+    visibility?: TVisibility,
+): {
+    leaveChannel: (leaveAll?: boolean) => void;
+    leave: () => void;
+    stopListening: () => void;
+    listen: () => void;
+    channel: () => ChannelReturnType<TDriver, TVisibility>;
+};
+
+// Implementation
+export function useEcho<
     TPayload,
     TDriver extends BroadcastDriver = BroadcastDriver,
     TVisibility extends Channel["visibility"] = "private",
@@ -77,17 +144,22 @@ export const useEcho = <
     channelName: string,
     event: string | string[] = [],
     callback: (payload: TPayload) => void = () => {},
-    dependencies: any[] = [],
+    dependencies: DependencyList = [],
     visibility: TVisibility = "private" as TVisibility,
-) => {
-    const channel: Channel = {
-        name: channelName,
-        id: ["private", "presence"].includes(visibility)
-            ? `${visibility}-${channelName}`
-            : channelName,
-        visibility,
-    };
+) {
+    const channel: Channel = useMemo(
+        () => ({
+            name: channelName,
+            id: ["private", "presence"].includes(visibility)
+                ? `${visibility}-${channelName}`
+                : channelName,
+            visibility,
+        }),
+        [channelName, visibility],
+    );
 
+    // callback and dependencies are parameters meant to be used directly
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const callbackFunc = useCallback(callback, dependencies);
     const listening = useRef(false);
     const initialized = useRef(false);
@@ -95,7 +167,10 @@ export const useEcho = <
         resolveChannelSubscription<TDriver>(channel),
     );
 
-    const events = toArray(event);
+    const eventKey = Array.isArray(event) ? JSON.stringify(event) : event;
+    // Using eventKey instead of event to stabilize array dependencies
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const events = useMemo(() => toArray(event), [eventKey]);
 
     const stopListening = useCallback(() => {
         if (!listening.current) {
@@ -107,7 +182,7 @@ export const useEcho = <
         });
 
         listening.current = false;
-    }, dependencies);
+    }, [events, callbackFunc]);
 
     const listen = useCallback(() => {
         if (listening.current) {
@@ -119,17 +194,20 @@ export const useEcho = <
         });
 
         listening.current = true;
-    }, dependencies);
+    }, [events, callbackFunc]);
 
-    const tearDown = useCallback((leaveAll: boolean = false) => {
-        stopListening();
+    const tearDown = useCallback(
+        (leaveAll: boolean = false) => {
+            stopListening();
 
-        leaveChannel(channel, leaveAll);
-    }, dependencies);
+            leaveChannel(channel, leaveAll);
+        },
+        [stopListening, channel],
+    );
 
     const leave = useCallback(() => {
         tearDown(true);
-    }, dependencies);
+    }, [tearDown]);
 
     useEffect(() => {
         if (initialized.current) {
@@ -141,32 +219,35 @@ export const useEcho = <
         listen();
 
         return tearDown;
-    }, dependencies);
+    }, [listen, tearDown, channel]);
 
-    return {
-        /**
-         * Leave the channel
-         */
-        leaveChannel: tearDown,
-        /**
-         * Leave the channel and also its associated private and presence channels
-         */
-        leave,
-        /**
-         * Stop listening for event(s) without leaving the channel
-         */
-        stopListening,
-        /**
-         * Listen for event(s)
-         */
-        listen,
-        /**
-         * Channel instance
-         */
-        channel: () =>
-            subscription.current as ChannelReturnType<TDriver, TVisibility>,
-    };
-};
+    return useMemo(
+        () => ({
+            /**
+             * Leave the channel
+             */
+            leaveChannel: tearDown,
+            /**
+             * Leave the channel and also its associated private and presence channels
+             */
+            leave,
+            /**
+             * Stop listening for event(s) without leaving the channel
+             */
+            stopListening,
+            /**
+             * Listen for event(s)
+             */
+            listen,
+            /**
+             * Channel instance
+             */
+            channel: () =>
+                subscription.current as ChannelReturnType<TDriver, TVisibility>,
+        }),
+        [leave, listen, stopListening, tearDown],
+    );
+}
 
 export const useEchoNotification = <
     TPayload,
@@ -175,7 +256,7 @@ export const useEchoNotification = <
     channelName: string,
     callback: (payload: BroadcastNotification<TPayload>) => void = () => {},
     event: string | string[] = [],
-    dependencies: any[] = [],
+    dependencies: DependencyList = [],
 ) => {
     const result = useEcho<BroadcastNotification<TPayload>, TDriver, "private">(
         channelName,
@@ -185,8 +266,9 @@ export const useEchoNotification = <
         "private",
     );
 
-    const events = useRef(
-        toArray(event)
+    const eventKey = Array.isArray(event) ? JSON.stringify(event) : event;
+    const events = useMemo(() => {
+        return toArray(event)
             .map((e) => {
                 if (e.includes(".")) {
                     return [e, e.replace(/\./g, "\\")];
@@ -194,10 +276,15 @@ export const useEchoNotification = <
 
                 return [e, e.replace(/\\/g, ".")];
             })
-            .flat(),
-    );
+            .flat();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [eventKey]);
+
     const listening = useRef(false);
-    const initialized = useRef(false);
+    const initializedRef = useRef(false);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const memoizedCallback = useCallback(callback, dependencies);
 
     const cb = useCallback(
         (notification: BroadcastNotification<TPayload>) => {
@@ -205,14 +292,11 @@ export const useEchoNotification = <
                 return;
             }
 
-            if (
-                events.current.length === 0 ||
-                events.current.includes(notification.type)
-            ) {
-                callback(notification);
+            if (events.length === 0 || events.includes(notification.type)) {
+                memoizedCallback(notification);
             }
         },
-        dependencies.concat(events.current).concat([callback]),
+        [memoizedCallback, events],
     );
 
     const listen = useCallback(() => {
@@ -220,13 +304,13 @@ export const useEchoNotification = <
             return;
         }
 
-        if (!initialized.current) {
+        if (!initializedRef.current) {
             result.channel().notification(cb);
         }
 
         listening.current = true;
-        initialized.current = true;
-    }, [cb]);
+        initializedRef.current = true;
+    }, [cb, result]);
 
     const stopListening = useCallback(() => {
         if (!listening.current) {
@@ -236,25 +320,28 @@ export const useEchoNotification = <
         result.channel().stopListeningForNotification(cb);
 
         listening.current = false;
-    }, [cb]);
+    }, [cb, result]);
 
     useEffect(() => {
         listen();
 
         return () => stopListening();
-    }, dependencies.concat(events.current));
+    }, [listen, stopListening]);
 
-    return {
-        ...result,
-        /**
-         * Stop listening for notification events
-         */
-        stopListening,
-        /**
-         * Listen for notification events
-         */
-        listen,
-    };
+    return useMemo(
+        () => ({
+            ...result,
+            /**
+             * Stop listening for notification events
+             */
+            stopListening,
+            /**
+             * Listen for notification events
+             */
+            listen,
+        }),
+        [result, stopListening, listen],
+    );
 };
 
 export const useEchoPresence = <
@@ -264,7 +351,7 @@ export const useEchoPresence = <
     channelName: string,
     event: string | string[] = [],
     callback: (payload: TPayload) => void = () => {},
-    dependencies: any[] = [],
+    dependencies: DependencyList = [],
 ) => {
     return useEcho<TPayload, TDriver, "presence">(
         channelName,
@@ -282,7 +369,7 @@ export const useEchoPublic = <
     channelName: string,
     event: string | string[] = [],
     callback: (payload: TPayload) => void = () => {},
-    dependencies: any[] = [],
+    dependencies: DependencyList = [],
 ) => {
     return useEcho<TPayload, TDriver, "public">(
         channelName,
@@ -302,7 +389,7 @@ export const useEchoModel = <
     identifier: string | number,
     event: ModelEvents<TModel> | ModelEvents<TModel>[] = [],
     callback: (payload: ModelPayload<TPayload>) => void = () => {},
-    dependencies: any[] = [],
+    dependencies: DependencyList = [],
 ) => {
     return useEcho<ModelPayload<TPayload>, TDriver, "private">(
         `${model}.${identifier}`,
