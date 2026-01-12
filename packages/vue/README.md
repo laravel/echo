@@ -29,33 +29,17 @@ In the above example, the configuration would also fill in the following keys if
 
 ## Connection Status
 
-You can get the current WebSocket connection status using the `useConnectionStatus` composable or the `getConnectionStatus` utility function:
+You can get the current WebSocket connection status using the `useConnectionStatus` composable or the `echo().connectionStatus()` utility function.
 
-```ts
-import { useConnectionStatus, getConnectionStatus } from "@laravel/echo-vue";
+### `useConnectionStatus` Composable (Reactive)
 
-// Using the composable (recommended for Vue components)
-const status = useConnectionStatus(); // Returns: "connected" | "disconnected" | "connecting" | "reconnecting" | "failed"
-
-// Or using the utility function
-const status = getConnectionStatus(); // Same return type
-```
-
-The possible status values are:
-
-- `"connected"` - Successfully connected to the WebSocket server
-- `"disconnected"` - Not connected and not attempting to reconnect
-- `"connecting"` - Initial connection attempt in progress
-- `"reconnecting"` - Attempting to reconnect after a disconnection
-- `"failed"` - Connection failed and won't retry
-
-You can use this to show connection status indicators in your UI:
+The `useConnectionStatus` composable provides **reactive** connection status that automatically updates when the connection state changes. Use this in Vue components that need to display live connection status:
 
 ```vue
 <script setup>
 import { useConnectionStatus } from "@laravel/echo-vue";
 
-const status = useConnectionStatus();
+const status = useConnectionStatus(); // Automatically updates when status changes
 
 const getStatusColor = (status) => {
     switch (status) {
@@ -79,6 +63,14 @@ const getStatusColor = (status) => {
     </div>
 </template>
 ```
+
+### Status Values
+
+- `"connected"` - Successfully connected to the WebSocket server
+- `"disconnected"` - Not connected and not attempting to reconnect
+- `"connecting"` - Initial connection attempt in progress
+- `"reconnecting"` - Attempting to reconnect after a disconnection
+- `"failed"` - Connection failed and won't retry
 
 ## `useEcho` Hook
 
