@@ -1,16 +1,16 @@
-import { Connector } from "./connector";
-import {
-    SocketIoChannel,
-    SocketIoPrivateChannel,
-    SocketIoPresenceChannel,
-} from "../channel";
 import type {
     io,
     ManagerOptions,
     Socket,
     SocketOptions,
 } from "socket.io-client";
+import {
+    SocketIoChannel,
+    SocketIoPresenceChannel,
+    SocketIoPrivateChannel,
+} from "../channel";
 import type { ConnectionStatus } from "../echo";
+import { Connector } from "./connector";
 
 type AnySocketIoChannel =
     | SocketIoChannel
@@ -171,9 +171,7 @@ export class SocketIoConnector extends Connector<
 
         // Check if socket was previously connected (disconnected)
         // or never connected (connecting/failed)
-        const wasConnected = this.socket.id !== undefined;
-
-        if (wasConnected) {
+        if (this.socket.id !== undefined) {
             return "disconnected";
         }
 
