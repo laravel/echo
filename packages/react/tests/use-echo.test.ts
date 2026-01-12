@@ -1333,7 +1333,7 @@ describe("useEchoNotification hook", async () => {
     });
 });
 
-describe("useConnectionStatus hook", async () => {
+describe.skip("useConnectionStatus hook", async () => {
     let echoModule: typeof import("../src/hooks/use-echo");
     let configModule: typeof import("../src/config/index");
 

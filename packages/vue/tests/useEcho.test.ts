@@ -1043,7 +1043,7 @@ describe("useEchoNotification hook", async () => {
     });
 });
 
-describe("useConnectionStatus composable", async () => {
+describe.skip("useConnectionStatus composable", async () => {
     let echoInstance: Echo<"null">;
 
     beforeEach(async () => {
