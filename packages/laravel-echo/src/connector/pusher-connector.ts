@@ -6,7 +6,7 @@ import {
     PusherPresenceChannel,
     PusherPrivateChannel,
 } from "../channel";
-import type { BroadcastDriver } from "../echo";
+import type { BroadcastDriver, ConnectionStatus } from "../echo";
 import { Connector, type EchoOptionsWithDefaults } from "./connector";
 
 type AnyPusherChannel =
@@ -186,6 +186,47 @@ export class PusherConnector<
      */
     socketId(): string {
         return this.pusher.connection.socket_id;
+    }
+
+    /**
+     * Get the current connection status.
+     */
+    connectionStatus(): ConnectionStatus {
+        const state = this.pusher.connection.state;
+
+        switch (state) {
+            case "connected":
+            case "connecting":
+                return state;
+            case "failed":
+            case "unavailable":
+                return "failed";
+            default:
+                return "disconnected";
+        }
+    }
+
+    /**
+     * Subscribe to connection status changes.
+     */
+    onConnectionChange(
+        callback: (status: ConnectionStatus) => void,
+    ): () => void {
+        const updateStatus = () => {
+            callback(this.connectionStatus());
+        };
+
+        const events = ["state_change", "connected", "disconnected"];
+
+        events.forEach((event) => {
+            this.pusher.connection.bind(event, updateStatus);
+        });
+
+        return () => {
+            events.forEach((event) => {
+                this.pusher.connection.unbind(event, updateStatus);
+            });
+        };
     }
 
     /**

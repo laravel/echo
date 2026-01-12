@@ -27,6 +27,51 @@ In the above example, the configuration would also fill in the following keys if
 }
 ```
 
+## Connection Status
+
+You can get the current WebSocket connection status using the `useConnectionStatus` composable or the `echo().connectionStatus()` utility function.
+
+### `useConnectionStatus` Composable (Reactive)
+
+The `useConnectionStatus` composable provides **reactive** connection status that automatically updates when the connection state changes. Use this in Vue components that need to display live connection status:
+
+```vue
+<script setup>
+import { useConnectionStatus } from "@laravel/echo-vue";
+
+const status = useConnectionStatus(); // Automatically updates when status changes
+
+const getStatusColor = (status) => {
+    switch (status) {
+        case "connected":
+            return "green";
+        case "connecting":
+            return "yellow";
+        case "reconnecting":
+            return "orange";
+        case "failed":
+            return "red";
+        default:
+            return "gray";
+    }
+};
+</script>
+
+<template>
+    <div :style="{ color: getStatusColor(status) }">
+        Connection: {{ status }}
+    </div>
+</template>
+```
+
+### Status Values
+
+- `"connected"` - Successfully connected to the WebSocket server
+- `"disconnected"` - Not connected and not attempting to reconnect
+- `"connecting"` - Initial connection attempt in progress
+- `"reconnecting"` - Attempting to reconnect after a disconnection
+- `"failed"` - Connection failed and won't retry
+
 ## `useEcho` Hook
 
 Connect to private channel:

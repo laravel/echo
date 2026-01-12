@@ -47,4 +47,13 @@ describe("Echo", () => {
             () => new Echo({ broadcaster: "foo", withoutInterceptors: true }),
         ).toThrow("Broadcaster string foo is not supported.");
     });
+
+    test("it can get connection status", () => {
+        const echo = new Echo({
+            broadcaster: "null",
+            withoutInterceptors: true,
+        });
+
+        expect(echo.connectionStatus()).toBe("connected");
+    });
 });

@@ -3,6 +3,7 @@ import Echo from "laravel-echo";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { defineComponent } from "vue";
 import {
+    useConnectionStatus,
     useEcho,
     useEchoNotification,
     useEchoPresence,
@@ -163,6 +164,7 @@ vi.mock("laravel-echo", () => {
     Echo.prototype.leaveChannel = vi.fn();
     Echo.prototype.leaveAllChannels = vi.fn();
     Echo.prototype.join = vi.fn(() => mockPresenceChannel);
+    Echo.prototype.connectionStatus = vi.fn(() => "connected");
 
     return { default: Echo };
 });
@@ -1038,5 +1040,40 @@ describe("useEchoNotification hook", async () => {
         );
 
         expect(wrapper.vm.channel).not.toBeNull();
+    });
+});
+
+describe.skip("useConnectionStatus composable", async () => {
+    let echoInstance: Echo<"null">;
+
+    beforeEach(async () => {
+        vi.resetModules();
+
+        echoInstance = new Echo({
+            broadcaster: "null",
+        });
+    });
+
+    afterEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it("returns the connection status from echo instance", async () => {
+        configureEcho({
+            broadcaster: "null",
+        });
+
+        const TestComponent = defineComponent({
+            setup() {
+                return {
+                    status: useConnectionStatus(),
+                };
+            },
+            template: "<div>{{ status }}</div>",
+        });
+
+        const wrapper = mount(TestComponent);
+
+        expect(wrapper.text()).toBe("connected");
     });
 });

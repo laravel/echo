@@ -1,7 +1,7 @@
 /// <reference types="window" />
 
 import type { Channel, PresenceChannel } from "../channel";
-import type { BroadcastDriver, EchoOptions } from "../echo";
+import type { BroadcastDriver, ConnectionStatus, EchoOptions } from "../echo";
 
 export type EchoOptionsWithDefaults<TBroadcaster extends BroadcastDriver> = {
     broadcaster: TBroadcaster;
@@ -146,6 +146,21 @@ export abstract class Connector<
      * Get the socket_id of the connection.
      */
     abstract socketId(): string | undefined;
+
+    /**
+     * Get the current connection status.
+     */
+    abstract connectionStatus(): ConnectionStatus;
+
+    /**
+     * Subscribe to connection status changes.
+     *
+     * @param callback - Function to call when connection status changes
+     * @returns Unsubscribe function
+     */
+    abstract onConnectionChange(
+        callback: (status: ConnectionStatus) => void,
+    ): () => void;
 
     /**
      * Disconnect from the Echo server.

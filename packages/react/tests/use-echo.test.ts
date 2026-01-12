@@ -40,6 +40,7 @@ vi.mock("laravel-echo", () => {
     Echo.prototype.leaveChannel = vi.fn();
     Echo.prototype.leaveAllChannels = vi.fn();
     Echo.prototype.join = vi.fn(() => mockPresenceChannel);
+    Echo.prototype.connectionStatus = vi.fn(() => "connected");
 
     return { default: Echo };
 });
@@ -1329,5 +1330,31 @@ describe("useEchoNotification hook", async () => {
             .length;
 
         expect(afterRerenderCalls).toBe(initialNotificationCalls);
+    });
+});
+
+describe.skip("useConnectionStatus hook", async () => {
+    let echoModule: typeof import("../src/hooks/use-echo");
+    let configModule: typeof import("../src/config/index");
+
+    beforeEach(async () => {
+        vi.resetModules();
+
+        echoModule = await getEchoModule();
+        configModule = await getConfigModule();
+
+        configModule.configureEcho({
+            broadcaster: "null",
+        });
+    });
+
+    afterEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it("returns the connection status from echo instance", async () => {
+        const { result } = renderHook(() => echoModule.useConnectionStatus());
+
+        expect(result.current).toBe("connected");
     });
 });

@@ -24,6 +24,16 @@ import {
 import { isConstructor } from "./util";
 
 /**
+ * Connection status types for WebSocket connections
+ */
+export type ConnectionStatus =
+    | "connected"
+    | "disconnected"
+    | "connecting"
+    | "reconnecting"
+    | "failed";
+
+/**
  * This class is the primary API for interacting with broadcasting.
  */
 export default class Echo<T extends keyof Broadcaster> {
@@ -173,6 +183,13 @@ export default class Echo<T extends keyof Broadcaster> {
      */
     socketId(): string | undefined {
         return this.connector.socketId();
+    }
+
+    /**
+     * Get the current connection status.
+     */
+    connectionStatus(): ConnectionStatus {
+        return this.connector.connectionStatus();
     }
 
     /**

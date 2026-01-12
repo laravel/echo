@@ -1,15 +1,16 @@
-import { Connector } from "./connector";
-import {
-    SocketIoChannel,
-    SocketIoPrivateChannel,
-    SocketIoPresenceChannel,
-} from "../channel";
 import type {
     io,
     ManagerOptions,
     Socket,
     SocketOptions,
 } from "socket.io-client";
+import {
+    SocketIoChannel,
+    SocketIoPresenceChannel,
+    SocketIoPrivateChannel,
+} from "../channel";
+import type { ConnectionStatus } from "../echo";
+import { Connector } from "./connector";
 
 type AnySocketIoChannel =
     | SocketIoChannel
@@ -153,6 +154,61 @@ export class SocketIoConnector extends Connector<
      */
     socketId(): string | undefined {
         return this.socket.id;
+    }
+
+    /**
+     * Get the current connection status.
+     */
+    connectionStatus(): ConnectionStatus {
+        if (this.socket.connected) {
+            return "connected";
+        }
+
+        // Check if socket is trying to reconnect
+        if (this.socket.io._reconnecting) {
+            return "reconnecting";
+        }
+
+        // Check if socket was previously connected (disconnected)
+        // or never connected (connecting/failed)
+        if (this.socket.id !== undefined) {
+            return "disconnected";
+        }
+
+        // Socket.io doesn't have explicit failed state, but we can infer
+        // if it's not connected and not reconnecting
+        return "connecting";
+    }
+
+    /**
+     * Subscribe to connection status changes.
+     */
+    onConnectionChange(
+        callback: (status: ConnectionStatus) => void,
+    ): () => void {
+        const updateStatus = () => {
+            callback(this.connectionStatus());
+        };
+
+        const events = [
+            "connect",
+            "disconnect",
+            "connect_error",
+            "reconnect_attempt",
+            "reconnect",
+            "reconnect_error",
+            "reconnect_failed",
+        ];
+
+        events.forEach((event) => {
+            this.socket.on(event, updateStatus);
+        });
+
+        return () => {
+            events.forEach((event) => {
+                this.socket.off(event, updateStatus);
+            });
+        };
     }
 
     /**

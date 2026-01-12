@@ -1,4 +1,5 @@
 export {
+    useConnectionStatus,
     useEcho,
     useEchoModel,
     useEchoNotification,

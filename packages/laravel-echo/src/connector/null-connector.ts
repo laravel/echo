@@ -1,10 +1,11 @@
-import { Connector } from "./connector";
 import {
     NullChannel,
-    NullPrivateChannel,
-    NullPresenceChannel,
     NullEncryptedPrivateChannel,
+    NullPresenceChannel,
+    NullPrivateChannel,
 } from "../channel";
+import type { ConnectionStatus } from "../echo";
+import { Connector } from "./connector";
 
 /**
  * This class creates a null connector.
@@ -85,6 +86,26 @@ export class NullConnector extends Connector<
      */
     socketId(): string {
         return "fake-socket-id";
+    }
+
+    /**
+     * Get the current connection status.
+     */
+    connectionStatus(): ConnectionStatus {
+        return "connected";
+    }
+
+    /**
+     * Subscribe to connection status changes.
+     */
+    onConnectionChange(
+        _callback: (status: ConnectionStatus) => void,
+    ): () => void {
+        // Null connector always returns "connected" and never changes
+
+        return () => {
+            // No-op cleanup
+        };
     }
 
     /**
