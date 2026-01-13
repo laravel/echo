@@ -1,6 +1,20 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v2.2.7...2.x)
+## [Unreleased](https://github.com/laravel/echo/compare/v2.3.0...2.x)
+
+## [v2.3.0](https://github.com/laravel/echo/compare/v2.2.7...v2.3.0) - 2026-01-13
+
+### What's Changed
+
+* fix(hooks): resolve performance issues and stale closure bugs in useEcho by [@pataar](https://github.com/pataar) in https://github.com/laravel/echo/pull/472
+* Add a connection status hook (discussion required) by [@nexxai](https://github.com/nexxai) in https://github.com/laravel/echo/pull/469
+
+### New Contributors
+
+* [@pataar](https://github.com/pataar) made their first contribution in https://github.com/laravel/echo/pull/472
+* [@nexxai](https://github.com/nexxai) made their first contribution in https://github.com/laravel/echo/pull/469
+
+**Full Changelog**: https://github.com/laravel/echo/compare/v2.2.7...v2.3.0
 
 ## [v2.2.7](https://github.com/laravel/echo/compare/v2.2.6...v2.2.7) - 2025-12-27
 
