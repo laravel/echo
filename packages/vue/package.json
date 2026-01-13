@@ -1,6 +1,6 @@
 {
     "name": "@laravel/echo-vue",
-    "version": "2.2.7",
+    "version": "2.3.0",
     "description": "Vue hooks for seamless integration with Laravel Echo.",
     "keywords": [
         "laravel",

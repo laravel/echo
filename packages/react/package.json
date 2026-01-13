@@ -1,6 +1,6 @@
 {
     "name": "@laravel/echo-react",
-    "version": "2.2.7",
+    "version": "2.3.0",
     "description": "React hooks for seamless integration with Laravel Echo.",
     "keywords": [
         "laravel",
