@@ -1,0 +1,164 @@
+# Laravel Echo Svelte Helpers
+
+## `configureEcho`
+
+You must call this function somewhere in your app _before_ you use `createEcho` in a component to configure your Echo instance. You only need to pass the required data:
+
+```ts
+import { configureEcho } from "@laravel/echo-svelte";
+
+configureEcho({
+    broadcaster: "reverb",
+});
+```
+
+Based on your broadcaster, the package will fill in appropriate defaults for the rest of the config [based on the Echo documentation](https://laravel.com/docs/broadcasting#client-side-installation). You can always override these values by simply passing in your own.
+
+In the above example, the configuration would also fill in the following keys if they aren't present:
+
+```ts
+{
+    key: import.meta.env.VITE_REVERB_APP_KEY,
+    wsHost: import.meta.env.VITE_REVERB_HOST,
+    wsPort: import.meta.env.VITE_REVERB_PORT,
+    wssPort: import.meta.env.VITE_REVERB_PORT,
+    forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
+    enabledTransports: ['ws', 'wss'],
+}
+```
+
+## Connection Status
+
+You can get the current WebSocket connection status using the `createConnectionStatus` function or the `echo().connectionStatus()` utility function.
+
+### `createConnectionStatus` (Reactive)
+
+The `createConnectionStatus` function provides **reactive** connection status that automatically updates when the connection state changes. Use this in Svelte components that need to display live connection status:
+
+```svelte
+<script>
+import { createConnectionStatus } from "@laravel/echo-svelte";
+
+const status = createConnectionStatus(); // Automatically updates when status changes
+
+function getStatusColor(status) {
+    switch (status) {
+        case "connected":
+            return "green";
+        case "connecting":
+            return "yellow";
+        case "reconnecting":
+            return "orange";
+        case "failed":
+            return "red";
+        default:
+            return "gray";
+    }
+}
+</script>
+
+<div style="color: {getStatusColor(status)}">
+    Connection: {status}
+</div>
+```
+
+### Status Values
+
+- `"connected"` - Successfully connected to the WebSocket server
+- `"disconnected"` - Not connected and not attempting to reconnect
+- `"connecting"` - Initial connection attempt in progress
+- `"reconnecting"` - Attempting to reconnect after a disconnection
+- `"failed"` - Connection failed and won't retry
+
+## `createEcho`
+
+Connect to private channel:
+
+```ts
+import { createEcho } from "@laravel/echo-svelte";
+
+const { leaveChannel, leave, stopListening, listen } = createEcho(
+    `orders.${orderId}`,
+    "OrderShipmentStatusUpdated",
+    (e) => {
+        console.log(e.order);
+    },
+);
+
+// Stop listening without leaving channel
+stopListening();
+
+// Start listening again
+listen();
+
+// Leave channel
+leaveChannel();
+
+// Leave a channel and also its associated private and presence channels
+leave();
+```
+
+Multiple events:
+
+```ts
+createEcho(
+    `orders.${orderId}`,
+    ["OrderShipmentStatusUpdated", "OrderShipped"],
+    (e) => {
+        console.log(e.order);
+    },
+);
+```
+
+Specify shape of payload data:
+
+```ts
+type OrderData = {
+    order: {
+        id: number;
+        user: {
+            id: number;
+            name: string;
+        };
+        created_at: string;
+    };
+};
+
+createEcho<OrderData>(
+    `orders.${orderId}`,
+    "OrderShipmentStatusUpdated",
+    (e) => {
+        console.log(e.order.id);
+        console.log(e.order.user.id);
+    },
+);
+```
+
+Connect to public channel:
+
+```ts
+createEchoPublic("posts", "PostPublished", (e) => {
+    console.log(e.post);
+});
+```
+
+Connect to presence channel:
+
+```ts
+createEchoPresence("posts", "PostPublished", (e) => {
+    console.log(e.post);
+});
+```
+
+Listening for model events:
+
+```ts
+createEchoModel(
+    "App.Models.User",
+    userId,
+    ["UserCreated", "UserUpdated"],
+    (e) => {
+        console.log(e.model);
+    },
+);
+```
