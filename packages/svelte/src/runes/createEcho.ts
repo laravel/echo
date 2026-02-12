@@ -187,7 +187,7 @@ export function createEcho<
         // Track external reactive dependencies
         const currentCallback = callback;
         if (dependencies.length > 0) {
-            dependencies.forEach((dep) => dep);
+            dependencies.forEach((dep) => void dep);
         }
 
         // Update callback and listeners if callback changed
@@ -296,9 +296,9 @@ export const createEchoNotification = <
 
     $effect(() => {
         // Track external reactive dependencies
-        callback;
+        void callback;
         if (dependencies.length > 0) {
-            dependencies.forEach((dep) => dep);
+            dependencies.forEach((dep) => void dep);
         }
 
         listen();
