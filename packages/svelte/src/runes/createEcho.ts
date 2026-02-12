@@ -139,8 +139,8 @@ export function createEcho<
     dependencies: any[] = [],
     visibility: TVisibility = "private" as TVisibility,
 ) {
-    let listening = $state(false);
-    let eventCallback = $state(callback);
+    let listening = false;
+    let eventCallback = callback;
     const events = Array.isArray(event) ? event : [event];
 
     const channel: Channel = {
@@ -184,17 +184,17 @@ export function createEcho<
     };
 
     $effect(() => {
-        // Update callback when it changes
-        const previousCallback = eventCallback;
-        eventCallback = callback;
-
-        // Track dependencies for reactivity
+        // Track external reactive dependencies
+        const currentCallback = callback;
         if (dependencies.length > 0) {
             dependencies.forEach((dep) => dep);
         }
 
-        // If callback changed and we were listening, update listeners
-        if (listening && previousCallback !== callback) {
+        // Update callback and listeners if callback changed
+        const previousCallback = eventCallback;
+        eventCallback = currentCallback;
+
+        if (listening && previousCallback !== currentCallback) {
             events.forEach((e) => {
                 subscription.stopListening(e, previousCallback);
                 subscription.listen(e, eventCallback);
@@ -259,8 +259,8 @@ export const createEchoNotification = <
         })
         .flat();
 
-    let listening = $state(false);
-    let initialized = $state(false);
+    let listening = false;
+    let initialized = false;
 
     const cb = (notification: BroadcastNotification<TPayload>) => {
         if (!listening) {
@@ -295,7 +295,7 @@ export const createEchoNotification = <
     };
 
     $effect(() => {
-        // Track callback and dependencies for reactivity
+        // Track external reactive dependencies
         callback;
         if (dependencies.length > 0) {
             dependencies.forEach((dep) => dep);
@@ -380,9 +380,9 @@ export const createEchoModel = <
 /**
  * Rune to get the current WebSocket connection status
  *
- * @returns ConnectionStatus - A reactive state containing the current connection status
+ * @returns A getter function that returns the current connection status
  */
-export const createConnectionStatus = (): ConnectionStatus => {
+export const createConnectionStatus = (): (() => ConnectionStatus) => {
     let status = $state<ConnectionStatus>(echo().connectionStatus());
 
     $effect(() => {
@@ -402,5 +402,5 @@ export const createConnectionStatus = (): ConnectionStatus => {
         };
     });
 
-    return status;
+    return () => status;
 };
