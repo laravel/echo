@@ -78,6 +78,7 @@ export const configureEcho = <T extends BroadcastDriver>(
 
     // Reset the instance if it was already created
     if (echoInstance) {
+        echoInstance.leaveAllChannels();
         echoInstance = null;
     }
 };
