@@ -16,6 +16,8 @@ export type Channel = {
     visibility: "private" | "public" | "presence";
 };
 
+export type Dependency = unknown;
+
 export type BroadcastNotification<TPayload> = TPayload & {
     id: string;
     type: string;

@@ -1,3 +1,4 @@
+import type Echo from "laravel-echo";
 import { type BroadcastDriver, type ConnectionStatus } from "laravel-echo";
 import { echo } from "../config";
 import type {
@@ -6,6 +7,7 @@ import type {
     ChannelData,
     ChannelReturnType,
     Connection,
+    Dependency,
     EventName,
     InferEventPayload,
     ModelEvents,
@@ -14,17 +16,38 @@ import type {
 import { toArray } from "../util";
 
 const channels: Record<string, ChannelData<BroadcastDriver>> = {};
+let activeEchoInstance: Echo<BroadcastDriver> | null = null;
+
+const clearChannelCache = (): void => {
+    Object.keys(channels).forEach((channelId) => {
+        delete channels[channelId];
+    });
+};
 
 const resolveChannelSubscription = <T extends BroadcastDriver>(
     channel: Channel,
 ): Connection<T> => {
+    const instance = echo<T>();
+
+    if (
+        activeEchoInstance !== null &&
+        activeEchoInstance !== (instance as Echo<BroadcastDriver>)
+    ) {
+        clearChannelCache();
+    }
+
+    activeEchoInstance = instance as Echo<BroadcastDriver>;
+
     if (channels[channel.id]) {
         channels[channel.id].count += 1;
 
         return channels[channel.id].connection;
     }
 
-    const channelSubscription = subscribeToChannel<T>(channel);
+    const channelSubscription = subscribeToChannel<T>(
+        instance,
+        channel,
+    );
 
     channels[channel.id] = {
         count: 1,
@@ -35,10 +58,9 @@ const resolveChannelSubscription = <T extends BroadcastDriver>(
 };
 
 const subscribeToChannel = <T extends BroadcastDriver>(
+    instance: Echo<T>,
     channel: Channel,
 ): Connection<T> => {
-    const instance = echo<T>();
-
     if (channel.visibility === "presence") {
         return instance.join(channel.name);
     }
@@ -70,6 +92,20 @@ const leaveChannel = (channel: Channel, leaveAll: boolean = false): void => {
     }
 };
 
+const trackDependencies = (dependencies: Dependency[]): void => {
+    dependencies.forEach((dependency) => {
+        if (typeof dependency === "function") {
+            const getter = dependency as () => unknown;
+
+            void getter();
+
+            return;
+        }
+
+        void dependency;
+    });
+};
+
 // Overload for automatic type inference from event name
 export function createEcho<
     TEvent extends EventName = EventName,
@@ -79,7 +115,7 @@ export function createEcho<
     channelName: string,
     event: TEvent,
     callback: (payload: InferEventPayload<TEvent>) => void,
-    dependencies?: any[],
+    dependencies?: Dependency[],
     visibility?: TVisibility,
 ): {
     leaveChannel: (leaveAll?: boolean) => void;
@@ -98,7 +134,7 @@ export function createEcho<
     channelName: string,
     event: TEvent[],
     callback: (payload: InferEventPayload<TEvent>) => void,
-    dependencies?: any[],
+    dependencies?: Dependency[],
     visibility?: TVisibility,
 ): {
     leaveChannel: (leaveAll?: boolean) => void;
@@ -117,7 +153,7 @@ export function createEcho<
     channelName: string,
     event: string | string[],
     callback: (payload: TPayload) => void,
-    dependencies?: any[],
+    dependencies?: Dependency[],
     visibility?: TVisibility,
 ): {
     leaveChannel: (leaveAll?: boolean) => void;
@@ -136,12 +172,14 @@ export function createEcho<
     channelName: string,
     event: string | string[] = [],
     callback: (payload: TPayload) => void = () => {},
-    dependencies: any[] = [],
+    dependencies: Dependency[] = [],
     visibility: TVisibility = "private" as TVisibility,
 ) {
     let listening = false;
-    let eventCallback = callback;
     const events = Array.isArray(event) ? event : [event];
+    const eventCallback = (payload: TPayload) => {
+        callback(payload);
+    };
 
     const channel: Channel = {
         name: channelName,
@@ -184,28 +222,13 @@ export function createEcho<
     };
 
     $effect(() => {
-        // Track external reactive dependencies
-        const currentCallback = callback;
-        if (dependencies.length > 0) {
-            dependencies.forEach((dep) => void dep);
-        }
+        listen();
 
-        // Update callback and listeners if callback changed
-        const previousCallback = eventCallback;
-        eventCallback = currentCallback;
+        return () => tearDown();
+    });
 
-        if (listening && previousCallback !== currentCallback) {
-            events.forEach((e) => {
-                subscription.stopListening(e, previousCallback);
-                subscription.listen(e, eventCallback);
-            });
-        } else if (!listening) {
-            listen();
-        }
-
-        return () => {
-            tearDown();
-        };
+    $effect(() => {
+        trackDependencies(dependencies);
     });
 
     return {
@@ -239,7 +262,7 @@ export const createEchoNotification = <
     channelName: string,
     callback: (payload: BroadcastNotification<TPayload>) => void = () => {},
     event: string | string[] = [],
-    dependencies: any[] = [],
+    dependencies: Dependency[] = [],
 ) => {
     const result = createEcho<BroadcastNotification<TPayload>, TDriver, "private">(
         channelName,
@@ -260,7 +283,6 @@ export const createEchoNotification = <
         .flat();
 
     let listening = false;
-    let initialized = false;
 
     const cb = (notification: BroadcastNotification<TPayload>) => {
         if (!listening) {
@@ -277,12 +299,9 @@ export const createEchoNotification = <
             return;
         }
 
-        if (!initialized) {
-            result.channel().notification(cb);
-        }
+        result.channel().notification(cb);
 
         listening = true;
-        initialized = true;
     };
 
     const stopListening = () => {
@@ -295,17 +314,13 @@ export const createEchoNotification = <
     };
 
     $effect(() => {
-        // Track external reactive dependencies
-        void callback;
-        if (dependencies.length > 0) {
-            dependencies.forEach((dep) => void dep);
-        }
-
         listen();
 
-        return () => {
-            stopListening();
-        };
+        return () => stopListening();
+    });
+
+    $effect(() => {
+        trackDependencies(dependencies);
     });
 
     return {
@@ -328,7 +343,7 @@ export const createEchoPresence = <
     channelName: string,
     event: string | string[] = [],
     callback: (payload: TPayload) => void = () => {},
-    dependencies: any[] = [],
+    dependencies: Dependency[] = [],
 ) => {
     return createEcho<TPayload, TDriver, "presence">(
         channelName,
@@ -346,7 +361,7 @@ export const createEchoPublic = <
     channelName: string,
     event: string | string[] = [],
     callback: (payload: TPayload) => void = () => {},
-    dependencies: any[] = [],
+    dependencies: Dependency[] = [],
 ) => {
     return createEcho<TPayload, TDriver, "public">(
         channelName,
@@ -366,7 +381,7 @@ export const createEchoModel = <
     identifier: string | number,
     event: ModelEvents<TModel> | ModelEvents<TModel>[] = [],
     callback: (payload: ModelPayload<TPayload>) => void = () => {},
-    dependencies: any[] = [],
+    dependencies: Dependency[] = [],
 ) => {
     return createEcho<ModelPayload<TPayload>, TDriver, "private">(
         `${model}.${identifier}`,
@@ -386,20 +401,13 @@ export const createConnectionStatus = (): (() => ConnectionStatus) => {
     let status = $state<ConnectionStatus>(echo().connectionStatus());
 
     $effect(() => {
+        status = echo().connectionStatus();
+
         const unsubscribe = echo().connector.onConnectionChange((newStatus) => {
             status = newStatus;
         });
 
-        status = echo().connectionStatus();
-
-        const timeoutId = setTimeout(() => {
-            status = echo().connectionStatus();
-        }, 0);
-
-        return () => {
-            clearTimeout(timeoutId);
-            unsubscribe();
-        };
+        return () => unsubscribe();
     });
 
     return () => status;
