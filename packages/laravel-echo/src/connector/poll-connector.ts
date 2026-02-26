@@ -230,7 +230,7 @@ export class PollConnector extends Connector<
 
         const channelNames = Object.keys(this.channels);
 
-        if (channelNames.length === 0 && this.lastEventId !== null) {
+        if (channelNames.length === 0) {
             return;
         }
 
@@ -240,26 +240,25 @@ export class PollConnector extends Connector<
             const endpoint =
                 this.options.pollEndpoint ?? "/broadcasting/poll";
 
-            const params = new URLSearchParams();
-            channelNames.forEach((name) => {
-                params.append("channels[]", name);
-            });
+            const body: Record<string, any> = {
+                channels: channelNames,
+            };
             if (this.lastEventId) {
-                params.append("lastEventId", this.lastEventId);
+                body.lastEventId = this.lastEventId;
             }
 
-            const url = `${endpoint}?${params.toString()}`;
-
             const headers: Record<string, string> = {
-                Accept: "application/json",
+                "Accept": "application/json",
+                "Content-Type": "application/json",
                 "X-Socket-ID": this._socketId,
                 ...this.options.auth.headers,
             };
 
-            const response = await fetch(url, {
-                method: "GET",
+            const response = await fetch(endpoint, {
+                method: "POST",
                 headers,
                 credentials: "same-origin",
+                body: JSON.stringify(body),
             });
 
             if (!response.ok) {
@@ -295,11 +294,7 @@ export class PollConnector extends Connector<
                     const ch = this.channels[channelName];
                     if (ch && ch instanceof PollPresenceChannel) {
                         ch.updatePresence(
-                            presenceData as {
-                                members: any[];
-                                joined: any[];
-                                left: any[];
-                            },
+                            presenceData as { members: any[] },
                         );
                     }
                 }

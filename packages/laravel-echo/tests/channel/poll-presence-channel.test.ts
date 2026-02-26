@@ -18,43 +18,68 @@ describe("PollPresenceChannel", () => {
         channel.here(cb);
 
         channel.updatePresence({
-            members: [{ id: 1, name: "Alice" }, { id: 2, name: "Bob" }],
-            joined: [],
-            left: [],
+            members: [
+                { user_id: 1, user_info: { name: "Alice" } },
+                { user_id: 2, user_info: { name: "Bob" } },
+            ],
         });
 
         expect(cb).toHaveBeenCalledWith([
-            { id: 1, name: "Alice" },
-            { id: 2, name: "Bob" },
+            { user_id: 1, user_info: { name: "Alice" } },
+            { user_id: 2, user_info: { name: "Bob" } },
         ]);
     });
 
-    test("joining() callbacks fire for each joined member", () => {
+    test("joining() callbacks fire for newly seen members", () => {
         const cb = vi.fn();
         channel.joining(cb);
 
+        // First update — all members are "new"
         channel.updatePresence({
-            members: [],
-            joined: [{ id: 3, name: "Charlie" }, { id: 4, name: "Diana" }],
-            left: [],
+            members: [{ user_id: 1, user_info: {} }],
         });
 
-        expect(cb).toHaveBeenCalledTimes(2);
-        expect(cb).toHaveBeenCalledWith({ id: 3, name: "Charlie" });
-        expect(cb).toHaveBeenCalledWith({ id: 4, name: "Diana" });
+        expect(cb).toHaveBeenCalledTimes(1);
+        expect(cb).toHaveBeenCalledWith({ user_id: 1, user_info: {} });
+
+        cb.mockClear();
+
+        // Second update — user 2 joins
+        channel.updatePresence({
+            members: [
+                { user_id: 1, user_info: {} },
+                { user_id: 2, user_info: {} },
+            ],
+        });
+
+        expect(cb).toHaveBeenCalledTimes(1);
+        expect(cb).toHaveBeenCalledWith({ user_id: 2, user_info: {} });
     });
 
-    test("leaving() callbacks fire for each left member", () => {
+    test("leaving() callbacks fire when a member disappears", () => {
         const cb = vi.fn();
         channel.leaving(cb);
 
+        // First update — establish known members
         channel.updatePresence({
-            members: [],
-            joined: [],
-            left: [{ id: 1, name: "Alice" }],
+            members: [
+                { user_id: 1, user_info: { name: "Alice" } },
+                { user_id: 2, user_info: { name: "Bob" } },
+            ],
         });
 
-        expect(cb).toHaveBeenCalledWith({ id: 1, name: "Alice" });
+        expect(cb).not.toHaveBeenCalled();
+
+        // Second update — user 1 is gone
+        channel.updatePresence({
+            members: [{ user_id: 2, user_info: { name: "Bob" } }],
+        });
+
+        expect(cb).toHaveBeenCalledTimes(1);
+        expect(cb).toHaveBeenCalledWith({
+            user_id: 1,
+            user_info: { name: "Alice" },
+        });
     });
 
     test("multiple callbacks can be registered for each event", () => {
@@ -68,19 +93,25 @@ describe("PollPresenceChannel", () => {
         channel.joining(joining1);
         channel.leaving(leaving1);
 
+        // First update — user 1 joins
         channel.updatePresence({
-            members: [{ id: 1 }],
-            joined: [{ id: 2 }],
-            left: [{ id: 3 }],
+            members: [{ user_id: 1, user_info: {} }],
         });
 
         expect(here1).toHaveBeenCalledOnce();
         expect(here2).toHaveBeenCalledOnce();
         expect(joining1).toHaveBeenCalledOnce();
+
+        // Second update — user 1 leaves, user 2 joins
+        channel.updatePresence({
+            members: [{ user_id: 2, user_info: {} }],
+        });
+
         expect(leaving1).toHaveBeenCalledOnce();
+        expect(joining1).toHaveBeenCalledTimes(2);
     });
 
-    test("unsubscribe clears presence callbacks", () => {
+    test("unsubscribe clears presence callbacks and known members", () => {
         const here = vi.fn();
         const joining = vi.fn();
         const leaving = vi.fn();
@@ -92,14 +123,50 @@ describe("PollPresenceChannel", () => {
         channel.unsubscribe();
 
         channel.updatePresence({
-            members: [{ id: 1 }],
-            joined: [{ id: 2 }],
-            left: [{ id: 3 }],
+            members: [{ user_id: 1, user_info: {} }],
         });
 
         expect(here).not.toHaveBeenCalled();
         expect(joining).not.toHaveBeenCalled();
         expect(leaving).not.toHaveBeenCalled();
+    });
+
+    test("same member in consecutive updates does not trigger joining again", () => {
+        const joining = vi.fn();
+        channel.joining(joining);
+
+        channel.updatePresence({
+            members: [{ user_id: 1, user_info: {} }],
+        });
+
+        joining.mockClear();
+
+        channel.updatePresence({
+            members: [{ user_id: 1, user_info: {} }],
+        });
+
+        expect(joining).not.toHaveBeenCalled();
+    });
+
+    test("every client sees leaving independently", () => {
+        const leaving = vi.fn();
+        channel.leaving(leaving);
+
+        // Establish members
+        channel.updatePresence({
+            members: [
+                { user_id: 1, user_info: {} },
+                { user_id: 2, user_info: {} },
+            ],
+        });
+
+        // User 2 disappears — this client sees leaving
+        channel.updatePresence({
+            members: [{ user_id: 1, user_info: {} }],
+        });
+
+        expect(leaving).toHaveBeenCalledTimes(1);
+        expect(leaving).toHaveBeenCalledWith({ user_id: 2, user_info: {} });
     });
 
     test("whisper is a no-op", () => {

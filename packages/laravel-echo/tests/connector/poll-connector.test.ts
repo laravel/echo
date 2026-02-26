@@ -27,11 +27,10 @@ function mockFetchFailure(error?: Error): void {
 }
 
 /**
- * Flush the initial poll's promise chain. The connector calls poll()
- * synchronously during connect(), but the fetch response resolves
- * as a microtask. Advancing by 0ms flushes it.
+ * Flush the poll's promise chain. The connector's poll() is async
+ * and the fetch response resolves as a microtask.
  */
-async function flushInitialPoll(): Promise<void> {
+async function flushPoll(): Promise<void> {
     await vi.advanceTimersByTimeAsync(0);
 }
 
@@ -142,8 +141,10 @@ describe("PollConnector", () => {
 
     test("transitions to connected after first successful poll", async () => {
         const connector = createConnector();
+        connector.channel("orders");
 
-        await flushInitialPoll();
+        // Trigger first interval poll (channels now registered)
+        await vi.advanceTimersByTimeAsync(5000);
 
         expect(connector.connectionStatus()).toBe("connected");
 
@@ -152,10 +153,11 @@ describe("PollConnector", () => {
 
     test("fires connection status change callbacks", async () => {
         const connector = createConnector();
+        connector.channel("orders");
         const cb = vi.fn();
         connector.onConnectionChange(cb);
 
-        await flushInitialPoll();
+        await vi.advanceTimersByTimeAsync(5000);
 
         expect(cb).toHaveBeenCalledWith("connected");
 
@@ -164,12 +166,13 @@ describe("PollConnector", () => {
 
     test("unsubscribe from connection status changes", async () => {
         const connector = createConnector();
+        connector.channel("orders");
         const cb = vi.fn();
         const unsub = connector.onConnectionChange(cb);
 
         unsub();
 
-        await flushInitialPoll();
+        await vi.advanceTimersByTimeAsync(5000);
 
         expect(cb).not.toHaveBeenCalled();
 
@@ -178,7 +181,8 @@ describe("PollConnector", () => {
 
     test("disconnect stops polling and sets disconnected", async () => {
         const connector = createConnector();
-        await flushInitialPoll();
+        connector.channel("orders");
+        await vi.advanceTimersByTimeAsync(5000);
 
         connector.disconnect();
 
@@ -186,7 +190,7 @@ describe("PollConnector", () => {
         expect(Object.keys(connector.channels)).toHaveLength(0);
     });
 
-    test("polls the correct endpoint with channel names", async () => {
+    test("polls the correct endpoint with channel names via POST", async () => {
         const connector = createConnector();
         connector.channel("orders");
         connector.privateChannel("users");
@@ -197,22 +201,27 @@ describe("PollConnector", () => {
         const fetchMock = vi.mocked(fetch);
         const lastCall = fetchMock.mock.calls[fetchMock.mock.calls.length - 1];
         const url = lastCall[0] as string;
+        const options = lastCall[1] as RequestInit;
 
-        expect(url).toContain("/broadcasting/poll?");
-        expect(url).toContain("channels%5B%5D=orders");
-        expect(url).toContain("channels%5B%5D=private-users");
+        expect(url).toBe("/broadcasting/poll");
+        expect(options.method).toBe("POST");
+
+        const body = JSON.parse(options.body as string);
+        expect(body.channels).toContain("orders");
+        expect(body.channels).toContain("private-users");
 
         connector.disconnect();
     });
 
     test("sends X-Socket-ID header", async () => {
         const connector = createConnector();
+        connector.channel("orders");
 
-        await flushInitialPoll();
+        await vi.advanceTimersByTimeAsync(5000);
 
         const fetchMock = vi.mocked(fetch);
-        const firstCall = fetchMock.mock.calls[0];
-        const options = firstCall[1] as RequestInit;
+        const lastCall = fetchMock.mock.calls[fetchMock.mock.calls.length - 1];
+        const options = lastCall[1] as RequestInit;
 
         expect((options.headers as Record<string, string>)["X-Socket-ID"]).toBe(
             connector.socketId(),
@@ -226,16 +235,17 @@ describe("PollConnector", () => {
         connector.channel("orders");
 
         // First poll resolves with cursor-1
-        await flushInitialPoll();
+        await vi.advanceTimersByTimeAsync(5000);
 
         // Trigger the next interval poll
         await vi.advanceTimersByTimeAsync(5000);
 
         const fetchMock = vi.mocked(fetch);
         const lastCall = fetchMock.mock.calls[fetchMock.mock.calls.length - 1];
-        const url = lastCall[0] as string;
+        const options = lastCall[1] as RequestInit;
+        const body = JSON.parse(options.body as string);
 
-        expect(url).toContain("lastEventId=cursor-1");
+        expect(body.lastEventId).toBe("cursor-1");
 
         connector.disconnect();
     });
@@ -276,14 +286,16 @@ describe("PollConnector", () => {
     });
 
     test("dispatches presence data to presence channels", async () => {
+        // Server returns only members — client computes joined/left
         mockFetchResponse({
             events: [],
             lastEventId: "cursor-1",
             presence: {
                 "presence-chat": {
-                    members: [{ id: 1, name: "Alice" }],
-                    joined: [{ id: 2, name: "Bob" }],
-                    left: [],
+                    members: [
+                        { user_id: 1, user_info: { name: "Alice" } },
+                        { user_id: 2, user_info: { name: "Bob" } },
+                    ],
                 },
             },
         });
@@ -298,8 +310,14 @@ describe("PollConnector", () => {
         // Trigger interval poll with presence data
         await vi.advanceTimersByTimeAsync(5000);
 
-        expect(hereCb).toHaveBeenCalledWith([{ id: 1, name: "Alice" }]);
-        expect(joiningCb).toHaveBeenCalledWith({ id: 2, name: "Bob" });
+        expect(hereCb).toHaveBeenCalledWith([
+            { user_id: 1, user_info: { name: "Alice" } },
+            { user_id: 2, user_info: { name: "Bob" } },
+        ]);
+        // Both are new to the client, so joining fires for each
+        expect(joiningCb).toHaveBeenCalledTimes(2);
+        expect(joiningCb).toHaveBeenCalledWith({ user_id: 1, user_info: { name: "Alice" } });
+        expect(joiningCb).toHaveBeenCalledWith({ user_id: 2, user_info: { name: "Bob" } });
 
         connector.disconnect();
     });
@@ -310,7 +328,7 @@ describe("PollConnector", () => {
 
         connector.channel("orders").subscribed(cb);
 
-        await flushInitialPoll();
+        await vi.advanceTimersByTimeAsync(5000);
 
         expect(cb).toHaveBeenCalledOnce();
 
@@ -322,7 +340,7 @@ describe("PollConnector", () => {
         connector.channel("orders");
 
         // First poll succeeds
-        await flushInitialPoll();
+        await vi.advanceTimersByTimeAsync(5000);
         expect(connector.connectionStatus()).toBe("connected");
 
         // Next poll fails
@@ -338,7 +356,9 @@ describe("PollConnector", () => {
         mockFetchFailure();
 
         const connector = createConnector();
-        await flushInitialPoll();
+        connector.channel("orders");
+
+        await vi.advanceTimersByTimeAsync(5000);
 
         expect(connector.connectionStatus()).toBe("failed");
 
@@ -352,7 +372,7 @@ describe("PollConnector", () => {
         const cb = vi.fn();
         connector.channel("orders").error(cb);
 
-        await flushInitialPoll();
+        await vi.advanceTimersByTimeAsync(5000);
 
         expect(cb).toHaveBeenCalledWith(expect.any(Error));
 
@@ -363,13 +383,14 @@ describe("PollConnector", () => {
         const connector = createConnector({
             pollEndpoint: "/api/custom-poll",
         });
+        connector.channel("orders");
 
-        await flushInitialPoll();
+        await vi.advanceTimersByTimeAsync(5000);
 
         const fetchMock = vi.mocked(fetch);
         const url = fetchMock.mock.calls[0][0] as string;
 
-        expect(url).toContain("/api/custom-poll?");
+        expect(url).toBe("/api/custom-poll");
 
         connector.disconnect();
     });
@@ -378,7 +399,7 @@ describe("PollConnector", () => {
         const connector = createConnector({ pollInterval: 2000 });
         connector.channel("orders");
 
-        await flushInitialPoll();
+        await flushPoll();
 
         const fetchMock = vi.mocked(fetch);
         const callCount = fetchMock.mock.calls.length;
@@ -396,7 +417,7 @@ describe("PollConnector", () => {
         connector.channel("orders");
 
         // Connect successfully
-        await flushInitialPoll();
+        await vi.advanceTimersByTimeAsync(5000);
         expect(connector.connectionStatus()).toBe("connected");
 
         // Fail
@@ -446,11 +467,15 @@ describe("PollConnector", () => {
         );
 
         const connector = createConnector();
+        connector.channel("orders");
 
-        // Advance past several intervals while the first poll is still pending
+        // Trigger first poll
+        vi.advanceTimersByTime(5000);
+
+        // Advance past several more intervals while the first poll is still pending
         vi.advanceTimersByTime(15000);
 
-        // fetch should only have been called once (the initial poll)
+        // fetch should only have been called once
         expect(vi.mocked(fetch)).toHaveBeenCalledTimes(1);
 
         connector.disconnect();
