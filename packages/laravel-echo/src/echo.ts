@@ -12,13 +12,18 @@ import {
     SocketIoChannel,
     SocketIoPresenceChannel,
     SocketIoPrivateChannel,
+    PollChannel,
+    PollPresenceChannel,
+    PollPrivateChannel,
     type PresenceChannel,
 } from "./channel";
 import {
     Connector,
     NullConnector,
+    PollConnector,
     PusherConnector,
     SocketIoConnector,
+    type PollOptions,
     type PusherOptions,
 } from "./connector";
 import { isConstructor } from "./util";
@@ -85,6 +90,8 @@ export default class Echo<T extends keyof Broadcaster> {
             });
         } else if (this.options.broadcaster === "socket.io") {
             this.connector = new SocketIoConnector(this.options);
+        } else if (this.options.broadcaster === "poll") {
+            this.connector = new PollConnector(this.options);
         } else if (this.options.broadcaster === "null") {
             this.connector = new NullConnector(this.options);
         } else if (
@@ -329,6 +336,14 @@ export type Broadcaster = {
         encrypted: never;
         presence: SocketIoPresenceChannel;
         options: GenericOptions<"socket.io">;
+    };
+    poll: {
+        connector: PollConnector;
+        public: PollChannel;
+        private: PollPrivateChannel;
+        encrypted: never;
+        presence: PollPresenceChannel;
+        options: GenericOptions<"poll"> & Partial<PollOptions>;
     };
     null: {
         connector: NullConnector;

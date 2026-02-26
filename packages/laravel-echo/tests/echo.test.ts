@@ -23,6 +23,10 @@ describe("Echo", () => {
         ).not.toThrow("Broadcaster string socket.io is not supported.");
 
         expect(
+            () => new Echo({ broadcaster: "poll", withoutInterceptors: true }),
+        ).not.toThrow("Broadcaster string poll is not supported.");
+
+        expect(
             () => new Echo({ broadcaster: "null", withoutInterceptors: true }),
         ).not.toThrow("Broadcaster string null is not supported.");
         expect(

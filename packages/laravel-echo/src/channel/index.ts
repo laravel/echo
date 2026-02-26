@@ -11,3 +11,6 @@ export * from "./null-channel";
 export * from "./null-private-channel";
 export * from "./null-encrypted-private-channel";
 export * from "./null-presence-channel";
+export * from "./poll-channel";
+export * from "./poll-private-channel";
+export * from "./poll-presence-channel";
