@@ -1011,7 +1011,7 @@ describe("useEchoNotification hook", async () => {
         wrapper.vm.stopListening();
         wrapper.vm.listen();
 
-        expect(channel.notification).toHaveBeenCalledTimes(1);
+        expect(channel.notification).toHaveBeenCalledTimes(2);
     });
 
     it("stopListening prevents new notification listeners", async () => {

@@ -267,7 +267,6 @@ export const useEchoNotification = <
         .flat();
 
     const listening = ref(false);
-    const initialized = ref(false);
 
     const cb = (notification: BroadcastNotification<TPayload>) => {
         if (!listening.value) {
@@ -284,12 +283,9 @@ export const useEchoNotification = <
             return;
         }
 
-        if (!initialized.value) {
-            result.channel().notification(cb);
-        }
+        result.channel().notification(cb);
 
         listening.value = true;
-        initialized.value = true;
     };
 
     const stopListening = () => {

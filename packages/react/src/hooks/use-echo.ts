@@ -281,7 +281,6 @@ export const useEchoNotification = <
     }, [eventKey]);
 
     const listening = useRef(false);
-    const initializedRef = useRef(false);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const memoizedCallback = useCallback(callback, dependencies);
@@ -304,12 +303,9 @@ export const useEchoNotification = <
             return;
         }
 
-        if (!initializedRef.current) {
-            result.channel().notification(cb);
-        }
+        result.channel().notification(cb);
 
         listening.current = true;
-        initializedRef.current = true;
     }, [cb, result]);
 
     const stopListening = useCallback(() => {
