@@ -1222,8 +1222,8 @@ describe("useEchoNotification hook", async () => {
 
         result.current.listen();
 
-        // notification should still only be called once due to initialized check
-        expect(channel.notification).toHaveBeenCalledTimes(1);
+        // notification should be re-registered after stop + listen
+        expect(channel.notification).toHaveBeenCalledTimes(2);
     });
 
     it("stopListening prevents new notification listeners", async () => {
