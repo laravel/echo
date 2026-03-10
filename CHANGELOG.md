@@ -1,6 +1,22 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v2.3.0...2.x)
+## [Unreleased](https://github.com/laravel/echo/compare/v2.3.1...2.x)
+
+## [v2.3.1](https://github.com/laravel/echo/compare/v2.3.0...v2.3.1) - 2026-03-10
+
+### What's Changed
+
+* fix: prevent isConstructor from executing constructor side effects by [@valentin-dufois](https://github.com/valentin-dufois) in https://github.com/laravel/echo/pull/476
+* Bump axios from 1.12.0 to 1.13.5 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/477
+* Add Boost skills for Echo, Vue, and React packages by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/echo/pull/480
+* fix: useEchoNotification callback not firing after re-render by [@pataar](https://github.com/pataar) in https://github.com/laravel/echo/pull/481
+
+### New Contributors
+
+* [@valentin-dufois](https://github.com/valentin-dufois) made their first contribution in https://github.com/laravel/echo/pull/476
+* [@pushpak1300](https://github.com/pushpak1300) made their first contribution in https://github.com/laravel/echo/pull/480
+
+**Full Changelog**: https://github.com/laravel/echo/compare/v2.3.0...v2.3.1
 
 ## [v2.3.0](https://github.com/laravel/echo/compare/v2.2.7...v2.3.0) - 2026-01-13
 
