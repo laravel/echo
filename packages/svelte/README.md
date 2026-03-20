@@ -57,8 +57,8 @@ function getStatusColor(status) {
 }
 </script>
 
-<div style="color: {getStatusColor(status)}">
-    Connection: {status}
+<div style="color: {getStatusColor(status())}">
+    Connection: {status()}
 </div>
 ```
 
@@ -107,6 +107,22 @@ createEcho(
     (e) => {
         console.log(e.order);
     },
+);
+```
+
+Reactive inputs:
+
+```ts
+let orderId = $state(1);
+let event = $state("OrderShipmentStatusUpdated");
+
+createEcho(
+    () => `orders.${orderId}`,
+    () => event,
+    (e) => {
+        console.log(e.order);
+    },
+    [() => orderId, () => event],
 );
 ```
 

@@ -284,7 +284,125 @@ describe("createEcho (Svelte runes)", () => {
         await tick();
 
         expect(dependencyRuns).toBe(2);
-        expect(instance.__privateChannel.listen).toHaveBeenCalledTimes(1);
+        expect(instance.__privateChannel.stopListening).toHaveBeenCalledTimes(1);
+        expect(instance.__privateChannel.listen).toHaveBeenCalledTimes(2);
+
+        cleanup();
+    });
+
+    it("rebinds when a reactive channel getter changes", async () => {
+        const { echoModule, instance } = await setupConfiguredEcho();
+
+        let setOrderId: (value: number) => void = () => {};
+
+        const cleanup = $effect.root(() => {
+            let orderId = $state(1);
+            setOrderId = (value: number) => {
+                orderId = value;
+            };
+
+            echoModule.createEcho(
+                () => `orders.${orderId}`,
+                "OrderUpdated",
+                vi.fn(),
+                [() => orderId],
+            );
+        });
+
+        await tick();
+
+        expect(instance.private).toHaveBeenCalledWith("orders.1");
+
+        setOrderId(2);
+        await tick();
+
+        expect(instance.leaveChannel).toHaveBeenCalledWith("private-orders.1");
+        expect(instance.private).toHaveBeenCalledWith("orders.2");
+
+        cleanup();
+    });
+
+    it("rebinds when a reactive event getter changes", async () => {
+        const { echoModule, instance } = await setupConfiguredEcho();
+
+        let setEventName: (value: string) => void = () => {};
+
+        const cleanup = $effect.root(() => {
+            let eventName = $state("OrderCreated");
+            setEventName = (value: string) => {
+                eventName = value;
+            };
+
+            echoModule.createEcho(
+                "orders.10",
+                () => eventName,
+                vi.fn(),
+                [() => eventName],
+            );
+        });
+
+        await tick();
+
+        expect(instance.__privateChannel.listen).toHaveBeenCalledWith(
+            "OrderCreated",
+            expect.any(Function),
+        );
+
+        setEventName("OrderShipped");
+        await tick();
+
+        expect(instance.__privateChannel.stopListening).toHaveBeenCalledWith(
+            "OrderCreated",
+            expect.any(Function),
+        );
+        expect(instance.__privateChannel.listen).toHaveBeenCalledWith(
+            "OrderShipped",
+            expect.any(Function),
+        );
+
+        cleanup();
+    });
+
+    it("uses the latest callback ref without remounting", async () => {
+        const { echoModule, instance } = await setupConfiguredEcho();
+
+        const firstCallback = vi.fn();
+        const secondCallback = vi.fn();
+        let updateCallback: (callback: (payload: unknown) => void) => void =
+            () => {};
+
+        const cleanup = $effect.root(() => {
+            let currentCallback = $state<(payload: unknown) => void>(
+                firstCallback,
+            );
+
+            updateCallback = (callback) => {
+                currentCallback = callback;
+            };
+
+            echoModule.createEcho(
+                "orders.11",
+                "OrderUpdated",
+                {
+                    get current() {
+                        return currentCallback;
+                    },
+                },
+                [() => currentCallback],
+            );
+        });
+
+        await tick();
+
+        const listener = instance.__privateChannel.listen.mock.calls[0][1];
+        listener({ id: 1 });
+        expect(firstCallback).toHaveBeenCalledTimes(1);
+
+        updateCallback(secondCallback);
+        await tick();
+
+        listener({ id: 2 });
+        expect(secondCallback).toHaveBeenCalledTimes(1);
 
         cleanup();
     });
@@ -502,6 +620,94 @@ describe("createEchoNotification", () => {
             instance.__privateChannel.notification.mock.calls[1][0];
         secondListener({ type: "App\\Notifications\\Welcome" });
         expect(callback).toHaveBeenCalledTimes(2);
+
+        cleanup();
+    });
+
+    it("rebinds notification filters when a reactive event getter changes", async () => {
+        const { echoModule, instance } = await setupConfiguredEcho();
+        const callback = vi.fn();
+        let setEventName: (value: string) => void = () => {};
+
+        const cleanup = $effect.root(() => {
+            let eventName = $state("App.Notifications.First");
+            setEventName = (value: string) => {
+                eventName = value;
+            };
+
+            echoModule.createEchoNotification(
+                "users.6",
+                callback,
+                () => eventName,
+                [() => eventName],
+            );
+        });
+
+        await tick();
+
+        const firstListener = instance.__privateChannel.notification.mock.calls[0][0];
+        firstListener({ type: "App\\Notifications\\First", data: {} });
+        expect(callback).toHaveBeenCalledTimes(1);
+
+        setEventName("App.Notifications.Second");
+        await tick();
+
+        expect(
+            instance.__privateChannel.stopListeningForNotification,
+        ).toHaveBeenCalledTimes(1);
+        expect(instance.__privateChannel.notification).toHaveBeenCalledTimes(2);
+
+        const secondListener =
+            instance.__privateChannel.notification.mock.calls[1][0];
+        secondListener({ type: "App\\Notifications\\First", data: {} });
+        secondListener({ type: "App\\Notifications\\Second", data: {} });
+
+        expect(callback).toHaveBeenCalledTimes(2);
+
+        cleanup();
+    });
+
+    it("uses the latest notification callback ref", async () => {
+        const { echoModule, instance } = await setupConfiguredEcho();
+
+        const firstCallback = vi.fn();
+        const secondCallback = vi.fn();
+        let updateCallback: (
+            callback: (payload: Record<string, unknown>) => void,
+        ) => void = () => {};
+
+        const cleanup = $effect.root(() => {
+            let currentCallback = $state<
+                (payload: Record<string, unknown>) => void
+            >(firstCallback);
+
+            updateCallback = (callback) => {
+                currentCallback = callback;
+            };
+
+            echoModule.createEchoNotification(
+                "users.7",
+                {
+                    get current() {
+                        return currentCallback;
+                    },
+                },
+                "App.Notifications.Welcome",
+                [() => currentCallback],
+            );
+        });
+
+        await tick();
+
+        const listener = instance.__privateChannel.notification.mock.calls[0][0];
+        listener({ type: "App\\Notifications\\Welcome", data: {} });
+        expect(firstCallback).toHaveBeenCalledTimes(1);
+
+        updateCallback(secondCallback);
+        await tick();
+
+        listener({ type: "App\\Notifications\\Welcome", data: {} });
+        expect(secondCallback).toHaveBeenCalledTimes(1);
 
         cleanup();
     });
