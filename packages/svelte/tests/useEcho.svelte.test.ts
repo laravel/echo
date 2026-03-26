@@ -65,7 +65,7 @@ vi.mock("laravel-echo", () => {
     return { default: Echo };
 });
 
-const getEchoModule = async () => import("../src/runes/createEcho");
+const getEchoModule = async () => import("../src/runes/useEcho");
 const getConfigModule = async () => import("../src/config/index");
 
 const setupConfiguredEcho = async () => {
@@ -100,7 +100,7 @@ const mountRune = async <T>(factory: (module: Awaited<ReturnType<typeof getEchoM
     };
 };
 
-describe("createEcho (Svelte runes)", () => {
+describe("useEcho (Svelte runes)", () => {
     beforeEach(() => {
         vi.resetModules();
         echoInstances.length = 0;
@@ -111,11 +111,11 @@ describe("createEcho (Svelte runes)", () => {
     });
 
     it("throws if echo is used before configureEcho", async () => {
-        const { createEcho } = await getEchoModule();
+        const { useEcho } = await getEchoModule();
 
         expect(() =>
             $effect.root(() => {
-                createEcho("orders.1", "OrderUpdated", vi.fn());
+                useEcho("orders.1", "OrderUpdated", vi.fn());
             }),
         ).toThrow("Echo has not been configured");
     });
@@ -123,7 +123,7 @@ describe("createEcho (Svelte runes)", () => {
     it("subscribes to a private channel and exposes channel controls", async () => {
         const callback = vi.fn();
         const { instance, value, cleanup } = await mountRune((echoModule) =>
-            echoModule.createEcho("orders.1", "OrderUpdated", callback),
+            echoModule.useEcho("orders.1", "OrderUpdated", callback),
         );
 
         expect(value).toHaveProperty("leaveChannel");
@@ -142,7 +142,7 @@ describe("createEcho (Svelte runes)", () => {
     it("handles multiple private events and stops listening on teardown", async () => {
         const callback = vi.fn();
         const { instance, cleanup } = await mountRune((echoModule) =>
-            echoModule.createEcho(
+            echoModule.useEcho(
                 "orders.2",
                 ["OrderUpdated", "OrderShipped"],
                 callback,
@@ -169,11 +169,11 @@ describe("createEcho (Svelte runes)", () => {
         const { echoModule, instance } = await setupConfiguredEcho();
 
         const cleanupA = $effect.root(() => {
-            echoModule.createEcho("orders.3", "OrderUpdated", vi.fn());
+            echoModule.useEcho("orders.3", "OrderUpdated", vi.fn());
         });
 
         const cleanupB = $effect.root(() => {
-            echoModule.createEcho("orders.3", "OrderUpdated", vi.fn());
+            echoModule.useEcho("orders.3", "OrderUpdated", vi.fn());
         });
 
         await tick();
@@ -194,7 +194,7 @@ describe("createEcho (Svelte runes)", () => {
 
     it("can leave a private channel", async () => {
         const { instance, value, cleanup } = await mountRune((echoModule) =>
-            echoModule.createEcho("orders.4", "OrderUpdated", vi.fn()),
+            echoModule.useEcho("orders.4", "OrderUpdated", vi.fn()),
         );
 
         value.leaveChannel();
@@ -205,7 +205,7 @@ describe("createEcho (Svelte runes)", () => {
 
     it("can leave all private channel variations", async () => {
         const { instance, value, cleanup } = await mountRune((echoModule) =>
-            echoModule.createEcho("orders.4", "OrderUpdated", vi.fn()),
+            echoModule.useEcho("orders.4", "OrderUpdated", vi.fn()),
         );
 
         value.leave();
@@ -216,7 +216,7 @@ describe("createEcho (Svelte runes)", () => {
 
     it("supports manual listen and stopListening controls", async () => {
         const { instance, value, cleanup } = await mountRune((echoModule) =>
-            echoModule.createEcho("orders.5", "OrderUpdated", vi.fn()),
+            echoModule.useEcho("orders.5", "OrderUpdated", vi.fn()),
         );
 
         value.stopListening();
@@ -230,7 +230,7 @@ describe("createEcho (Svelte runes)", () => {
 
     it("guards against duplicate listen and stopListening calls", async () => {
         const { instance, value, cleanup } = await mountRune((echoModule) =>
-            echoModule.createEcho("orders.6", "OrderUpdated", vi.fn()),
+            echoModule.useEcho("orders.6", "OrderUpdated", vi.fn()),
         );
 
         value.listen();
@@ -245,7 +245,7 @@ describe("createEcho (Svelte runes)", () => {
 
     it("allows events and callbacks to be omitted", async () => {
         const { instance, value, cleanup } = await mountRune((echoModule) =>
-            echoModule.createEcho("orders.7"),
+            echoModule.useEcho("orders.7"),
         );
 
         expect(value.channel()).toBe(instance.__privateChannel);
@@ -266,7 +266,7 @@ describe("createEcho (Svelte runes)", () => {
                 version = value;
             };
 
-            echoModule.createEcho("orders.8", "OrderUpdated", vi.fn(), [
+            echoModule.useEcho("orders.8", "OrderUpdated", vi.fn(), [
                 () => {
                     dependencyRuns += 1;
 
@@ -301,7 +301,7 @@ describe("createEcho (Svelte runes)", () => {
                 orderId = value;
             };
 
-            echoModule.createEcho(
+            echoModule.useEcho(
                 () => `orders.${orderId}`,
                 "OrderUpdated",
                 vi.fn(),
@@ -333,7 +333,7 @@ describe("createEcho (Svelte runes)", () => {
                 eventName = value;
             };
 
-            echoModule.createEcho(
+            echoModule.useEcho(
                 "orders.10",
                 () => eventName,
                 vi.fn(),
@@ -380,7 +380,7 @@ describe("createEcho (Svelte runes)", () => {
                 currentCallback = callback;
             };
 
-            echoModule.createEcho(
+            echoModule.useEcho(
                 "orders.11",
                 "OrderUpdated",
                 {
@@ -412,7 +412,7 @@ describe("createEcho (Svelte runes)", () => {
             await setupConfiguredEcho();
 
         const firstCleanup = $effect.root(() => {
-            echoModule.createEcho("orders.9", "OrderUpdated", vi.fn());
+            echoModule.useEcho("orders.9", "OrderUpdated", vi.fn());
         });
 
         await tick();
@@ -425,7 +425,7 @@ describe("createEcho (Svelte runes)", () => {
 
         const secondInstance = configModule.echo() as any;
         const secondCleanup = $effect.root(() => {
-            echoModule.createEcho("orders.9", "OrderUpdated", vi.fn());
+            echoModule.useEcho("orders.9", "OrderUpdated", vi.fn());
         });
 
         await tick();
@@ -438,7 +438,7 @@ describe("createEcho (Svelte runes)", () => {
     });
 });
 
-describe("createEchoPublic", () => {
+describe("useEchoPublic", () => {
     beforeEach(() => {
         vi.resetModules();
         echoInstances.length = 0;
@@ -450,7 +450,7 @@ describe("createEchoPublic", () => {
 
     it("subscribes to a public channel and leaves it on teardown", async () => {
         const { instance, cleanup } = await mountRune((echoModule) =>
-            echoModule.createEchoPublic("posts", "PostPublished", vi.fn()),
+            echoModule.useEchoPublic("posts", "PostPublished", vi.fn()),
         );
 
         expect(instance.channel).toHaveBeenCalledWith("posts");
@@ -467,7 +467,7 @@ describe("createEchoPublic", () => {
 
     it("allows events and callbacks to be omitted", async () => {
         const { instance, value, cleanup } = await mountRune((echoModule) =>
-            echoModule.createEchoPublic("posts"),
+            echoModule.useEchoPublic("posts"),
         );
 
         expect(value.channel()).toBe(instance.__publicChannel);
@@ -477,7 +477,7 @@ describe("createEchoPublic", () => {
     });
 });
 
-describe("createEchoPresence", () => {
+describe("useEchoPresence", () => {
     beforeEach(() => {
         vi.resetModules();
         echoInstances.length = 0;
@@ -489,7 +489,7 @@ describe("createEchoPresence", () => {
 
     it("subscribes to a presence channel and leaves it on teardown", async () => {
         const { instance, cleanup } = await mountRune((echoModule) =>
-            echoModule.createEchoPresence("chat.1", "MessageSent", vi.fn()),
+            echoModule.useEchoPresence("chat.1", "MessageSent", vi.fn()),
         );
 
         expect(instance.join).toHaveBeenCalledWith("chat.1");
@@ -506,7 +506,7 @@ describe("createEchoPresence", () => {
 
     it("allows events and callbacks to be omitted", async () => {
         const { instance, value, cleanup } = await mountRune((echoModule) =>
-            echoModule.createEchoPresence("chat.1"),
+            echoModule.useEchoPresence("chat.1"),
         );
 
         expect(value.channel()).toBe(instance.__presenceChannel);
@@ -516,7 +516,7 @@ describe("createEchoPresence", () => {
     });
 });
 
-describe("createEchoNotification", () => {
+describe("useEchoNotification", () => {
     beforeEach(() => {
         vi.resetModules();
         echoInstances.length = 0;
@@ -528,7 +528,7 @@ describe("createEchoNotification", () => {
 
     it("subscribes to a private channel and registers a notification listener", async () => {
         const { instance, cleanup } = await mountRune((echoModule) =>
-            echoModule.createEchoNotification("users.1", vi.fn()),
+            echoModule.useEchoNotification("users.1", vi.fn()),
         );
 
         expect(instance.private).toHaveBeenCalledWith("users.1");
@@ -540,7 +540,7 @@ describe("createEchoNotification", () => {
     it("filters notifications by event type", async () => {
         const callback = vi.fn();
         const { instance, cleanup } = await mountRune((echoModule) =>
-            echoModule.createEchoNotification(
+            echoModule.useEchoNotification(
                 "users.2",
                 callback,
                 "App.Notifications.Welcome",
@@ -559,7 +559,7 @@ describe("createEchoNotification", () => {
     it("handles multiple notification event types", async () => {
         const callback = vi.fn();
         const { instance, cleanup } = await mountRune((echoModule) =>
-            echoModule.createEchoNotification("users.3", callback, [
+            echoModule.useEchoNotification("users.3", callback, [
                 "App.Notifications.First",
                 "App.Notifications.Second",
             ]),
@@ -578,7 +578,7 @@ describe("createEchoNotification", () => {
     it("accepts all notifications when no event types are specified", async () => {
         const callback = vi.fn();
         const { instance, cleanup } = await mountRune((echoModule) =>
-            echoModule.createEchoNotification("users.4", callback),
+            echoModule.useEchoNotification("users.4", callback),
         );
 
         const listener = instance.__privateChannel.notification.mock.calls[0][0];
@@ -593,7 +593,7 @@ describe("createEchoNotification", () => {
     it("allows notification listeners to stop and resume", async () => {
         const callback = vi.fn();
         const { instance, value, cleanup } = await mountRune((echoModule) =>
-            echoModule.createEchoNotification(
+            echoModule.useEchoNotification(
                 "users.5",
                 callback,
                 "App.Notifications.Welcome",
@@ -635,7 +635,7 @@ describe("createEchoNotification", () => {
                 eventName = value;
             };
 
-            echoModule.createEchoNotification(
+            echoModule.useEchoNotification(
                 "users.6",
                 callback,
                 () => eventName,
@@ -685,7 +685,7 @@ describe("createEchoNotification", () => {
                 currentCallback = callback;
             };
 
-            echoModule.createEchoNotification(
+            echoModule.useEchoNotification(
                 "users.7",
                 {
                     get current() {
@@ -713,7 +713,7 @@ describe("createEchoNotification", () => {
     });
 });
 
-describe("createEchoModel", () => {
+describe("useEchoModel", () => {
     beforeEach(() => {
         vi.resetModules();
         echoInstances.length = 0;
@@ -725,7 +725,7 @@ describe("createEchoModel", () => {
 
     it("subscribes to a model channel and prefixes model events", async () => {
         const { instance, cleanup } = await mountRune((echoModule) =>
-            echoModule.createEchoModel(
+            echoModule.useEchoModel(
                 "App.Models.User",
                 1,
                 "UserCreated",
@@ -744,7 +744,7 @@ describe("createEchoModel", () => {
 
     it("handles multiple model events", async () => {
         const { instance, cleanup } = await mountRune((echoModule) =>
-            echoModule.createEchoModel(
+            echoModule.useEchoModel(
                 "App.Models.User",
                 1,
                 ["UserCreated", "UserUpdated"],
@@ -765,7 +765,7 @@ describe("createEchoModel", () => {
     });
 });
 
-describe("createConnectionStatus", () => {
+describe("useConnectionStatus", () => {
     beforeEach(() => {
         vi.resetModules();
         echoInstances.length = 0;
@@ -777,7 +777,7 @@ describe("createConnectionStatus", () => {
 
     it("tracks connection status changes and unsubscribes on teardown", async () => {
         const { instance, value, cleanup } = await mountRune((echoModule) =>
-            echoModule.createConnectionStatus(),
+            echoModule.useConnectionStatus(),
         );
 
         expect(value()).toBe("connected");

@@ -142,7 +142,7 @@ const resolveChannel = <TVisibility extends Channel["visibility"]>(
 };
 
 // Overload for automatic type inference from event name
-export function createEcho<
+export function useEcho<
     TEvent extends EventName = EventName,
     TDriver extends BroadcastDriver = BroadcastDriver,
     TVisibility extends Channel["visibility"] = "private",
@@ -161,7 +161,7 @@ export function createEcho<
 };
 
 // Overload for multiple events with automatic type inference
-export function createEcho<
+export function useEcho<
     TEvent extends EventName = EventName,
     TDriver extends BroadcastDriver = BroadcastDriver,
     TVisibility extends Channel["visibility"] = "private",
@@ -180,7 +180,7 @@ export function createEcho<
 };
 
 // Overload for explicit payload type (backward compatibility)
-export function createEcho<
+export function useEcho<
     TPayload,
     TDriver extends BroadcastDriver = BroadcastDriver,
     TVisibility extends Channel["visibility"] = "private",
@@ -199,7 +199,7 @@ export function createEcho<
 };
 
 // Implementation
-export function createEcho<
+export function useEcho<
     TPayload,
     TDriver extends BroadcastDriver = BroadcastDriver,
     TVisibility extends Channel["visibility"] = "private",
@@ -289,7 +289,7 @@ export function createEcho<
     };
 }
 
-export const createEchoNotification = <
+export const useEchoNotification = <
     TPayload,
     TDriver extends BroadcastDriver = BroadcastDriver,
 >(
@@ -298,7 +298,7 @@ export const createEchoNotification = <
     event: ReactiveInput<string | string[]> = [],
     dependencies: Dependency[] = [],
 ) => {
-    const result = createEcho<BroadcastNotification<TPayload>, TDriver, "private">(
+    const result = useEcho<BroadcastNotification<TPayload>, TDriver, "private">(
         channelName,
         [],
         callback,
@@ -376,7 +376,7 @@ export const createEchoNotification = <
     };
 };
 
-export const createEchoPresence = <
+export const useEchoPresence = <
     TPayload,
     TDriver extends BroadcastDriver = BroadcastDriver,
 >(
@@ -385,7 +385,7 @@ export const createEchoPresence = <
     callback: CallbackInput<TPayload> = () => {},
     dependencies: Dependency[] = [],
 ) => {
-    return createEcho<TPayload, TDriver, "presence">(
+    return useEcho<TPayload, TDriver, "presence">(
         channelName,
         event,
         callback,
@@ -394,7 +394,7 @@ export const createEchoPresence = <
     );
 };
 
-export const createEchoPublic = <
+export const useEchoPublic = <
     TPayload,
     TDriver extends BroadcastDriver = BroadcastDriver,
 >(
@@ -403,7 +403,7 @@ export const createEchoPublic = <
     callback: CallbackInput<TPayload> = () => {},
     dependencies: Dependency[] = [],
 ) => {
-    return createEcho<TPayload, TDriver, "public">(
+    return useEcho<TPayload, TDriver, "public">(
         channelName,
         event,
         callback,
@@ -412,7 +412,7 @@ export const createEchoPublic = <
     );
 };
 
-export const createEchoModel = <
+export const useEchoModel = <
     TPayload,
     TModel extends string,
     TDriver extends BroadcastDriver = BroadcastDriver,
@@ -423,7 +423,7 @@ export const createEchoModel = <
     callback: CallbackInput<ModelPayload<TPayload>> = () => {},
     dependencies: Dependency[] = [],
 ) => {
-    return createEcho<ModelPayload<TPayload>, TDriver, "private">(
+    return useEcho<ModelPayload<TPayload>, TDriver, "private">(
         () => `${resolveInput(model)}.${resolveInput(identifier)}`,
         () =>
             toArray(resolveInput(event)).map((e) =>
@@ -440,7 +440,7 @@ export const createEchoModel = <
  *
  * @returns A getter function that returns the current connection status
  */
-export const createConnectionStatus = (): (() => ConnectionStatus) => {
+export const useConnectionStatus = (): (() => ConnectionStatus) => {
     let status = $state<ConnectionStatus>(echo().connectionStatus());
 
     $effect(() => {

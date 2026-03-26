@@ -2,7 +2,7 @@
 
 ## `configureEcho`
 
-You must call this function somewhere in your app _before_ you use `createEcho` in a component to configure your Echo instance. You only need to pass the required data:
+You must call this function somewhere in your app _before_ you use `useEcho` in a component to configure your Echo instance. You only need to pass the required data:
 
 ```ts
 import { configureEcho } from "@laravel/echo-svelte";
@@ -29,17 +29,17 @@ In the above example, the configuration would also fill in the following keys if
 
 ## Connection Status
 
-You can get the current WebSocket connection status using the `createConnectionStatus` function or the `echo().connectionStatus()` utility function.
+You can get the current WebSocket connection status using the `useConnectionStatus` function or the `echo().connectionStatus()` utility function.
 
-### `createConnectionStatus` (Reactive)
+### `useConnectionStatus` (Reactive)
 
-The `createConnectionStatus` function provides **reactive** connection status that automatically updates when the connection state changes. Use this in Svelte components that need to display live connection status:
+The `useConnectionStatus` function provides **reactive** connection status that automatically updates when the connection state changes. Use this in Svelte components that need to display live connection status:
 
 ```svelte
 <script>
-import { createConnectionStatus } from "@laravel/echo-svelte";
+import { useConnectionStatus } from "@laravel/echo-svelte";
 
-const status = createConnectionStatus(); // Automatically updates when status changes
+const status = useConnectionStatus(); // Automatically updates when status changes
 
 function getStatusColor(status) {
     switch (status) {
@@ -70,14 +70,14 @@ function getStatusColor(status) {
 - `"reconnecting"` - Attempting to reconnect after a disconnection
 - `"failed"` - Connection failed and won't retry
 
-## `createEcho`
+## `useEcho`
 
 Connect to private channel:
 
 ```ts
-import { createEcho } from "@laravel/echo-svelte";
+import { useEcho } from "@laravel/echo-svelte";
 
-const { leaveChannel, leave, stopListening, listen } = createEcho(
+const { leaveChannel, leave, stopListening, listen } = useEcho(
     `orders.${orderId}`,
     "OrderShipmentStatusUpdated",
     (e) => {
@@ -101,7 +101,7 @@ leave();
 Multiple events:
 
 ```ts
-createEcho(
+useEcho(
     `orders.${orderId}`,
     ["OrderShipmentStatusUpdated", "OrderShipped"],
     (e) => {
@@ -116,7 +116,7 @@ Reactive inputs:
 let orderId = $state(1);
 let event = $state("OrderShipmentStatusUpdated");
 
-createEcho(
+useEcho(
     () => `orders.${orderId}`,
     () => event,
     (e) => {
@@ -140,7 +140,7 @@ type OrderData = {
     };
 };
 
-createEcho<OrderData>(
+useEcho<OrderData>(
     `orders.${orderId}`,
     "OrderShipmentStatusUpdated",
     (e) => {
@@ -153,7 +153,7 @@ createEcho<OrderData>(
 Connect to public channel:
 
 ```ts
-createEchoPublic("posts", "PostPublished", (e) => {
+useEchoPublic("posts", "PostPublished", (e) => {
     console.log(e.post);
 });
 ```
@@ -161,7 +161,7 @@ createEchoPublic("posts", "PostPublished", (e) => {
 Connect to presence channel:
 
 ```ts
-createEchoPresence("posts", "PostPublished", (e) => {
+useEchoPresence("posts", "PostPublished", (e) => {
     console.log(e.post);
 });
 ```
@@ -169,7 +169,7 @@ createEchoPresence("posts", "PostPublished", (e) => {
 Listening for model events:
 
 ```ts
-createEchoModel(
+useEchoModel(
     "App.Models.User",
     userId,
     ["UserCreated", "UserUpdated"],
