@@ -13,7 +13,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                adapter: ["laravel-echo", "react", "vue"]
+                adapter: ["laravel-echo", "react", "svelte", "vue"]
         steps:
             - name: Checkout
               uses: actions/checkout@v4
