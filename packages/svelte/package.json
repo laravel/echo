@@ -1,6 +1,6 @@
 {
     "name": "@laravel/echo-svelte",
-    "version": "2.3.0",
+    "version": "2.3.1",
     "description": "Svelte 5 runes for seamless integration with Laravel Echo.",
     "keywords": [
         "laravel",
