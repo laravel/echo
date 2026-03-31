@@ -1,6 +1,14 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v2.3.1...2.x)
+## [Unreleased](https://github.com/laravel/echo/compare/v2.3.2...2.x)
+
+## [v2.3.2](https://github.com/laravel/echo/compare/v2.3.1...v2.3.2) - 2026-03-31
+
+### What's Changed
+
+* Svelte 5 Adapter by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/echo/pull/484
+
+**Full Changelog**: https://github.com/laravel/echo/compare/v2.3.1...v2.3.2
 
 ## [v2.3.1](https://github.com/laravel/echo/compare/v2.3.0...v2.3.1) - 2026-03-10
 
