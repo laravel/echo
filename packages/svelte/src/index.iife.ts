@@ -6,5 +6,4 @@ export {
     useEchoNotification,
     useEchoPresence,
     useEchoPublic,
-} from "./hooks/use-echo";
-export type { ConnectionStatus } from "laravel-echo";
+} from "./runes/useEcho";
