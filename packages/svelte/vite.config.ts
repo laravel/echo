@@ -5,12 +5,16 @@ import { defineConfig, PluginOption, UserConfig } from "vite";
 import dts from "vite-plugin-dts";
 
 const srcDir = resolve(__dirname, "src");
+const testsDir = resolve(__dirname, "tests");
 
 const svelteRunesTsPlugin = (): PluginOption => ({
     name: "svelte-runes-ts",
     enforce: "pre",
     async transform(code, id) {
-        if (!id.startsWith(srcDir) || !id.endsWith(".ts")) {
+        if (
+            (!id.startsWith(srcDir) && !id.startsWith(testsDir)) ||
+            !id.endsWith(".ts")
+        ) {
             return null;
         }
 

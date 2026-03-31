@@ -16,7 +16,24 @@ export type Channel = {
     visibility: "private" | "public" | "presence";
 };
 
-export type Dependency = unknown;
+export type ReactiveInput<T> = T | (() => T);
+
+export type CallbackInput<TPayload> =
+    | ((payload: TPayload) => void)
+    | {
+          current: (payload: TPayload) => void;
+      };
+
+export type Dependency =
+    | (() => unknown)
+    | object
+    | string
+    | number
+    | boolean
+    | symbol
+    | bigint
+    | null
+    | undefined;
 
 export type BroadcastNotification<TPayload> = TPayload & {
     id: string;
