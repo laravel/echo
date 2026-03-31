@@ -140,14 +140,10 @@ type OrderData = {
     };
 };
 
-useEcho<OrderData>(
-    `orders.${orderId}`,
-    "OrderShipmentStatusUpdated",
-    (e) => {
-        console.log(e.order.id);
-        console.log(e.order.user.id);
-    },
-);
+useEcho<OrderData>(`orders.${orderId}`, "OrderShipmentStatusUpdated", (e) => {
+    console.log(e.order.id);
+    console.log(e.order.user.id);
+});
 ```
 
 Connect to public channel:
@@ -169,12 +165,7 @@ useEchoPresence("posts", "PostPublished", (e) => {
 Listening for model events:
 
 ```ts
-useEchoModel(
-    "App.Models.User",
-    userId,
-    ["UserCreated", "UserUpdated"],
-    (e) => {
-        console.log(e.model);
-    },
-);
+useEchoModel("App.Models.User", userId, ["UserCreated", "UserUpdated"], (e) => {
+    console.log(e.model);
+});
 ```

@@ -44,11 +44,13 @@ vi.mock("laravel-echo", () => {
             leaveAllChannels: vi.fn(),
             connectionStatus: vi.fn(() => "connected"),
             connector: {
-                onConnectionChange: vi.fn((callback: (status: string) => void) => {
-                    onConnectionChange = callback;
+                onConnectionChange: vi.fn(
+                    (callback: (status: string) => void) => {
+                        onConnectionChange = callback;
 
-                    return unsubscribe;
-                }),
+                        return unsubscribe;
+                    },
+                ),
             },
             __privateChannel: privateChannel,
             __publicChannel: publicChannel,
@@ -83,7 +85,9 @@ const setupConfiguredEcho = async () => {
     };
 };
 
-const mountRune = async <T>(factory: (module: Awaited<ReturnType<typeof getEchoModule>>) => T) => {
+const mountRune = async <T>(
+    factory: (module: Awaited<ReturnType<typeof getEchoModule>>) => T,
+) => {
     const context = await setupConfiguredEcho();
     let value!: T;
 
@@ -161,7 +165,9 @@ describe("useEcho (Svelte runes)", () => {
         cleanup();
         await tick();
 
-        expect(instance.__privateChannel.stopListening).toHaveBeenCalledTimes(2);
+        expect(instance.__privateChannel.stopListening).toHaveBeenCalledTimes(
+            2,
+        );
         expect(instance.leaveChannel).toHaveBeenCalledWith("private-orders.2");
     });
 
@@ -220,7 +226,9 @@ describe("useEcho (Svelte runes)", () => {
         );
 
         value.stopListening();
-        expect(instance.__privateChannel.stopListening).toHaveBeenCalledTimes(1);
+        expect(instance.__privateChannel.stopListening).toHaveBeenCalledTimes(
+            1,
+        );
 
         value.listen();
         expect(instance.__privateChannel.listen).toHaveBeenCalledTimes(2);
@@ -238,7 +246,9 @@ describe("useEcho (Svelte runes)", () => {
 
         value.stopListening();
         value.stopListening();
-        expect(instance.__privateChannel.stopListening).toHaveBeenCalledTimes(1);
+        expect(instance.__privateChannel.stopListening).toHaveBeenCalledTimes(
+            1,
+        );
 
         cleanup();
     });
@@ -284,7 +294,9 @@ describe("useEcho (Svelte runes)", () => {
         await tick();
 
         expect(dependencyRuns).toBe(2);
-        expect(instance.__privateChannel.stopListening).toHaveBeenCalledTimes(1);
+        expect(instance.__privateChannel.stopListening).toHaveBeenCalledTimes(
+            1,
+        );
         expect(instance.__privateChannel.listen).toHaveBeenCalledTimes(2);
 
         cleanup();
@@ -333,12 +345,9 @@ describe("useEcho (Svelte runes)", () => {
                 eventName = value;
             };
 
-            echoModule.useEcho(
-                "orders.10",
+            echoModule.useEcho("orders.10", () => eventName, vi.fn(), [
                 () => eventName,
-                vi.fn(),
-                [() => eventName],
-            );
+            ]);
         });
 
         await tick();
@@ -368,13 +377,13 @@ describe("useEcho (Svelte runes)", () => {
 
         const firstCallback = vi.fn();
         const secondCallback = vi.fn();
-        let updateCallback: (callback: (payload: unknown) => void) => void =
-            () => {};
+        let updateCallback: (
+            callback: (payload: unknown) => void,
+        ) => void = () => {};
 
         const cleanup = $effect.root(() => {
-            let currentCallback = $state<(payload: unknown) => void>(
-                firstCallback,
-            );
+            let currentCallback =
+                $state<(payload: unknown) => void>(firstCallback);
 
             updateCallback = (callback) => {
                 currentCallback = callback;
@@ -408,8 +417,11 @@ describe("useEcho (Svelte runes)", () => {
     });
 
     it("clears stale channel cache when configureEcho swaps instances", async () => {
-        const { echoModule, configModule, instance: firstInstance } =
-            await setupConfiguredEcho();
+        const {
+            echoModule,
+            configModule,
+            instance: firstInstance,
+        } = await setupConfiguredEcho();
 
         const firstCleanup = $effect.root(() => {
             echoModule.useEcho("orders.9", "OrderUpdated", vi.fn());
@@ -547,7 +559,8 @@ describe("useEchoNotification", () => {
             ),
         );
 
-        const listener = instance.__privateChannel.notification.mock.calls[0][0];
+        const listener =
+            instance.__privateChannel.notification.mock.calls[0][0];
         listener({ type: "App\\Notifications\\Welcome", data: {} });
         listener({ type: "App\\Notifications\\Ignored", data: {} });
 
@@ -565,7 +578,8 @@ describe("useEchoNotification", () => {
             ]),
         );
 
-        const listener = instance.__privateChannel.notification.mock.calls[0][0];
+        const listener =
+            instance.__privateChannel.notification.mock.calls[0][0];
         listener({ type: "App\\Notifications\\First", data: {} });
         listener({ type: "App\\Notifications\\Second", data: {} });
         listener({ type: "App\\Notifications\\Third", data: {} });
@@ -581,7 +595,8 @@ describe("useEchoNotification", () => {
             echoModule.useEchoNotification("users.4", callback),
         );
 
-        const listener = instance.__privateChannel.notification.mock.calls[0][0];
+        const listener =
+            instance.__privateChannel.notification.mock.calls[0][0];
         listener({ type: "Type.One", data: {} });
         listener({ type: "Type.Two", data: {} });
 
@@ -645,7 +660,8 @@ describe("useEchoNotification", () => {
 
         await tick();
 
-        const firstListener = instance.__privateChannel.notification.mock.calls[0][0];
+        const firstListener =
+            instance.__privateChannel.notification.mock.calls[0][0];
         firstListener({ type: "App\\Notifications\\First", data: {} });
         expect(callback).toHaveBeenCalledTimes(1);
 
@@ -677,9 +693,10 @@ describe("useEchoNotification", () => {
         ) => void = () => {};
 
         const cleanup = $effect.root(() => {
-            let currentCallback = $state<
-                (payload: Record<string, unknown>) => void
-            >(firstCallback);
+            let currentCallback =
+                $state<(payload: Record<string, unknown>) => void>(
+                    firstCallback,
+                );
 
             updateCallback = (callback) => {
                 currentCallback = callback;
@@ -699,7 +716,8 @@ describe("useEchoNotification", () => {
 
         await tick();
 
-        const listener = instance.__privateChannel.notification.mock.calls[0][0];
+        const listener =
+            instance.__privateChannel.notification.mock.calls[0][0];
         listener({ type: "App\\Notifications\\Welcome", data: {} });
         expect(firstCallback).toHaveBeenCalledTimes(1);
 

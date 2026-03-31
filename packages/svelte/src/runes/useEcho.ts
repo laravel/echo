@@ -46,10 +46,7 @@ const resolveChannelSubscription = <T extends BroadcastDriver>(
         return channels[channel.id].connection;
     }
 
-    const channelSubscription = subscribeToChannel<T>(
-        instance,
-        channel,
-    );
+    const channelSubscription = subscribeToChannel<T>(instance, channel);
 
     channels[channel.id] = {
         count: 1,
