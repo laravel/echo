@@ -14,6 +14,8 @@ echo/
 │   ├── laravel-echo/    Core library
 │   ├── react/           React hooks
 │   │   └── tests/       React tests
+│   ├── svelte/          Svelte runes
+│   │   └── tests/       Svelte tests
 │   └── vue/             Vue hooks
 │       └── tests/       Vue Tests
 ```
@@ -41,6 +43,7 @@ If you prefer, you can also start individual watchers from each package director
 ```sh
 cd packages/laravel-echo && pnpm dev
 cd packages/react && pnpm dev
+cd packages/svelte && pnpm dev
 cd packages/vue && pnpm dev
 ```
 
@@ -59,5 +62,6 @@ Run the test suite for a specific adapter:
 ```sh
 cd packages/laravel-echo && pnpm test
 cd packages/react && pnpm test
+cd packages/svelte && pnpm test
 cd packages/vue && pnpm test
 ```
