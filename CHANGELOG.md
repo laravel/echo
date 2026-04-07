@@ -1,6 +1,14 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v2.3.3...2.x)
+## [Unreleased](https://github.com/laravel/echo/compare/v2.3.4...2.x)
+
+## [v2.3.4](https://github.com/laravel/echo/compare/v2.3.3...v2.3.4) - 2026-04-07
+
+### What's Changed
+
+* Bump vite from 6.4.1 to 6.4.2 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/486
+
+**Full Changelog**: https://github.com/laravel/echo/compare/v2.3.3...v2.3.4
 
 ## [v2.3.3](https://github.com/laravel/echo/compare/v2.3.2...v2.3.3) - 2026-03-31
 
