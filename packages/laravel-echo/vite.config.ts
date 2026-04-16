@@ -16,6 +16,7 @@ const config: UserConfig = (() => {
         outDir: resolve(__dirname, "dist"),
         sourcemap: true,
         minify: true,
+        target: "es2022",
     };
 
     if (process.env.FORMAT === "iife") {
