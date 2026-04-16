@@ -380,12 +380,15 @@ export const useEchoModel = <
  * @returns Ref<ConnectionStatus> - A reactive ref containing the current connection status
  */
 export const useConnectionStatus = (): Ref<ConnectionStatus> => {
-    const status = ref<ConnectionStatus>(echo().connectionStatus());
+    const echoInstance = echo();
+    const status = ref<ConnectionStatus>(echoInstance.connectionStatus());
 
     let unsubscribe: (() => void) | undefined;
 
     onMounted(() => {
-        unsubscribe = echo().connector.onConnectionChange((newStatus) => {
+        status.value = echoInstance.connectionStatus();
+
+        unsubscribe = echoInstance.connector.onConnectionChange((newStatus) => {
             status.value = newStatus;
         });
     });
