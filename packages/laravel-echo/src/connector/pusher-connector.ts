@@ -81,8 +81,9 @@ export class PusherConnector<
         name: string,
         event: string,
         callback: CallableFunction,
+        context?: any
     ): AnyPusherChannel {
-        return this.channel(name).listen(event, callback);
+        return this.channel(name).listen(event, callback, context);
     }
 
     /**

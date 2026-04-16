@@ -66,8 +66,8 @@ export class PusherChannel<
     /**
      * Listen for an event on the channel instance.
      */
-    listen(event: string, callback: CallableFunction): this {
-        this.on(this.eventFormatter.format(event), callback);
+    listen(event: string, callback: CallableFunction, context?: any): this {
+        this.on(this.eventFormatter.format(event), callback, context);
 
         return this;
     }
@@ -113,6 +113,15 @@ export class PusherChannel<
     }
 
     /**
+     * Remove handlers for the given context
+     */
+    stopListeningForContext(context: any): this {
+        this.subscription.unbind(undefined, undefined, context);
+
+        return this;
+    }
+
+    /**
      * Stop listening for all events on the channel instance.
      */
     stopListeningToAll(callback?: CallableFunction): this {
@@ -128,10 +137,10 @@ export class PusherChannel<
     /**
      * Register a callback to be called anytime a subscription succeeds.
      */
-    subscribed(callback: CallableFunction): this {
+    subscribed(callback: CallableFunction, context?: any): this {
         this.on("pusher:subscription_succeeded", () => {
             callback();
-        });
+        }, context);
 
         return this;
     }
@@ -139,10 +148,10 @@ export class PusherChannel<
     /**
      * Register a callback to be called anytime a subscription error occurs.
      */
-    error(callback: CallableFunction): this {
+    error(callback: CallableFunction, context?: any): this {
         this.on("pusher:subscription_error", (status: Record<string, any>) => {
             callback(status);
-        });
+        }, context);
 
         return this;
     }
@@ -150,8 +159,8 @@ export class PusherChannel<
     /**
      * Bind a channel to an event.
      */
-    on(event: string, callback: CallableFunction): this {
-        this.subscription.bind(event, callback);
+    on(event: string, callback: CallableFunction, context?: any): this {
+        this.subscription.bind(event, callback, context);
 
         return this;
     }
