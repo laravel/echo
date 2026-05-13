@@ -60,6 +60,14 @@
         "socket.io-client": "*",
         "vue": "^3.0.0"
     },
+    "peerDependenciesMeta": {
+        "pusher-js": {
+            "optional": true
+        },
+        "socket.io-client": {
+            "optional": true
+        }
+    },
     "typesVersions": {
         "*": {
             "socket.io-client": [],

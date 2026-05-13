@@ -57,6 +57,14 @@
         "pusher-js": "*",
         "socket.io-client": "*"
     },
+    "peerDependenciesMeta": {
+        "pusher-js": {
+            "optional": true
+        },
+        "socket.io-client": {
+            "optional": true
+        }
+    },
     "typesVersions": {
         "*": {
             "socket.io-client": [],

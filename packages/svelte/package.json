@@ -61,6 +61,14 @@
         "socket.io-client": "*",
         "svelte": "^5.0.0"
     },
+    "peerDependenciesMeta": {
+        "pusher-js": {
+            "optional": true
+        },
+        "socket.io-client": {
+            "optional": true
+        }
+    },
     "typesVersions": {
         "*": {
             "socket.io-client": [],
