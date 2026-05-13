@@ -16,10 +16,12 @@ jobs:
                 adapter: ["laravel-echo", "react", "svelte", "vue"]
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+              with:
+                persist-credentials: false
 
             - name: Install pnpm
-              uses: pnpm/action-setup@v3
+              uses: pnpm/action-setup@a3252b78c470c02df07e9d59298aecedc3ccdd6d # v3
               with:
                   version: 10
 
