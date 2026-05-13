@@ -12,7 +12,7 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    target-branch: "1.x"
+    target-branch: "2.x"
     groups:
       github-actions:
         patterns:
