@@ -68,6 +68,14 @@
         "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
         "socket.io-client": "*"
     },
+    "peerDependenciesMeta": {
+        "pusher-js": {
+            "optional": true
+        },
+        "socket.io-client": {
+            "optional": true
+        }
+    },
     "typesVersions": {
         "*": {
             "socket.io-client": [],
