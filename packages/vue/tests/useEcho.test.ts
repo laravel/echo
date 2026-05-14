@@ -1077,3 +1077,39 @@ describe.skip("useConnectionStatus composable", async () => {
         expect(wrapper.text()).toBe("connected");
     });
 });
+
+describe.skip("useSocketId composable", async () => {
+    let echoInstance: Echo<"null">;
+
+    beforeEach(async () => {
+        vi.resetModules();
+
+        echoInstance = new Echo({
+            broadcaster: "null",
+        });
+    });
+
+    afterEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it("returns the socket id from the echo instance", async () => {
+        const { useSocketId } = await import("../src/composables/useEcho");
+
+        configureEcho({
+            broadcaster: "null",
+        });
+
+        const TestComponent = defineComponent({
+            setup() {
+                return { socketId: useSocketId() };
+            },
+            template: "<div>{{ socketId }}</div>",
+        });
+
+        const wrapper = mount(TestComponent);
+
+        // The mock overrides socketId — renders as empty string when undefined
+        expect(wrapper.text()).toBe("");
+    });
+});

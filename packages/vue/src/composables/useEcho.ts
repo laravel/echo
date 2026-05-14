@@ -1,5 +1,5 @@
 import { type BroadcastDriver, type ConnectionStatus } from "laravel-echo";
-import { onMounted, onUnmounted, ref, watch, type Ref } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from "vue";
 import { echo } from "../config";
 import type {
     BroadcastNotification,
@@ -398,4 +398,20 @@ export const useConnectionStatus = (): Ref<ConnectionStatus> => {
     });
 
     return status;
+};
+
+/**
+ * Composable to get the current WebSocket socket ID.
+ * Returns undefined until the connection handshake completes.
+ * Updates automatically when the connection reconnects.
+ *
+ * @returns ComputedRef<string | undefined> - The current socket ID, or undefined if not yet connected
+ */
+export const useSocketId = (): ComputedRef<string | undefined> => {
+    const status = useConnectionStatus();
+
+    return computed(() => {
+        void status.value;
+        return echo().socketId();
+    });
 };
