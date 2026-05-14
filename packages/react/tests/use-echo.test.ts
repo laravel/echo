@@ -41,6 +41,8 @@ vi.mock("laravel-echo", () => {
     Echo.prototype.leaveAllChannels = vi.fn();
     Echo.prototype.join = vi.fn(() => mockPresenceChannel);
     Echo.prototype.connectionStatus = vi.fn(() => "connected");
+    Echo.prototype.socketId = vi.fn(() => undefined);
+    Echo.prototype.connector = { onConnectionChange: vi.fn(() => () => {}) };
 
     return { default: Echo };
 });
@@ -1330,6 +1332,43 @@ describe("useEchoNotification hook", async () => {
             .length;
 
         expect(afterRerenderCalls).toBe(initialNotificationCalls);
+    });
+});
+
+describe("useSocketId hook", async () => {
+    let echoModule: typeof import("../src/hooks/use-echo");
+    let configModule: typeof import("../src/config/index");
+
+    beforeEach(async () => {
+        vi.resetModules();
+
+        echoModule = await getEchoModule();
+        configModule = await getConfigModule();
+
+        configModule.configureEcho({
+            broadcaster: "null",
+        });
+    });
+
+    afterEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it("returns the socket id from the echo instance", async () => {
+        const { result } = renderHook(() => echoModule.useSocketId());
+
+        // The mock overrides socketId to return undefined
+        expect(result.current).toBeUndefined();
+    });
+
+    it("returns the socket id when the connector provides one", async () => {
+        // Override the mock to return a real-looking socket ID
+        const Echo = (await import("laravel-echo")).default as any;
+        Echo.prototype.socketId = vi.fn(() => "abc123.def456");
+
+        const { result } = renderHook(() => echoModule.useSocketId());
+
+        expect(result.current).toBe("abc123.def456");
     });
 });
 
