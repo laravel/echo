@@ -452,3 +452,19 @@ export const useConnectionStatus = (): (() => ConnectionStatus) => {
 
     return () => status;
 };
+
+/**
+ * Rune to get the current WebSocket socket ID.
+ * Returns undefined until the connection handshake completes.
+ * Updates automatically when the connection reconnects.
+ *
+ * @returns A getter function that returns the current socket ID, or undefined if not yet connected
+ */
+export const useSocketId = (): (() => string | undefined) => {
+    const getStatus = useConnectionStatus();
+
+    return () => {
+        getStatus();
+        return echo().socketId();
+    };
+};

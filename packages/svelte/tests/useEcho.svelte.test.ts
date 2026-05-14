@@ -43,6 +43,7 @@ vi.mock("laravel-echo", () => {
             leaveChannel: vi.fn(),
             leaveAllChannels: vi.fn(),
             connectionStatus: vi.fn(() => "connected"),
+            socketId: vi.fn(() => undefined),
             connector: {
                 onConnectionChange: vi.fn(
                     (callback: (status: string) => void) => {
@@ -806,5 +807,27 @@ describe("useConnectionStatus", () => {
 
         cleanup();
         expect(instance.__unsubscribe).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe("useSocketId rune", () => {
+    beforeEach(() => {
+        vi.resetModules();
+        echoInstances.length = 0;
+    });
+
+    afterEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it("returns the current socket id", async () => {
+        const { value, cleanup } = await mountRune((echoModule) =>
+            echoModule.useSocketId(),
+        );
+
+        // The mock returns undefined for socketId by default
+        expect(value()).toBeUndefined();
+
+        cleanup();
     });
 });
