@@ -49,7 +49,7 @@
         "prettier": "^3.5.3",
         "pusher-js": "^8.0",
         "socket.io-client": "^4.0",
-        "svelte": "^5.0.0",
+        "svelte": "^5.55.7",
         "tslib": "^2.8.1",
         "typescript": "^5.7.0",
         "vite": "^6.4.2",
@@ -59,7 +59,7 @@
     "peerDependencies": {
         "pusher-js": "*",
         "socket.io-client": "*",
-        "svelte": "^5.0.0"
+        "svelte": "^5.55.7"
     },
     "peerDependenciesMeta": {
         "pusher-js": {
