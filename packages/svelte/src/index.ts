@@ -1,3 +1,4 @@
+export type { ConnectionStatus } from "laravel-echo";
 export { configureEcho, echo, echoIsConfigured } from "./config/index";
 export {
     useConnectionStatus,
@@ -6,5 +7,5 @@ export {
     useEchoNotification,
     useEchoPresence,
     useEchoPublic,
+    useSocketId,
 } from "./runes/useEcho";
-export type { ConnectionStatus } from "laravel-echo";

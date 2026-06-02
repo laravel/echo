@@ -8,6 +8,7 @@ import {
     useEchoNotification,
     useEchoPresence,
     useEchoPublic,
+    useSocketId,
 } from "../src/composables/useEcho";
 import { configureEcho } from "../src/config/index";
 
@@ -165,6 +166,8 @@ vi.mock("laravel-echo", () => {
     Echo.prototype.leaveAllChannels = vi.fn();
     Echo.prototype.join = vi.fn(() => mockPresenceChannel);
     Echo.prototype.connectionStatus = vi.fn(() => "connected");
+    Echo.prototype.socketId = vi.fn(() => undefined);
+    Echo.prototype.connector = { onConnectionChange: vi.fn(() => () => {}) };
 
     return { default: Echo };
 });
@@ -1075,5 +1078,68 @@ describe.skip("useConnectionStatus composable", async () => {
         const wrapper = mount(TestComponent);
 
         expect(wrapper.text()).toBe("connected");
+    });
+});
+
+describe("useSocketId composable", () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        configureEcho({ broadcaster: "null" });
+    });
+
+    it("returns undefined when no socket id is available", () => {
+        const TestComponent = defineComponent({
+            setup() {
+                return { socketId: useSocketId() };
+            },
+            template: "<div>{{ socketId ?? '' }}</div>",
+        });
+
+        const wrapper = mount(TestComponent);
+        expect(wrapper.text()).toBe("");
+    });
+
+    it("returns the current socket id", () => {
+        (Echo as any).prototype.socketId = vi.fn(() => "abc123.def456");
+
+        const TestComponent = defineComponent({
+            setup() {
+                return { socketId: useSocketId() };
+            },
+            template: "<div>{{ socketId }}</div>",
+        });
+
+        const wrapper = mount(TestComponent);
+        expect(wrapper.text()).toBe("abc123.def456");
+    });
+
+    it("updates when the connection reconnects with a new socket id", async () => {
+        let connectionCallback: (() => void) | undefined;
+
+        (Echo as any).prototype.socketId = vi
+            .fn()
+            .mockReturnValueOnce(undefined)
+            .mockReturnValue("new-socket.abc123");
+        (Echo as any).prototype.connector = {
+            onConnectionChange: vi.fn((cb: () => void) => {
+                connectionCallback = cb;
+                return () => {};
+            }),
+        };
+
+        const TestComponent = defineComponent({
+            setup() {
+                return { socketId: useSocketId() };
+            },
+            template: "<div>{{ socketId ?? '' }}</div>",
+        });
+
+        const wrapper = mount(TestComponent);
+        expect(wrapper.text()).toBe("");
+
+        connectionCallback?.();
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.text()).toBe("new-socket.abc123");
     });
 });

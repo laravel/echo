@@ -374,28 +374,45 @@ export const useEchoModel = <
     );
 };
 
-/**
- * Composable to get the current WebSocket connection status
- *
- * @returns Ref<ConnectionStatus> - A reactive ref containing the current connection status
- */
-export const useConnectionStatus = (): Ref<ConnectionStatus> => {
+const useConnectionChange = (
+    callback: (status: ConnectionStatus) => void,
+    invokeOnMount: boolean = true,
+): void => {
     const echoInstance = echo();
-    const status = ref<ConnectionStatus>(echoInstance.connectionStatus());
 
     let unsubscribe: (() => void) | undefined;
 
     onMounted(() => {
-        status.value = echoInstance.connectionStatus();
+        if (invokeOnMount) {
+            callback(echoInstance.connectionStatus());
+        }
 
-        unsubscribe = echoInstance.connector.onConnectionChange((newStatus) => {
-            status.value = newStatus;
-        });
+        unsubscribe = echoInstance.connector.onConnectionChange(callback);
     });
 
     onUnmounted(() => {
         unsubscribe?.();
     });
+};
+
+export const useConnectionStatus = (): Ref<ConnectionStatus> => {
+    const echoInstance = echo();
+    const status = ref<ConnectionStatus>(echoInstance.connectionStatus());
+
+    useConnectionChange((newStatus) => {
+        status.value = newStatus;
+    });
 
     return status;
+};
+
+export const useSocketId = (): Ref<string | undefined> => {
+    const echoInstance = echo();
+    const socketId = ref<string | undefined>(echoInstance.socketId());
+
+    useConnectionChange(() => {
+        socketId.value = echoInstance.socketId();
+    }, false);
+
+    return socketId;
 };
