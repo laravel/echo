@@ -825,8 +825,24 @@ describe("useSocketId rune", () => {
             echoModule.useSocketId(),
         );
 
-        // The mock returns undefined for socketId by default
         expect(value()).toBeUndefined();
+
+        cleanup();
+    });
+
+    it("updates when the connection reconnects with a new socket id", async () => {
+        const { value, instance, cleanup } = await mountRune((echoModule) =>
+            echoModule.useSocketId(),
+        );
+
+        expect(value()).toBeUndefined();
+
+        instance.socketId.mockReturnValue("new-socket.abc123");
+        instance.__emitStatus("connected");
+
+        await tick();
+
+        expect(value()).toBe("new-socket.abc123");
 
         cleanup();
     });

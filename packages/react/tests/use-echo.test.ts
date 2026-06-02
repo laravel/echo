@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 import Echo from "laravel-echo";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -1362,13 +1362,33 @@ describe("useSocketId hook", async () => {
     });
 
     it("returns the socket id when the connector provides one", async () => {
-        // Override the mock to return a real-looking socket ID
         const Echo = (await import("laravel-echo")).default as any;
         Echo.prototype.socketId = vi.fn(() => "abc123.def456");
 
         const { result } = renderHook(() => echoModule.useSocketId());
 
         expect(result.current).toBe("abc123.def456");
+    });
+
+    it("updates when the connection reconnects with a new socket id", async () => {
+        const Echo = (await import("laravel-echo")).default as any;
+        let connectionCallback: (() => void) | undefined;
+
+        Echo.prototype.socketId = vi.fn()
+            .mockReturnValueOnce(undefined)
+            .mockReturnValue("new-socket.abc123");
+        Echo.prototype.connector = {
+            onConnectionChange: vi.fn((cb: () => void) => {
+                connectionCallback = cb;
+                return () => {};
+            }),
+        };
+
+        const { result } = renderHook(() => echoModule.useSocketId());
+        expect(result.current).toBeUndefined();
+
+        act(() => connectionCallback?.());
+        expect(result.current).toBe("new-socket.abc123");
     });
 });
 

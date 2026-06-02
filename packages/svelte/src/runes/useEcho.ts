@@ -432,32 +432,37 @@ export const useEchoModel = <
     );
 };
 
-/**
- * Rune to get the current WebSocket connection status
- *
- * @returns A getter function that returns the current connection status
- */
+const useConnectionChange = (
+    callback: (status: ConnectionStatus) => void,
+    invokeOnMount: boolean = true,
+): void => {
+    $effect(() => {
+        if (invokeOnMount) {
+            callback(echo().connectionStatus());
+        }
+
+        const unsubscribe = echo().connector.onConnectionChange(callback);
+
+        return () => unsubscribe();
+    });
+};
+
 export const useConnectionStatus = (): (() => ConnectionStatus) => {
     let status = $state<ConnectionStatus>(echo().connectionStatus());
 
-    $effect(() => {
-        status = echo().connectionStatus();
-
-        const unsubscribe = echo().connector.onConnectionChange((newStatus) => {
-            status = newStatus;
-        });
-
-        return () => unsubscribe();
+    useConnectionChange((newStatus) => {
+        status = newStatus;
     });
 
     return () => status;
 };
 
 export const useSocketId = (): (() => string | undefined) => {
-    const getStatus = useConnectionStatus();
+    let socketId = $state<string | undefined>(echo().socketId());
 
-    return () => {
-        getStatus();
-        return echo().socketId();
-    };
+    useConnectionChange(() => {
+        socketId = echo().socketId();
+    }, false);
+
+    return () => socketId;
 };

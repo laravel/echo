@@ -396,28 +396,45 @@ export const useEchoModel = <
     );
 };
 
-/**
- * Hook to get the current WebSocket connection status
- *
- * @returns ConnectionStatus - The current connection status
- */
+const useConnectionChange = (
+    callback: (status: ConnectionStatus) => void,
+    invokeOnMount: boolean = true,
+): void => {
+    const callbackRef = useRef(callback);
+
+    callbackRef.current = callback;
+
+    useEffect(() => {
+        if (invokeOnMount) {
+            callbackRef.current(echo().connectionStatus());
+        }
+
+        return echo().connector.onConnectionChange((status) =>
+            callbackRef.current(status),
+        );
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+};
+
 export const useConnectionStatus = (): ConnectionStatus => {
     const [status, setStatus] = useState<ConnectionStatus>(() =>
         echo().connectionStatus(),
     );
 
-    useEffect(() => {
-        return echo().connector.onConnectionChange(
-            (newStatus: ConnectionStatus) => {
-                setStatus(newStatus);
-            },
-        );
-    }, []);
+    useConnectionChange((newStatus) => {
+        setStatus(newStatus);
+    });
 
     return status;
 };
 
 export const useSocketId = (): string | undefined => {
-    useConnectionStatus();
-    return echo().socketId();
+    const [socketId, setSocketId] = useState<string | undefined>(() =>
+        echo().socketId(),
+    );
+
+    useConnectionChange(() => {
+        setSocketId(echo().socketId());
+    }, false);
+
+    return socketId;
 };
