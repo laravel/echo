@@ -3,6 +3,7 @@ import {
     type DependencyList,
     useCallback,
     useEffect,
+    useLayoutEffect,
     useMemo,
     useRef,
     useState,
@@ -402,7 +403,9 @@ const useConnectionChange = (
 ): void => {
     const callbackRef = useRef(callback);
 
-    callbackRef.current = callback;
+    useLayoutEffect(() => {
+        callbackRef.current = callback;
+    });
 
     useEffect(() => {
         if (invokeOnMount) {
