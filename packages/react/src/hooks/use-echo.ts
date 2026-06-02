@@ -95,7 +95,7 @@ export function useEcho<
     leave: () => void;
     stopListening: () => void;
     listen: () => void;
-    channel: () => ChannelReturnType<TDriver, TVisibility>;
+    channel: () => ChannelReturnType<TDriver, TVisibility> | null;
 };
 
 // Overload for multiple events with automatic type inference
@@ -114,7 +114,7 @@ export function useEcho<
     leave: () => void;
     stopListening: () => void;
     listen: () => void;
-    channel: () => ChannelReturnType<TDriver, TVisibility>;
+    channel: () => ChannelReturnType<TDriver, TVisibility> | null;
 };
 
 // Overload for explicit payload type (backward compatibility)
@@ -133,7 +133,7 @@ export function useEcho<
     leave: () => void;
     stopListening: () => void;
     listen: () => void;
-    channel: () => ChannelReturnType<TDriver, TVisibility>;
+    channel: () => ChannelReturnType<TDriver, TVisibility> | null;
 };
 
 // Implementation
@@ -163,10 +163,7 @@ export function useEcho<
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const callbackFunc = useCallback(callback, dependencies);
     const listening = useRef(false);
-    const initialized = useRef(false);
-    const subscription = useRef<Connection<TDriver>>(
-        resolveChannelSubscription<TDriver>(channel),
-    );
+    const subscription = useRef<Connection<TDriver> | null>(null);
 
     const eventKey = Array.isArray(event) ? JSON.stringify(event) : event;
     // Using eventKey instead of event to stabilize array dependencies
@@ -174,24 +171,24 @@ export function useEcho<
     const events = useMemo(() => toArray(event), [eventKey]);
 
     const stopListening = useCallback(() => {
-        if (!listening.current) {
+        if (!listening.current || !subscription.current) {
             return;
         }
 
         events.forEach((e) => {
-            subscription.current.stopListening(e, callbackFunc);
+            subscription.current!.stopListening(e, callbackFunc);
         });
 
         listening.current = false;
     }, [events, callbackFunc]);
 
     const listen = useCallback(() => {
-        if (listening.current) {
+        if (listening.current || !subscription.current) {
             return;
         }
 
         events.forEach((e) => {
-            subscription.current.listen(e, callbackFunc);
+            subscription.current!.listen(e, callbackFunc);
         });
 
         listening.current = true;
@@ -211,11 +208,7 @@ export function useEcho<
     }, [tearDown]);
 
     useEffect(() => {
-        if (initialized.current) {
-            subscription.current = resolveChannelSubscription<TDriver>(channel);
-        }
-
-        initialized.current = true;
+        subscription.current = resolveChannelSubscription<TDriver>(channel);
 
         listen();
 
@@ -244,7 +237,10 @@ export function useEcho<
              * Channel instance
              */
             channel: () =>
-                subscription.current as ChannelReturnType<TDriver, TVisibility>,
+                subscription.current as ChannelReturnType<
+                    TDriver,
+                    TVisibility
+                > | null,
         }),
         [leave, listen, stopListening, tearDown],
     );
@@ -304,7 +300,13 @@ export const useEchoNotification = <
             return;
         }
 
-        result.channel().notification(cb);
+        const ch = result.channel();
+
+        if (!ch) {
+            return;
+        }
+
+        ch.notification(cb);
 
         listening.current = true;
     }, [cb, result]);
@@ -314,7 +316,14 @@ export const useEchoNotification = <
             return;
         }
 
-        result.channel().stopListeningForNotification(cb);
+        const ch = result.channel();
+
+        if (!ch) {
+            listening.current = false;
+            return;
+        }
+
+        ch.stopListeningForNotification(cb);
 
         listening.current = false;
     }, [cb, result]);
