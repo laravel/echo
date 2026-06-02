@@ -1,3 +1,4 @@
+export type { ConnectionStatus } from "laravel-echo";
 export {
     useConnectionStatus,
     useEcho,
@@ -8,4 +9,3 @@ export {
     useSocketId,
 } from "./composables/useEcho";
 export { configureEcho, echo, echoIsConfigured } from "./config/index";
-export type { ConnectionStatus } from "laravel-echo";

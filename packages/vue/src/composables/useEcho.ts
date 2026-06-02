@@ -1,5 +1,13 @@
 import { type BroadcastDriver, type ConnectionStatus } from "laravel-echo";
-import { computed, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from "vue";
+import {
+    computed,
+    onMounted,
+    onUnmounted,
+    ref,
+    watch,
+    type ComputedRef,
+    type Ref,
+} from "vue";
 import { echo } from "../config";
 import type {
     BroadcastNotification,
