@@ -1116,7 +1116,8 @@ describe("useSocketId composable", () => {
     it("updates when the connection reconnects with a new socket id", async () => {
         let connectionCallback: (() => void) | undefined;
 
-        (Echo as any).prototype.socketId = vi.fn()
+        (Echo as any).prototype.socketId = vi
+            .fn()
             .mockReturnValueOnce(undefined)
             .mockReturnValue("new-socket.abc123");
         (Echo as any).prototype.connector = {

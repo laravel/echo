@@ -1374,7 +1374,8 @@ describe("useSocketId hook", async () => {
         const Echo = (await import("laravel-echo")).default as any;
         let connectionCallback: (() => void) | undefined;
 
-        Echo.prototype.socketId = vi.fn()
+        Echo.prototype.socketId = vi
+            .fn()
             .mockReturnValueOnce(undefined)
             .mockReturnValue("new-socket.abc123");
         Echo.prototype.connector = {
