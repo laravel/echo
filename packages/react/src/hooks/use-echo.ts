@@ -94,7 +94,7 @@ export function useEcho<
     leave: () => void;
     stopListening: () => void;
     listen: () => void;
-    channel: () => ChannelReturnType<TDriver, TVisibility>;
+    channel: () => ChannelReturnType<TDriver, TVisibility> | null;
 };
 
 // Overload for multiple events with automatic type inference
@@ -113,7 +113,7 @@ export function useEcho<
     leave: () => void;
     stopListening: () => void;
     listen: () => void;
-    channel: () => ChannelReturnType<TDriver, TVisibility>;
+    channel: () => ChannelReturnType<TDriver, TVisibility> | null;
 };
 
 // Overload for explicit payload type (backward compatibility)
@@ -132,7 +132,7 @@ export function useEcho<
     leave: () => void;
     stopListening: () => void;
     listen: () => void;
-    channel: () => ChannelReturnType<TDriver, TVisibility>;
+    channel: () => ChannelReturnType<TDriver, TVisibility> | null;
 };
 
 // Implementation
@@ -236,7 +236,10 @@ export function useEcho<
              * Channel instance
              */
             channel: () =>
-                subscription.current as ChannelReturnType<TDriver, TVisibility>,
+                subscription.current as ChannelReturnType<
+                    TDriver,
+                    TVisibility
+                > | null,
         }),
         [leave, listen, stopListening, tearDown],
     );
