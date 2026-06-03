@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v2.3.5...2.x)
+## [Unreleased](https://github.com/laravel/echo/compare/v2.3.6...2.x)
+
+## [v2.3.6](https://github.com/laravel/echo/compare/v2.3.5...v2.3.6) - 2026-06-03
+
+**Full Changelog**: https://github.com/laravel/echo/compare/v2.3.5...v2.3.6
 
 ## [v2.3.5](https://github.com/laravel/echo/compare/v2.3.4...v2.3.5) - 2026-06-03
 
