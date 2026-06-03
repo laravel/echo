@@ -33,18 +33,18 @@
     "devDependencies": {
         "@testing-library/vue": "^8.1.0",
         "@types/node": "^22.15.3",
-        "@typescript-eslint/eslint-plugin": "^8.21.0",
-        "@typescript-eslint/parser": "^8.21.0",
+        "@typescript-eslint/eslint-plugin": "^8.31.1",
+        "@typescript-eslint/parser": "^8.31.1",
         "@vue/test-utils": "^2.4.6",
-        "eslint": "^9.0.0",
+        "eslint": "^9.25.1",
         "laravel-echo": "workspace:^",
         "prettier": "^3.5.3",
-        "pusher-js": "^8.0",
-        "socket.io-client": "^4.0",
-        "typescript": "^5.7.0",
+        "pusher-js": "^8.4.0",
+        "socket.io-client": "^4.8.1",
+        "typescript": "^5.8.3",
         "vite": "^6.4.2",
         "vite-plugin-dts": "^4.5.3",
-        "vitest": "^3.1.2"
+        "vitest": "^3.2.6"
     },
     "peerDependencies": {
         "pusher-js": "*",
