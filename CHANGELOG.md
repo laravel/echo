@@ -1,6 +1,15 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v2.3.6...2.x)
+## [Unreleased](https://github.com/laravel/echo/compare/v2.3.7...2.x)
+
+## [v2.3.7](https://github.com/laravel/echo/compare/v2.3.6...v2.3.7) - 2026-06-03
+
+### What's Changed
+
+* Add Dependabot cooldown of 5 days by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/echo/pull/515
+* Resolve deprecated subdependencies via workspace overrides by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/echo/pull/517
+
+**Full Changelog**: https://github.com/laravel/echo/compare/v2.3.6...v2.3.7
 
 ## [v2.3.6](https://github.com/laravel/echo/compare/v2.3.5...v2.3.6) - 2026-06-03
 
