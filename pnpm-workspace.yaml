@@ -2,3 +2,11 @@ packages:
   - "packages/*"
 allowBuilds:
   esbuild: true
+overrides:
+  glob: ">=10.5.0"
+  validator: ">=13.15.22"
+  esbuild: ">=0.25.0"
+  js-yaml: ">=4.1.1"
+  brace-expansion: ">=2.0.2"
+  "@eslint/plugin-kit": ">=0.3.4"
+  ws: ">=8.20.1"
