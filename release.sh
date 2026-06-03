@@ -107,6 +107,7 @@ for package_dir in packages/*; do
         cd ../..
 
         git add "$package_dir/package.json"
+        git commit -m "Bump version for $package_dir"
 
         echo ""
     fi
@@ -119,10 +120,7 @@ echo "Updating lock file..."
 pnpm i
 echo ""
 
-echo "Staging package.json files..."
-git add "**/package.json"
-echo ""
-
+git add pnpm-lock.yaml
 git commit -m "$TAG"
 git tag -a "$TAG" -m "$TAG"
 git push
