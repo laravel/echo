@@ -27,7 +27,7 @@ const createMockPresenceChannel = () => ({
 });
 
 vi.mock("laravel-echo", () => {
-    const Echo = vi.fn((config: unknown) => {
+    const Echo = vi.fn(function (config: unknown) {
         const privateChannel = createMockPrivateChannel();
         const publicChannel = createMockPublicChannel();
         const presenceChannel = createMockPresenceChannel();
