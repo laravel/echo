@@ -1,6 +1,46 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v2.3.4...2.x)
+## [Unreleased](https://github.com/laravel/echo/compare/v2.3.5...2.x)
+
+## [v2.3.5](https://github.com/laravel/echo/compare/v2.3.4...v2.3.5) - 2026-06-03
+
+### What's Changed
+
+* Bump axios from 1.13.5 to 1.15.0 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/487
+* Refactor useConnectionStatus by [@ezra-obiwale](https://github.com/ezra-obiwale) in https://github.com/laravel/echo/pull/488
+* Target ES2022 by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/echo/pull/489
+* Mark pusher-js and socket.io-client as optional peerDependencies by [@YasserB94](https://github.com/YasserB94) in https://github.com/laravel/echo/pull/492
+* Pin GitHub Actions to commit SHAs and add Dependabot config by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/echo/pull/493
+* Bump the github-actions group with 5 updates by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/494
+* Bump pnpm to 11 in workflow and audit dependencies by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/echo/pull/496
+* Bump axios from 1.15.0 to 1.15.2 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/497
+* Bump lodash from 4.17.21 to 4.17.23 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/500
+* Bump postcss from 8.5.8 to 8.5.14 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/501
+* Bump flatted from 3.3.3 to 3.4.2 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/502
+* Bump socket.io-parser from 4.2.4 to 4.2.6 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/503
+* Bump minimatch from 3.0.8 to 9.0.9 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/504
+* Bump svelte from 5.55.1 to 5.55.7 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/506
+* Bump devalue from 5.6.4 to 5.8.1 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/505
+* Bump github/codeql-action from 4.35.4 to 4.35.5 in the github-actions group by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/507
+* Bump ws from 8.17.1 to 8.20.1 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/508
+* Bump js-cookie from 3.0.5 to 3.0.7 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/509
+* Bump github/codeql-action from 4.35.5 to 4.36.0 in the github-actions group by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/510
+* Bump axios from 1.15.2 to 1.16.0 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/511
+* Remove unused Babel dependencies and tslib from all packages by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/echo/pull/512
+* feat: add useSocketId() hook to React, Vue and Svelte adapters by [@hectorgrecco](https://github.com/hectorgrecco) in https://github.com/laravel/echo/pull/499
+* Fix WebSocket channel leak on React component unmount (fixes laravel/echo#475) by [@JoshSalway](https://github.com/JoshSalway) in https://github.com/laravel/echo/pull/483
+* GitHub Actions hardening by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/echo/pull/513
+* Patch ws vulnerability via dependency overrides by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/echo/pull/514
+
+### New Contributors
+
+* [@ezra-obiwale](https://github.com/ezra-obiwale) made their first contribution in https://github.com/laravel/echo/pull/488
+* [@YasserB94](https://github.com/YasserB94) made their first contribution in https://github.com/laravel/echo/pull/492
+* [@hectorgrecco](https://github.com/hectorgrecco) made their first contribution in https://github.com/laravel/echo/pull/499
+* [@JoshSalway](https://github.com/JoshSalway) made their first contribution in https://github.com/laravel/echo/pull/483
+* [@nunomaduro](https://github.com/nunomaduro) made their first contribution in https://github.com/laravel/echo/pull/513
+
+**Full Changelog**: https://github.com/laravel/echo/compare/v2.3.4...v2.3.5
 
 ## [v2.3.4](https://github.com/laravel/echo/compare/v2.3.3...v2.3.4) - 2026-04-07
 
