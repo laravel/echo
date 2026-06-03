@@ -106,6 +106,8 @@ for package_dir in packages/*; do
 
         cd ../..
 
+        git add "$package_dir/package.json"
+
         echo ""
     fi
 done
