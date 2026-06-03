@@ -42,7 +42,7 @@
         "@typescript-eslint/parser": "^8.31.1",
         "eslint": "^9.25.1",
         "eslint-plugin-react-hooks": "^7.0.1",
-        "jsdom": "^26.1.0",
+        "jsdom": "^29.1.1",
         "laravel-echo": "workspace:^",
         "prettier": "^3.5.3",
         "pusher-js": "^8.4.0",
@@ -82,8 +82,5 @@
             "import": "./dist/index.js",
             "require": "./dist/index.common.js"
         }
-    },
-    "overrides": {
-        "glob": "^9.0.0"
     }
 }

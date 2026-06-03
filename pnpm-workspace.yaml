@@ -12,7 +12,8 @@ minimumReleaseAgeExclude:
   - lodash@4.17.24
   - vitest@4.1.0
 overrides:
-  glob: ">=10.5.0"
+  glob: ">=11.0.0"
+  jsdom: ">=29.0.0"
   validator: ">=13.15.22"
   esbuild: ">=0.25.0"
   js-yaml: ">=4.1.1"
