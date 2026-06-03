@@ -106,8 +106,6 @@ for package_dir in packages/*; do
 
         cd ../..
 
-        echo "Staging changes for $package_dir"
-        git add "**/package.json"
         echo ""
     fi
 done
@@ -117,6 +115,10 @@ TAG="v$NEW_VERSION"
 
 echo "Updating lock file..."
 pnpm i
+echo ""
+
+echo "Staging package.json files..."
+git add "**/package.json"
 echo ""
 
 git commit -m "$TAG"
