@@ -38,3 +38,6 @@ jobs:
 
       - name: Execute tests
         run: pnpm test
+
+      - name: Audit dependencies
+        run: pnpm audit
