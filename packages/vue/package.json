@@ -42,7 +42,7 @@
         "pusher-js": "^8.4.0",
         "socket.io-client": "^4.8.1",
         "typescript": "^5.8.3",
-        "vite": "^6.4.2",
+        "vite": "^6.4.3",
         "vite-plugin-dts": "^4.5.3",
         "vitest": "^3.2.6"
     },
