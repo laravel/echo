@@ -1,9 +1,7 @@
 import type {
-    io,
-    ManagerOptions,
-    Socket,
-    SocketOptions,
-} from "socket.io-client";
+    SocketIoFunction,
+    SocketIoSocket as Socket,
+} from "../socketio-types";
 import {
     SocketIoChannel,
     SocketIoPresenceChannel,
@@ -40,11 +38,11 @@ export class SocketIoConnector extends Connector<
      * Create a fresh Socket.io connection.
      */
     connect(): void {
-        let io = this.getSocketIO();
+        const io = this.getSocketIO();
 
         this.socket = io(
             this.options.host ?? undefined,
-            this.options as Partial<ManagerOptions & SocketOptions>,
+            this.options as Record<string, unknown>,
         );
 
         this.socket.io.on("reconnect", () => {
@@ -57,9 +55,9 @@ export class SocketIoConnector extends Connector<
     /**
      * Get socket.io module from global scope or options.
      */
-    getSocketIO(): typeof io {
+    getSocketIO(): SocketIoFunction {
         if (typeof this.options.client !== "undefined") {
-            return this.options.client as typeof io;
+            return this.options.client as SocketIoFunction;
         }
 
         if (typeof window !== "undefined" && typeof window.io !== "undefined") {
