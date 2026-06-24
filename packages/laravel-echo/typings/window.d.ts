@@ -1,7 +1,7 @@
 import type { AxiosStatic } from "axios";
 import type { JQueryStatic } from "jquery";
 import type Pusher from "pusher-js";
-import type { io } from "socket.io-client";
+import type { SocketIoFunction } from "../src/socketio-types";
 
 declare global {
     interface Window {
@@ -9,7 +9,7 @@ declare global {
             csrfToken?: string;
         };
 
-        io?: typeof io;
+        io?: SocketIoFunction;
         Pusher?: typeof Pusher;
 
         Vue?: any;
