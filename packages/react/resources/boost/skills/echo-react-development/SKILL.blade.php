@@ -102,6 +102,7 @@ function PostFeed() {
 ### Presence Channels
 
 @boostsnippet("Presence Channel Hook", "tsx")
+import { useEffect } from "react";
 import { useEchoPresence } from "@laravel/echo-react";
 
 function ChatRoom({ roomId }: { roomId: number }) {
@@ -109,9 +110,11 @@ function ChatRoom({ roomId }: { roomId: number }) {
         console.log(e.message);
     });
 
-    channel().here((users) => console.log('Current users:', users));
-    channel().joining((user) => console.log(`${user.name} joined`));
-    channel().leaving((user) => console.log(`${user.name} left`));
+    useEffect(() => {
+        channel().here((users) => console.log('Current users:', users));
+        channel().joining((user) => console.log(`${user.name} joined`));
+        channel().leaving((user) => console.log(`${user.name} left`));
+    }, [channel]);
 
     return <div>Chat room {roomId}</div>;
 }
@@ -148,22 +151,27 @@ function NotificationBell({ userId }: { userId: number }) {
 ### Client Events (Whisper)
 
 @boostsnippet("Client Events in React", "tsx")
+import { useEffect } from "react";
 import { useEcho } from "@laravel/echo-react";
 
-function ChatInput({ roomId }: { roomId: number }) {
+function ChatInput({ roomId, user }: { roomId: number; user: { name: string } }) {
     const { channel } = useEcho(`chat.${roomId}`, ['update'], (e) => {
         console.log('Chat event received:', e);
     });
 
-    // Send typing indicator
-    channel().whisper('typing', { name: user.name });
-
     // Listen for typing
-    channel().listenForWhisper('typing', (e) => {
-        console.log(`${e.name} is typing...`);
-    });
+    useEffect(() => {
+        channel().listenForWhisper('typing', (e) => {
+            console.log(`${e.name} is typing...`);
+        });
+    }, [channel]);
 
-    return <input placeholder="Type a message..." />;
+    // Send typing indicator on user input
+    const handleTyping = () => {
+        channel().whisper('typing', { name: user.name });
+    };
+
+    return <input placeholder="Type a message..." onChange={handleTyping} />;
 }
 @endboostsnippet
 
