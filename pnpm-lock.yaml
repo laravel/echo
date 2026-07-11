@@ -104,7 +104,7 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1(eslint@9.25.1)
       jsdom:
-        specifier: '>=29.0.0'
+        specifier: ^29.1.1
         version: 29.1.1
       laravel-echo:
         specifier: workspace:^
@@ -152,7 +152,7 @@ importers:
         specifier: ^8.31.1
         version: 8.31.1(eslint@9.25.1)(typescript@5.8.3)
       esbuild:
-        specifier: '>=0.25.0'
+        specifier: ^0.28.1
         version: 0.28.1
       eslint:
         specifier: ^9.25.1
