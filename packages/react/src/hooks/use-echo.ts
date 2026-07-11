@@ -389,10 +389,7 @@ export const useEchoPublic = <
 export function useChannel<
     TDriver extends BroadcastDriver = BroadcastDriver,
     TVisibility extends Channel["visibility"] = "private",
->(
-    channelName: string,
-    visibility: TVisibility = "private" as TVisibility,
-) {
+>(channelName: string, visibility: TVisibility = "private" as TVisibility) {
     const channel: Channel = useMemo(
         () => ({
             name: channelName,
