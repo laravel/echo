@@ -354,6 +354,64 @@ export const useEchoPublic = <
     );
 };
 
+export function useChannel<
+    TDriver extends BroadcastDriver = BroadcastDriver,
+    TVisibility extends Channel["visibility"] = "private",
+>(
+    channelName: string,
+    visibility: TVisibility = "private" as TVisibility,
+) {
+    const channel: Channel = {
+        name: channelName,
+        id: ["private", "presence"].includes(visibility)
+            ? `${visibility}-${channelName}`
+            : channelName,
+        visibility,
+    };
+
+    const subscription: Connection<TDriver> =
+        resolveChannelSubscription<TDriver>(channel);
+
+    const tearDown = (leaveAll: boolean = false) => {
+        leaveChannel(channel, leaveAll);
+    };
+
+    onUnmounted(() => {
+        tearDown();
+    });
+
+    return {
+        /**
+         * Leave the channel
+         */
+        leaveChannel: tearDown,
+        /**
+         * Leave the channel and also its associated private and presence channels
+         */
+        leave: () => tearDown(true),
+        /**
+         * Channel instance
+         */
+        channel: () => subscription as ChannelReturnType<TDriver, TVisibility>,
+    };
+}
+
+export const usePresenceChannel = <
+    TDriver extends BroadcastDriver = BroadcastDriver,
+>(
+    channelName: string,
+) => {
+    return useChannel<TDriver, "presence">(channelName, "presence");
+};
+
+export const usePublicChannel = <
+    TDriver extends BroadcastDriver = BroadcastDriver,
+>(
+    channelName: string,
+) => {
+    return useChannel<TDriver, "public">(channelName, "public");
+};
+
 export const useEchoModel = <
     TPayload,
     TModel extends string,

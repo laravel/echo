@@ -386,6 +386,82 @@ export const useEchoPublic = <
     );
 };
 
+export function useChannel<
+    TDriver extends BroadcastDriver = BroadcastDriver,
+    TVisibility extends Channel["visibility"] = "private",
+>(
+    channelName: string,
+    visibility: TVisibility = "private" as TVisibility,
+) {
+    const channel: Channel = useMemo(
+        () => ({
+            name: channelName,
+            id: ["private", "presence"].includes(visibility)
+                ? `${visibility}-${channelName}`
+                : channelName,
+            visibility,
+        }),
+        [channelName, visibility],
+    );
+
+    const subscription = useRef<Connection<TDriver> | null>(null);
+
+    const tearDown = useCallback(
+        (leaveAll: boolean = false) => {
+            leaveChannel(channel, leaveAll);
+        },
+        [channel],
+    );
+
+    const leave = useCallback(() => {
+        tearDown(true);
+    }, [tearDown]);
+
+    useEffect(() => {
+        subscription.current = resolveChannelSubscription<TDriver>(channel);
+
+        return () => tearDown();
+    }, [tearDown, channel]);
+
+    return useMemo(
+        () => ({
+            /**
+             * Leave the channel
+             */
+            leaveChannel: tearDown,
+            /**
+             * Leave the channel and also its associated private and presence channels
+             */
+            leave,
+            /**
+             * Channel instance
+             */
+            channel: () =>
+                subscription.current as ChannelReturnType<
+                    TDriver,
+                    TVisibility
+                > | null,
+        }),
+        [leave, tearDown],
+    );
+}
+
+export const usePresenceChannel = <
+    TDriver extends BroadcastDriver = BroadcastDriver,
+>(
+    channelName: string,
+) => {
+    return useChannel<TDriver, "presence">(channelName, "presence");
+};
+
+export const usePublicChannel = <
+    TDriver extends BroadcastDriver = BroadcastDriver,
+>(
+    channelName: string,
+) => {
+    return useChannel<TDriver, "public">(channelName, "public");
+};
+
 export const useEchoModel = <
     TPayload,
     TModel extends string,
