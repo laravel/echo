@@ -1,6 +1,28 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v2.3.7...2.x)
+## [Unreleased](https://github.com/laravel/echo/compare/v2.4.0...2.x)
+
+## [v2.4.0](https://github.com/laravel/echo/compare/v2.3.7...v2.4.0) - 2026-07-11
+
+### What's Changed
+
+* Enable Dependabot auto-merge by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/echo/pull/518
+* Bump the github-actions group with 2 updates by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/519
+* Bump github/codeql-action from 4.36.1 to 4.36.2 in the github-actions group by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/524
+* Bump esbuild from 0.25.11 to 0.28.1 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/523
+* Bump the github-actions group with 2 updates by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/525
+* Bump vite from 6.4.2 to 6.4.3 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/526
+* Replace socket.io-client imports with a local type shim in echo.d.ts by [@lazerg](https://github.com/lazerg) in https://github.com/laravel/echo/pull/529
+* Update NPM dependencies by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/echo/pull/527
+* Fix presence and whisper examples in echo-react Boost skill by [@lazerg](https://github.com/lazerg) in https://github.com/laravel/echo/pull/530
+* Bump stefanzweifel/git-auto-commit-action from 7.1.0 to 7.2.0 in the github-actions group by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/531
+* Add `useChannel` hooks by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/echo/pull/532
+
+### New Contributors
+
+* [@lazerg](https://github.com/lazerg) made their first contribution in https://github.com/laravel/echo/pull/529
+
+**Full Changelog**: https://github.com/laravel/echo/compare/v2.3.7...v2.4.0
 
 ## [v2.3.7](https://github.com/laravel/echo/compare/v2.3.6...v2.3.7) - 2026-06-03
 
