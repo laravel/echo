@@ -58,6 +58,10 @@ export const configureEcho = <T extends BroadcastDriver>(
             broadcaster: "socket.io",
             host: import.meta.env.VITE_SOCKET_IO_HOST,
         },
+        mercure: {
+            broadcaster: "mercure",
+            host: import.meta.env.VITE_MERCURE_HUB_URL,
+        },
         null: {
             broadcaster: "null",
         },

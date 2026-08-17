@@ -1,6 +1,10 @@
 import type { InternalAxiosRequestConfig } from "axios";
 import {
     Channel,
+    MercureChannel,
+    MercureEncryptedPrivateChannel,
+    MercurePresenceChannel,
+    MercurePrivateChannel,
     NullChannel,
     NullEncryptedPrivateChannel,
     NullPresenceChannel,
@@ -16,9 +20,11 @@ import {
 } from "./channel";
 import {
     Connector,
+    MercureConnector,
     NullConnector,
     PusherConnector,
     SocketIoConnector,
+    type MercureOptions,
     type PusherOptions,
 } from "./connector";
 import { isConstructor } from "./util";
@@ -84,6 +90,8 @@ export default class Echo<T extends keyof Broadcaster> {
             });
         } else if (this.options.broadcaster === "socket.io") {
             this.connector = new SocketIoConnector(this.options);
+        } else if (this.options.broadcaster === "mercure") {
+            this.connector = new MercureConnector(this.options);
         } else if (this.options.broadcaster === "null") {
             this.connector = new NullConnector(this.options);
         } else if (
@@ -170,9 +178,10 @@ export default class Echo<T extends keyof Broadcaster> {
 
     private connectorSupportsEncryptedPrivateChannels(
         connector: unknown,
-    ): connector is PusherConnector<any> | NullConnector {
+    ): connector is PusherConnector<any> | MercureConnector | NullConnector {
         return (
             connector instanceof PusherConnector ||
+            connector instanceof MercureConnector ||
             connector instanceof NullConnector
         );
     }
@@ -328,6 +337,14 @@ export type Broadcaster = {
         encrypted: never;
         presence: SocketIoPresenceChannel;
         options: GenericOptions<"socket.io">;
+    };
+    mercure: {
+        connector: MercureConnector;
+        public: MercureChannel;
+        private: MercurePrivateChannel;
+        encrypted: MercureEncryptedPrivateChannel;
+        presence: MercurePresenceChannel;
+        options: GenericOptions<"mercure"> & Partial<MercureOptions>;
     };
     null: {
         connector: NullConnector;

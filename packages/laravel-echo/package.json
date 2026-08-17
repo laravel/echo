@@ -1,11 +1,12 @@
 {
     "name": "laravel-echo",
     "version": "2.4.0",
-    "description": "Laravel Echo library for beautiful Pusher and Socket.IO integration",
+    "description": "Laravel Echo library for beautiful Pusher, Socket.IO, and Mercure integration",
     "keywords": [
         "laravel",
         "pusher",
-        "ably"
+        "ably",
+        "mercure"
     ],
     "homepage": "https://github.com/laravel/echo/tree/2.x/packages/laravel-echo",
     "repository": {
