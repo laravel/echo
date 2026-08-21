@@ -1,11 +1,6 @@
 import { resolve } from "path";
 import { compileModule } from "svelte/compiler";
-import {
-    defineConfig,
-    PluginOption,
-    transformWithOxc,
-    UserConfig,
-} from "vite";
+import { defineConfig, PluginOption, transformWithOxc, UserConfig } from "vite";
 import dts from "unplugin-dts/vite";
 
 const srcDir = resolve(import.meta.dirname, "src");

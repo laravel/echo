@@ -27,11 +27,7 @@ import { isConstructor } from "./util";
  * Connection status types for WebSocket connections
  */
 export type ConnectionStatus =
-    | "connected"
-    | "disconnected"
-    | "connecting"
-    | "reconnecting"
-    | "failed";
+    "connected" | "disconnected" | "connecting" | "reconnecting" | "failed";
 
 /**
  * This class is the primary API for interacting with broadcasting.
