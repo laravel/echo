@@ -40,10 +40,7 @@ export class SocketIoConnector extends Connector<
     connect(): void {
         const io = this.getSocketIO();
 
-        this.socket = io(
-            this.options.host ?? undefined,
-            this.options as Record<string, unknown>,
-        );
+        this.socket = io(this.options.host ?? undefined, this.options);
 
         this.socket.io.on("reconnect", () => {
             Object.values(this.channels).forEach((channel) => {

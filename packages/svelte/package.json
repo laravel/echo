@@ -31,12 +31,12 @@
         "format": "prettier --write ."
     },
     "devDependencies": {
-        "@testing-library/svelte": "^5.3.1",
+        "@testing-library/svelte": "^5.4.2",
         "@types/node": "^22.15.3",
-        "@typescript-eslint/eslint-plugin": "^8.31.1",
-        "@typescript-eslint/parser": "^8.31.1",
+        "@typescript-eslint/eslint-plugin": "^8.67.0",
+        "@typescript-eslint/parser": "^8.67.0",
         "esbuild": "^0.28.1",
-        "eslint": "^9.25.1",
+        "eslint": "^10.8.1",
         "laravel-echo": "workspace:^",
         "prettier": "^3.5.3",
         "pusher-js": "^8.4.0",
