@@ -1,11 +1,15 @@
 import { resolve } from "path";
-import { transform as esbuildTransform } from "esbuild";
 import { compileModule } from "svelte/compiler";
-import { defineConfig, PluginOption, UserConfig } from "vite";
-import dts from "vite-plugin-dts";
+import {
+    defineConfig,
+    PluginOption,
+    transformWithOxc,
+    UserConfig,
+} from "vite";
+import dts from "unplugin-dts/vite";
 
-const srcDir = resolve(__dirname, "src");
-const testsDir = resolve(__dirname, "tests");
+const srcDir = resolve(import.meta.dirname, "src");
+const testsDir = resolve(import.meta.dirname, "tests");
 
 const svelteRunesTsPlugin = (): PluginOption => ({
     name: "svelte-runes-ts",
@@ -23,9 +27,9 @@ const svelteRunesTsPlugin = (): PluginOption => ({
         }
 
         try {
-            const tsResult = await esbuildTransform(code, {
-                loader: "ts",
-                tsconfigRaw: { compilerOptions: { target: "ES2020" } },
+            const tsResult = await transformWithOxc(code, id, {
+                lang: "ts",
+                target: "es2020",
             });
             const result = compileModule(tsResult.code, {
                 filename: id.replace(/\.ts$/, ".js"),
@@ -84,7 +88,7 @@ const config: UserConfig = (() => {
                 },
             },
         },
-        outDir: resolve(__dirname, "dist"),
+        outDir: resolve(import.meta.dirname, "dist"),
         sourcemap: true,
         minify: true,
         target: "es2022",
@@ -94,7 +98,7 @@ const config: UserConfig = (() => {
         return {
             build: {
                 lib: {
-                    entry: resolve(__dirname, "src/index.iife.ts"),
+                    entry: resolve(import.meta.dirname, "src/index.iife.ts"),
                     name: "EchoSvelte",
                     formats: ["iife"],
                     fileName: () => "echo-svelte.iife.js",
@@ -110,7 +114,7 @@ const config: UserConfig = (() => {
             svelteRunesTsPlugin(),
             dts({
                 insertTypesEntry: true,
-                rollupTypes: true,
+                bundleTypes: true,
                 include: ["src/**/*.ts"],
             }),
             handleEnvVariablesPlugin(),
@@ -139,7 +143,7 @@ const config: UserConfig = (() => {
         },
         build: {
             lib: {
-                entry: resolve(__dirname, "src/index.ts"),
+                entry: resolve(import.meta.dirname, "src/index.ts"),
                 formats: ["es", "cjs"],
                 fileName: (format, entryName) => {
                     return `${entryName}.${format === "es" ? "js" : "common.js"}`;

@@ -1,4 +1,5 @@
 /// <reference types="vite/client" />
+/// <reference types="svelte" />
 
 interface ImportMetaEnv {
     readonly VITE_PUSHER_APP_CLUSTER: string;

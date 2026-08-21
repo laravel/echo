@@ -1,6 +1,6 @@
 import { resolve } from "path";
 import { defineConfig, UserConfig } from "vite";
-import dts from "vite-plugin-dts";
+import dts from "unplugin-dts/vite";
 
 const config: UserConfig = (() => {
     const common: Partial<UserConfig["build"]> = {
@@ -13,7 +13,7 @@ const config: UserConfig = (() => {
                 },
             },
         },
-        outDir: resolve(__dirname, "dist"),
+        outDir: resolve(import.meta.dirname, "dist"),
         sourcemap: true,
         minify: true,
         target: "es2022",
@@ -23,7 +23,7 @@ const config: UserConfig = (() => {
         return {
             build: {
                 lib: {
-                    entry: resolve(__dirname, "src/echo.ts"),
+                    entry: resolve(import.meta.dirname, "src/echo.ts"),
                     name: "Echo",
                     formats: ["iife"],
                     fileName: () => "echo.iife.js",
@@ -38,13 +38,13 @@ const config: UserConfig = (() => {
         plugins: [
             dts({
                 insertTypesEntry: true,
-                rollupTypes: true,
+                bundleTypes: true,
                 include: ["src/**/*.ts"],
             }),
         ],
         build: {
             lib: {
-                entry: resolve(__dirname, "src/echo.ts"),
+                entry: resolve(import.meta.dirname, "src/echo.ts"),
                 formats: ["es", "cjs"],
                 fileName: (format, entryName) => {
                     return `${entryName}.${format === "es" ? "js" : "common.js"}`;

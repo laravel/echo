@@ -31,19 +31,22 @@
         "format": "prettier --write ."
     },
     "devDependencies": {
-        "@types/node": "^22.15.3",
+        "@microsoft/api-extractor": "^7.58.13",
+        "@types/node": "^24.13.3",
         "@typescript-eslint/eslint-plugin": "^8.67.0",
         "@typescript-eslint/parser": "^8.67.0",
         "@vue/test-utils": "^2.4.11",
         "eslint": "^10.8.1",
+        "jsdom": "^30.0.0",
         "laravel-echo": "workspace:^",
         "prettier": "^3.5.3",
         "pusher-js": "^8.4.0",
         "socket.io-client": "^4.8.1",
         "typescript": "^5.8.3",
-        "vite": "^6.4.3",
-        "vite-plugin-dts": "^4.5.3",
-        "vitest": "^4.1.8"
+        "unplugin-dts": "^1.0.3",
+        "vite": "^8.2.2",
+        "vitest": "^4.1.11",
+        "vue": "^3.5.41"
     },
     "peerDependencies": {
         "pusher-js": "*",
@@ -65,7 +68,7 @@
         }
     },
     "engines": {
-        "node": ">=20"
+        "node": ">=22.12.0"
     },
     "exports": {
         ".": {
@@ -73,8 +76,5 @@
             "import": "./dist/index.js",
             "require": "./dist/index.common.js"
         }
-    },
-    "overrides": {
-        "glob": "^9.0.0"
     }
 }

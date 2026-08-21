@@ -1,6 +1,6 @@
 import { resolve } from "path";
 import { defineConfig, PluginOption, UserConfig } from "vite";
-import dts from "vite-plugin-dts";
+import dts from "unplugin-dts/vite";
 
 const handleEnvVariablesPlugin = (): PluginOption => {
     return {
@@ -33,7 +33,7 @@ const config: UserConfig = (() => {
                 },
             },
         },
-        outDir: resolve(__dirname, "dist"),
+        outDir: resolve(import.meta.dirname, "dist"),
         sourcemap: true,
         minify: true,
         target: "es2022",
@@ -43,7 +43,7 @@ const config: UserConfig = (() => {
         return {
             build: {
                 lib: {
-                    entry: resolve(__dirname, "src/index.iife.ts"),
+                    entry: resolve(import.meta.dirname, "src/index.iife.ts"),
                     name: "EchoVue",
                     formats: ["iife"],
                     fileName: () => "echo-vue.iife.js",
@@ -58,7 +58,7 @@ const config: UserConfig = (() => {
         plugins: [
             dts({
                 insertTypesEntry: true,
-                rollupTypes: true,
+                bundleTypes: true,
                 include: ["src/**/*.ts"],
             }),
             handleEnvVariablesPlugin(),
@@ -87,7 +87,7 @@ const config: UserConfig = (() => {
         },
         build: {
             lib: {
-                entry: resolve(__dirname, "src/index.ts"),
+                entry: resolve(import.meta.dirname, "src/index.ts"),
                 formats: ["es", "cjs"],
                 fileName: (format, entryName) => {
                     return `${entryName}.${format === "es" ? "js" : "common.js"}`;
