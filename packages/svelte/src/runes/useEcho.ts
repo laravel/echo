@@ -38,7 +38,7 @@ const resolveChannelSubscription = <T extends BroadcastDriver>(
         clearChannelCache();
     }
 
-    activeEchoInstance = instance as Echo<BroadcastDriver>;
+    activeEchoInstance = instance;
 
     if (channels[channel.id]) {
         channels[channel.id].count += 1;

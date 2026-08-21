@@ -160,7 +160,7 @@ export function useEcho<
     );
 
     // callback and dependencies are parameters meant to be used directly
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/use-memo
     const callbackFunc = useCallback(callback, dependencies);
     const listening = useRef(false);
     const subscription = useRef<Connection<TDriver> | null>(null);
@@ -279,7 +279,7 @@ export const useEchoNotification = <
 
     const listening = useRef(false);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/use-memo
     const memoizedCallback = useCallback(callback, dependencies);
 
     const cb = useCallback(
