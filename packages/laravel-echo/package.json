@@ -31,7 +31,7 @@
     },
     "devDependencies": {
         "@types/jquery": "^3.5.32",
-        "@types/node": "^20.17.32",
+        "@types/node": "^22.15.3",
         "@typescript-eslint/eslint-plugin": "^8.31.1",
         "@typescript-eslint/parser": "^8.31.1",
         "axios": "^1.18.0",
