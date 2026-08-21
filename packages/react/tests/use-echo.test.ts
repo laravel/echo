@@ -224,7 +224,10 @@ describe("useEcho hook", async () => {
 
         const channel = echoInstance.private(channelName);
 
-        expect(channel.listen).toHaveBeenCalledWith(event, expect.any(Function));
+        expect(channel.listen).toHaveBeenCalledWith(
+            event,
+            expect.any(Function),
+        );
 
         registeredListener(channel, event)({ id: 7 });
 
@@ -1456,12 +1459,7 @@ describe("useEchoNotification hook", async () => {
 
         const { rerender } = renderHook(
             ({ deps }: { deps: unknown[] }) =>
-                echoModule.useEchoNotification(
-                    channelName,
-                    vi.fn(),
-                    [],
-                    deps,
-                ),
+                echoModule.useEchoNotification(channelName, vi.fn(), [], deps),
             { initialProps: { deps: [1] as unknown[] } },
         );
 
