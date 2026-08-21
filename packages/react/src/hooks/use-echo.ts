@@ -5,7 +5,7 @@ import {
     useEffect,
     useMemo,
     useRef,
-    useState,
+    useSyncExternalStore,
 } from "react";
 import { echo } from "../config";
 import type {
@@ -512,45 +512,21 @@ export const useEchoModel = <
     );
 };
 
-const useConnectionChange = (
-    callback: (status: ConnectionStatus) => void,
-): void => {
-    const callbackRef = useRef(callback);
+const subscribeToConnectionChange = (onStoreChange: () => void): (() => void) =>
+    echo().connector.onConnectionChange(onStoreChange);
 
-    useEffect(() => {
-        callbackRef.current = callback;
-    });
+/* The server snapshots keep `echo()` out of rendering on the server: constructing the
+   instance opens a socket, which must not happen while producing markup in Node. */
+export const useConnectionStatus = (): ConnectionStatus =>
+    useSyncExternalStore(
+        subscribeToConnectionChange,
+        () => echo().connectionStatus(),
+        () => "disconnected",
+    );
 
-    useEffect(() => {
-        callbackRef.current(echo().connectionStatus());
-
-        return echo().connector.onConnectionChange((status) =>
-            callbackRef.current(status),
-        );
-    }, []);
-};
-
-/*
- * Both hooks below read the connection through the effect rather than a state
- * initialiser: `echo()` constructs the instance and opens the socket, which must not
- * happen while rendering — least of all on the server.
- */
-export const useConnectionStatus = (): ConnectionStatus => {
-    const [status, setStatus] = useState<ConnectionStatus>("disconnected");
-
-    useConnectionChange((newStatus) => {
-        setStatus(newStatus);
-    });
-
-    return status;
-};
-
-export const useSocketId = (): string | undefined => {
-    const [socketId, setSocketId] = useState<string | undefined>(undefined);
-
-    useConnectionChange(() => {
-        setSocketId(echo().socketId());
-    });
-
-    return socketId;
-};
+export const useSocketId = (): string | undefined =>
+    useSyncExternalStore(
+        subscribeToConnectionChange,
+        () => echo().socketId(),
+        () => undefined,
+    );

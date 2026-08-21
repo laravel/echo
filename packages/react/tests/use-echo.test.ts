@@ -1758,10 +1758,9 @@ describe("useSocketId hook", async () => {
         const Echo = (await import("laravel-echo")).default as any;
         let connectionCallback: (() => void) | undefined;
 
-        Echo.prototype.socketId = vi
-            .fn()
-            .mockReturnValueOnce(undefined)
-            .mockReturnValue("new-socket.abc123");
+        let currentSocketId: string | undefined = undefined;
+
+        Echo.prototype.socketId = vi.fn(() => currentSocketId);
         Echo.prototype.connector = {
             onConnectionChange: vi.fn((cb: () => void) => {
                 connectionCallback = cb;
@@ -1772,7 +1771,9 @@ describe("useSocketId hook", async () => {
         const { result } = renderHook(() => echoModule.useSocketId());
         expect(result.current).toBeUndefined();
 
+        currentSocketId = "new-socket.abc123";
         act(() => connectionCallback?.());
+
         expect(result.current).toBe("new-socket.abc123");
     });
 });
@@ -1804,21 +1805,22 @@ describe("useConnectionStatus hook", async () => {
 
     it("updates when the connector reports a new status", async () => {
         const Echo = (await import("laravel-echo")).default as any;
-        let connectionCallback: ((status: ConnectionStatus) => void) | undefined;
+        let connectionCallback: (() => void) | undefined;
+        let currentStatus: ConnectionStatus = "connected";
 
+        Echo.prototype.connectionStatus = vi.fn(() => currentStatus);
         Echo.prototype.connector = {
-            onConnectionChange: vi.fn(
-                (cb: (status: ConnectionStatus) => void) => {
-                    connectionCallback = cb;
-                    return () => {};
-                },
-            ),
+            onConnectionChange: vi.fn((cb: () => void) => {
+                connectionCallback = cb;
+                return () => {};
+            }),
         };
 
         const { result } = renderHook(() => echoModule.useConnectionStatus());
         expect(result.current).toBe("connected");
 
-        act(() => connectionCallback?.("reconnecting"));
+        currentStatus = "reconnecting";
+        act(() => connectionCallback?.());
 
         expect(result.current).toBe("reconnecting");
     });
