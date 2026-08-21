@@ -438,6 +438,61 @@ describe("useEcho hook", async () => {
         expect(firstResult).toBe(secondResult);
     });
 
+    it("does not leave a channel another mounted consumer still holds", async () => {
+        const channelName = "shared-release-channel";
+        const event = "test-event";
+
+        const first = renderHook(() =>
+            echoModule.useEcho(channelName, event, vi.fn()),
+        );
+        const second = renderHook(() =>
+            echoModule.useEcho(channelName, event, vi.fn()),
+        );
+
+        // consumer one opts out explicitly, then goes away
+        first.result.current.leaveChannel();
+        first.unmount();
+
+        const leaves = vi
+            .mocked(echoInstance.leaveChannel)
+            .mock.calls.filter(([id]) => id === `private-${channelName}`);
+
+        expect(leaves).toHaveLength(0);
+
+        second.unmount();
+
+        expect(
+            vi
+                .mocked(echoInstance.leaveChannel)
+                .mock.calls.filter(([id]) => id === `private-${channelName}`),
+        ).toHaveLength(1);
+    });
+
+    it("ignores repeated leaveChannel calls from the same consumer", async () => {
+        const channelName = "repeated-release-channel";
+        const event = "test-event";
+
+        const first = renderHook(() =>
+            echoModule.useEcho(channelName, event, vi.fn()),
+        );
+        const second = renderHook(() =>
+            echoModule.useEcho(channelName, event, vi.fn()),
+        );
+
+        first.result.current.leaveChannel();
+        first.result.current.leaveChannel();
+        first.result.current.leave();
+
+        const leaves = vi
+            .mocked(echoInstance.leaveChannel)
+            .mock.calls.filter(([id]) => id === `private-${channelName}`);
+
+        expect(leaves).toHaveLength(0);
+        expect(echoInstance.leave).not.toHaveBeenCalledWith(channelName);
+
+        second.unmount();
+    });
+
     it("does not resubscribe the channel when dependencies change", async () => {
         const channelName = "dependency-change-channel";
         const event = "test-event";
@@ -1590,6 +1645,30 @@ describe("useChannel hook", async () => {
         expect(echoInstance.leaveChannel).toHaveBeenCalledWith(
             `private-${channelName}`,
         );
+    });
+
+    it("does not leave a channel another mounted consumer still holds", async () => {
+        const channelName = "shared-holder-channel";
+
+        const first = renderHook(() => echoModule.useChannel(channelName));
+        const second = renderHook(() => echoModule.useChannel(channelName));
+
+        first.result.current.leaveChannel();
+        first.unmount();
+
+        expect(
+            vi
+                .mocked(echoInstance.leaveChannel)
+                .mock.calls.filter(([id]) => id === `private-${channelName}`),
+        ).toHaveLength(0);
+
+        second.unmount();
+
+        expect(
+            vi
+                .mocked(echoInstance.leaveChannel)
+                .mock.calls.filter(([id]) => id === `private-${channelName}`),
+        ).toHaveLength(1);
     });
 
     it("shares one subscription with useEcho on the same channel", async () => {

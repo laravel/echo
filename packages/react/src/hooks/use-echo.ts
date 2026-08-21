@@ -204,8 +204,19 @@ export function useEcho<
         listening.current = true;
     }, [events, callbackFunc]);
 
+    /* One release per acquire: `leaveChannel` is handed to the caller and also used as
+       the effect cleanup, so without this the two together would decrement the shared
+       refcount twice and drop a channel another mounted consumer still holds. */
+    const subscribedRef = useRef(false);
+
     const tearDown = useCallback(
         (leaveAll: boolean = false) => {
+            if (!subscribedRef.current) {
+                return;
+            }
+
+            subscribedRef.current = false;
+
             stopListening();
 
             leaveChannel(channel, leaveAll);
@@ -219,6 +230,7 @@ export function useEcho<
 
     useEffect(() => {
         subscription.current = resolveChannelSubscription<TDriver>(channel);
+        subscribedRef.current = true;
 
         listen();
 
@@ -414,9 +426,17 @@ export function useChannel<
     );
 
     const subscription = useRef<Connection<TDriver> | null>(null);
+    // See the matching guard in useEcho: one release per acquire.
+    const subscribedRef = useRef(false);
 
     const tearDown = useCallback(
         (leaveAll: boolean = false) => {
+            if (!subscribedRef.current) {
+                return;
+            }
+
+            subscribedRef.current = false;
+
             leaveChannel(channel, leaveAll);
         },
         [channel],
@@ -428,6 +448,7 @@ export function useChannel<
 
     useEffect(() => {
         subscription.current = resolveChannelSubscription<TDriver>(channel);
+        subscribedRef.current = true;
 
         return () => tearDown();
     }, [tearDown, channel]);
