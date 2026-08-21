@@ -160,7 +160,6 @@ describe("useEcho hook", async () => {
 
         expect(() => unmount()).not.toThrow();
 
-        // whatever was registered has to be exactly what gets removed
         expect(channel.stopListening).toHaveBeenCalledWith(
             events[0],
             firstListener,
@@ -452,7 +451,6 @@ describe("useEcho hook", async () => {
             echoModule.useEcho(channelName, event, vi.fn()),
         );
 
-        // consumer one opts out explicitly, then goes away
         first.result.current.leaveChannel();
         first.unmount();
 

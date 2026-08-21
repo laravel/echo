@@ -144,8 +144,7 @@ export function useEcho<
     channelName: string,
     event: string | string[] = [],
     callback: (payload: TPayload) => void = () => {},
-    /* Kept for backwards compatibility: `visibility` is positional after it, and the
-       listener now always reaches the latest callback, so there is nothing to key on. */
+    // Unused, but `visibility` is positional after it: removing it would break callers.
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     dependencies: DependencyList = [],
     visibility: TVisibility = "private" as TVisibility,
@@ -167,7 +166,7 @@ export function useEcho<
         callbackRef.current = callback;
     });
 
-    // Stable for the subscription's lifetime, so a changing callback never costs a resubscribe.
+    // Kept stable so a changing callback never costs an unsubscribe and resubscribe.
     const callbackFunc = useCallback(
         (payload: TPayload) => callbackRef.current(payload),
         [],
@@ -204,9 +203,8 @@ export function useEcho<
         listening.current = true;
     }, [events, callbackFunc]);
 
-    /* One release per acquire: `leaveChannel` is handed to the caller and also used as
-       the effect cleanup, so without this the two together would decrement the shared
-       refcount twice and drop a channel another mounted consumer still holds. */
+    /* `leaveChannel` is both returned to the caller and used as the effect cleanup: without
+       this guard the two decrement the shared refcount twice, dropping a live channel. */
     const subscribedRef = useRef(false);
 
     const tearDown = useCallback(
@@ -426,7 +424,7 @@ export function useChannel<
     );
 
     const subscription = useRef<Connection<TDriver> | null>(null);
-    // See the matching guard in useEcho: one release per acquire.
+    // One release per acquire, as in useEcho.
     const subscribedRef = useRef(false);
 
     const tearDown = useCallback(
@@ -515,8 +513,7 @@ export const useEchoModel = <
 const subscribeToConnectionChange = (onStoreChange: () => void): (() => void) =>
     echo().connector.onConnectionChange(onStoreChange);
 
-/* The server snapshots keep `echo()` out of rendering on the server: constructing the
-   instance opens a socket, which must not happen while producing markup in Node. */
+// The server snapshots keep `echo()` out of server rendering: constructing it opens a socket.
 export const useConnectionStatus = (): ConnectionStatus =>
     useSyncExternalStore(
         subscribeToConnectionChange,
