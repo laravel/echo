@@ -145,6 +145,9 @@ export function useEcho<
     channelName: string,
     event: string | string[] = [],
     callback: (payload: TPayload) => void = () => {},
+    /* Kept for backwards compatibility: `visibility` is positional after it, and the
+       listener now always reaches the latest callback, so there is nothing to key on. */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     dependencies: DependencyList = [],
     visibility: TVisibility = "private" as TVisibility,
 ) {
@@ -159,9 +162,17 @@ export function useEcho<
         [channelName, visibility],
     );
 
-    // callback and dependencies are parameters meant to be used directly
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const callbackFunc = useCallback(callback, dependencies);
+    const callbackRef = useRef(callback);
+
+    useEffect(() => {
+        callbackRef.current = callback;
+    });
+
+    // Stable for the subscription's lifetime, so a changing callback never costs a resubscribe.
+    const callbackFunc = useCallback(
+        (payload: TPayload) => callbackRef.current(payload),
+        [],
+    );
     const listening = useRef(false);
     const subscription = useRef<Connection<TDriver> | null>(null);
 
@@ -278,9 +289,11 @@ export const useEchoNotification = <
     }, [eventKey]);
 
     const listening = useRef(false);
+    const callbackRef = useRef(callback);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const memoizedCallback = useCallback(callback, dependencies);
+    useEffect(() => {
+        callbackRef.current = callback;
+    });
 
     const cb = useCallback(
         (notification: BroadcastNotification<TPayload>) => {
@@ -289,10 +302,10 @@ export const useEchoNotification = <
             }
 
             if (events.length === 0 || events.includes(notification.type)) {
-                memoizedCallback(notification);
+                callbackRef.current(notification);
             }
         },
-        [memoizedCallback, events],
+        [events],
     );
 
     const listen = useCallback(() => {
