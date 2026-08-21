@@ -1,5 +1,5 @@
 import { act, renderHook } from "@testing-library/react";
-import Echo from "laravel-echo";
+import Echo, { type ConnectionStatus } from "laravel-echo";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const getEchoModule = async () => import("../src/hooks/use-echo");
@@ -1335,6 +1335,140 @@ describe("useEchoNotification hook", async () => {
     });
 });
 
+describe("useChannel hook", async () => {
+    let echoModule: typeof import("../src/hooks/use-echo");
+    let configModule: typeof import("../src/config/index");
+    let echoInstance: Echo<"null">;
+
+    beforeEach(async () => {
+        vi.resetModules();
+
+        echoInstance = new Echo({
+            broadcaster: "null",
+        });
+
+        echoModule = await getEchoModule();
+        configModule = await getConfigModule();
+
+        configModule.configureEcho({
+            broadcaster: "null",
+        });
+    });
+
+    afterEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it("subscribes to a private channel by default", async () => {
+        const channelName = "test-channel";
+
+        const { result } = renderHook(() => echoModule.useChannel(channelName));
+
+        expect(echoInstance.private).toHaveBeenCalledWith(channelName);
+        expect(result.current.channel()).not.toBeNull();
+    });
+
+    it("does not register any event listeners", async () => {
+        const channelName = "test-channel";
+
+        renderHook(() => echoModule.useChannel(channelName));
+
+        expect(echoInstance.private(channelName).listen).not.toHaveBeenCalled();
+    });
+
+    it("leaves the channel on unmount", async () => {
+        const channelName = "test-channel";
+
+        const { unmount } = renderHook(() =>
+            echoModule.useChannel(channelName),
+        );
+
+        expect(() => unmount()).not.toThrow();
+
+        expect(echoInstance.leaveChannel).toHaveBeenCalledWith(
+            `private-${channelName}`,
+        );
+    });
+
+    it("can leave all channel variations", async () => {
+        const channelName = "test-channel";
+
+        const { result } = renderHook(() => echoModule.useChannel(channelName));
+
+        result.current.leave();
+
+        expect(echoInstance.leave).toHaveBeenCalledWith(channelName);
+    });
+
+    it("won't subscribe multiple times to the same channel", async () => {
+        const channelName = "test-channel";
+
+        const { unmount: unmount1 } = renderHook(() =>
+            echoModule.useChannel(channelName),
+        );
+        const { unmount: unmount2 } = renderHook(() =>
+            echoModule.useChannel(channelName),
+        );
+
+        expect(echoInstance.private).toHaveBeenCalledTimes(1);
+
+        expect(() => unmount1()).not.toThrow();
+        expect(echoInstance.leaveChannel).not.toHaveBeenCalled();
+
+        expect(() => unmount2()).not.toThrow();
+        expect(echoInstance.leaveChannel).toHaveBeenCalledWith(
+            `private-${channelName}`,
+        );
+    });
+
+    it("shares one subscription with useEcho on the same channel", async () => {
+        const channelName = "test-channel";
+
+        const listener = renderHook(() =>
+            echoModule.useEcho(channelName, "test-event", vi.fn()),
+        );
+        const holder = renderHook(() => echoModule.useChannel(channelName));
+
+        expect(echoInstance.private).toHaveBeenCalledTimes(1);
+        expect(holder.result.current.channel()).toBe(
+            listener.result.current.channel(),
+        );
+    });
+
+    it("subscribes to a public channel via usePublicChannel", async () => {
+        const channelName = "test-channel";
+
+        const { result, unmount } = renderHook(() =>
+            echoModule.usePublicChannel(channelName),
+        );
+
+        expect(echoInstance.channel).toHaveBeenCalledWith(channelName);
+        expect(result.current.channel()).not.toBeNull();
+
+        unmount();
+
+        expect(echoInstance.leaveChannel).toHaveBeenCalledWith(channelName);
+    });
+
+    it("subscribes to a presence channel via usePresenceChannel", async () => {
+        const channelName = "test-channel";
+
+        const { result, unmount } = renderHook(() =>
+            echoModule.usePresenceChannel(channelName),
+        );
+
+        expect(echoInstance.join).toHaveBeenCalledWith(channelName);
+        expect(typeof result.current.channel()!.here).toBe("function");
+        expect(typeof result.current.channel()!.whisper).toBe("function");
+
+        unmount();
+
+        expect(echoInstance.leaveChannel).toHaveBeenCalledWith(
+            `presence-${channelName}`,
+        );
+    });
+});
+
 describe("useSocketId hook", async () => {
     let echoModule: typeof import("../src/hooks/use-echo");
     let configModule: typeof import("../src/config/index");
@@ -1393,7 +1527,7 @@ describe("useSocketId hook", async () => {
     });
 });
 
-describe.skip("useConnectionStatus hook", async () => {
+describe("useConnectionStatus hook", async () => {
     let echoModule: typeof import("../src/hooks/use-echo");
     let configModule: typeof import("../src/config/index");
 
@@ -1416,5 +1550,43 @@ describe.skip("useConnectionStatus hook", async () => {
         const { result } = renderHook(() => echoModule.useConnectionStatus());
 
         expect(result.current).toBe("connected");
+    });
+
+    it("updates when the connector reports a new status", async () => {
+        const Echo = (await import("laravel-echo")).default as any;
+        let connectionCallback: ((status: ConnectionStatus) => void) | undefined;
+
+        Echo.prototype.connector = {
+            onConnectionChange: vi.fn(
+                (cb: (status: ConnectionStatus) => void) => {
+                    connectionCallback = cb;
+                    return () => {};
+                },
+            ),
+        };
+
+        const { result } = renderHook(() => echoModule.useConnectionStatus());
+        expect(result.current).toBe("connected");
+
+        act(() => connectionCallback?.("reconnecting"));
+
+        expect(result.current).toBe("reconnecting");
+    });
+
+    it("unsubscribes from the connector on unmount", async () => {
+        const Echo = (await import("laravel-echo")).default as any;
+        const unsubscribe = vi.fn();
+
+        Echo.prototype.connector = {
+            onConnectionChange: vi.fn(() => unsubscribe),
+        };
+
+        const { unmount } = renderHook(() => echoModule.useConnectionStatus());
+
+        expect(unsubscribe).not.toHaveBeenCalled();
+
+        unmount();
+
+        expect(unsubscribe).toHaveBeenCalledTimes(1);
     });
 });
