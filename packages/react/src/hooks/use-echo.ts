@@ -3,7 +3,6 @@ import {
     type DependencyList,
     useCallback,
     useEffect,
-    useLayoutEffect,
     useMemo,
     useRef,
     useState,
@@ -494,29 +493,29 @@ export const useEchoModel = <
 
 const useConnectionChange = (
     callback: (status: ConnectionStatus) => void,
-    invokeOnMount: boolean = true,
 ): void => {
     const callbackRef = useRef(callback);
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         callbackRef.current = callback;
     });
 
     useEffect(() => {
-        if (invokeOnMount) {
-            callbackRef.current(echo().connectionStatus());
-        }
+        callbackRef.current(echo().connectionStatus());
 
         return echo().connector.onConnectionChange((status) =>
             callbackRef.current(status),
         );
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, []);
 };
 
+/*
+ * Both hooks below read the connection through the effect rather than a state
+ * initialiser: `echo()` constructs the instance and opens the socket, which must not
+ * happen while rendering — least of all on the server.
+ */
 export const useConnectionStatus = (): ConnectionStatus => {
-    const [status, setStatus] = useState<ConnectionStatus>(() =>
-        echo().connectionStatus(),
-    );
+    const [status, setStatus] = useState<ConnectionStatus>("disconnected");
 
     useConnectionChange((newStatus) => {
         setStatus(newStatus);
@@ -526,13 +525,11 @@ export const useConnectionStatus = (): ConnectionStatus => {
 };
 
 export const useSocketId = (): string | undefined => {
-    const [socketId, setSocketId] = useState<string | undefined>(() =>
-        echo().socketId(),
-    );
+    const [socketId, setSocketId] = useState<string | undefined>(undefined);
 
     useConnectionChange(() => {
         setSocketId(echo().socketId());
-    }, false);
+    });
 
     return socketId;
 };

@@ -1761,3 +1761,65 @@ describe("useConnectionStatus hook", async () => {
         expect(unsubscribe).toHaveBeenCalledTimes(1);
     });
 });
+
+describe("server rendering", async () => {
+    let echoModule: typeof import("../src/hooks/use-echo");
+    let configModule: typeof import("../src/config/index");
+    let renderToStaticMarkup: typeof import("react-dom/server").renderToStaticMarkup;
+    let createElement: typeof import("react").createElement;
+
+    beforeEach(async () => {
+        vi.resetModules();
+
+        echoModule = await getEchoModule();
+        configModule = await getConfigModule();
+        ({ renderToStaticMarkup } = await import("react-dom/server"));
+        ({ createElement } = await import("react"));
+
+        configModule.configureEcho({
+            broadcaster: "null",
+        });
+    });
+
+    afterEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it("renders useConnectionStatus without opening a connection", async () => {
+        const Echo = (await import("laravel-echo")).default as any;
+        const errors = vi.spyOn(console, "error").mockImplementation(() => {});
+
+        const Component = () =>
+            createElement("span", null, echoModule.useConnectionStatus());
+
+        const constructedBefore = Echo.mock.calls.length;
+
+        expect(renderToStaticMarkup(createElement(Component))).toBe(
+            "<span>disconnected</span>",
+        );
+
+        expect(Echo.mock.calls.length).toBe(constructedBefore);
+        expect(errors).not.toHaveBeenCalled();
+
+        errors.mockRestore();
+    });
+
+    it("renders useSocketId without opening a connection", async () => {
+        const Echo = (await import("laravel-echo")).default as any;
+        const errors = vi.spyOn(console, "error").mockImplementation(() => {});
+
+        const Component = () =>
+            createElement("span", null, echoModule.useSocketId() ?? "none");
+
+        const constructedBefore = Echo.mock.calls.length;
+
+        expect(renderToStaticMarkup(createElement(Component))).toBe(
+            "<span>none</span>",
+        );
+
+        expect(Echo.mock.calls.length).toBe(constructedBefore);
+        expect(errors).not.toHaveBeenCalled();
+
+        errors.mockRestore();
+    });
+});
