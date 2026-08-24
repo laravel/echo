@@ -79,6 +79,7 @@
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
+            "react-native": "./dist/index.common.js",
             "import": "./dist/index.js",
             "require": "./dist/index.common.js"
         }
