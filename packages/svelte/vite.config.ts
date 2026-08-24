@@ -1,11 +1,10 @@
 import { resolve } from "path";
-import { transform as esbuildTransform } from "esbuild";
 import { compileModule } from "svelte/compiler";
-import { defineConfig, PluginOption, UserConfig } from "vite";
-import dts from "vite-plugin-dts";
+import { defineConfig, PluginOption, transformWithOxc, UserConfig } from "vite";
+import dts from "unplugin-dts/vite";
 
-const srcDir = resolve(__dirname, "src");
-const testsDir = resolve(__dirname, "tests");
+const srcDir = resolve(import.meta.dirname, "src");
+const testsDir = resolve(import.meta.dirname, "tests");
 
 const svelteRunesTsPlugin = (): PluginOption => ({
     name: "svelte-runes-ts",
@@ -23,9 +22,9 @@ const svelteRunesTsPlugin = (): PluginOption => ({
         }
 
         try {
-            const tsResult = await esbuildTransform(code, {
-                loader: "ts",
-                tsconfigRaw: { compilerOptions: { target: "ES2020" } },
+            const tsResult = await transformWithOxc(code, id, {
+                lang: "ts",
+                target: "es2020",
             });
             const result = compileModule(tsResult.code, {
                 filename: id.replace(/\.ts$/, ".js"),
@@ -48,25 +47,20 @@ const svelteRunesTsPlugin = (): PluginOption => ({
     },
 });
 
-const handleEnvVariablesPlugin = (): PluginOption => {
-    return {
-        name: "handle-env-variables-plugin",
-        generateBundle(options, bundle) {
-            for (const fileName in bundle) {
-                const file = bundle[fileName];
-
-                if (file.type === "chunk" && file.fileName.endsWith(".js")) {
-                    const transformedContent = file.code.replace(
-                        /import\.meta\.env\.VITE_([A-Z0-9_]+)/g,
-                        "(typeof import.meta.env !== 'undefined' ? import.meta.env.VITE_$1 : undefined)",
-                    );
-
-                    file.code = transformedContent;
-                }
-            }
-        },
-    };
-};
+/*
+ * Laravel exposes its broadcasting defaults as VITE_* variables, and the consuming app's Vite
+ * build statically replaces `import.meta.env.VITE_*` — so these accesses must survive our own
+ * build verbatim. The guard makes non-Vite (e.g. CJS) consumers resolve to undefined instead of
+ * throwing: format rendering lowers `import.meta` in CJS output, turning the guard condition
+ * falsy while the guarded access is never evaluated.
+ */
+const guardedEnvVariables = (names: string[]): Record<string, string> =>
+    Object.fromEntries(
+        names.map((name) => [
+            `import.meta.env.${name}`,
+            `(typeof import.meta.env !== 'undefined' ? import.meta.env.${name} : undefined)`,
+        ]),
+    );
 
 const config: UserConfig = (() => {
     const common: Partial<UserConfig["build"]> = {
@@ -84,7 +78,7 @@ const config: UserConfig = (() => {
                 },
             },
         },
-        outDir: resolve(__dirname, "dist"),
+        outDir: resolve(import.meta.dirname, "dist"),
         sourcemap: true,
         minify: true,
         target: "es2022",
@@ -94,7 +88,7 @@ const config: UserConfig = (() => {
         return {
             build: {
                 lib: {
-                    entry: resolve(__dirname, "src/index.iife.ts"),
+                    entry: resolve(import.meta.dirname, "src/index.iife.ts"),
                     name: "EchoSvelte",
                     formats: ["iife"],
                     fileName: () => "echo-svelte.iife.js",
@@ -110,36 +104,25 @@ const config: UserConfig = (() => {
             svelteRunesTsPlugin(),
             dts({
                 insertTypesEntry: true,
-                rollupTypes: true,
+                bundleTypes: true,
                 include: ["src/**/*.ts"],
             }),
-            handleEnvVariablesPlugin(),
         ],
-        define: {
-            "import.meta.env.VITE_REVERB_APP_KEY":
-                "import.meta.env.VITE_REVERB_APP_KEY",
-            "import.meta.env.VITE_REVERB_HOST":
-                "import.meta.env.VITE_REVERB_HOST",
-            "import.meta.env.VITE_REVERB_PORT":
-                "import.meta.env.VITE_REVERB_PORT",
-            "import.meta.env.VITE_REVERB_SCHEME":
-                "import.meta.env.VITE_REVERB_SCHEME",
-            "import.meta.env.VITE_PUSHER_APP_KEY":
-                "import.meta.env.VITE_PUSHER_APP_KEY",
-            "import.meta.env.VITE_PUSHER_APP_CLUSTER":
-                "import.meta.env.VITE_PUSHER_APP_CLUSTER",
-            "import.meta.env.VITE_PUSHER_HOST":
-                "import.meta.env.VITE_PUSHER_HOST",
-            "import.meta.env.VITE_PUSHER_PORT":
-                "import.meta.env.VITE_PUSHER_PORT",
-            "import.meta.env.VITE_SOCKET_IO_HOST":
-                "import.meta.env.VITE_SOCKET_IO_HOST",
-            "import.meta.env.VITE_ABLY_PUBLIC_KEY":
-                "import.meta.env.VITE_ABLY_PUBLIC_KEY",
-        },
+        define: guardedEnvVariables([
+            "VITE_ABLY_PUBLIC_KEY",
+            "VITE_PUSHER_APP_CLUSTER",
+            "VITE_PUSHER_APP_KEY",
+            "VITE_PUSHER_HOST",
+            "VITE_PUSHER_PORT",
+            "VITE_REVERB_APP_KEY",
+            "VITE_REVERB_HOST",
+            "VITE_REVERB_PORT",
+            "VITE_REVERB_SCHEME",
+            "VITE_SOCKET_IO_HOST",
+        ]),
         build: {
             lib: {
-                entry: resolve(__dirname, "src/index.ts"),
+                entry: resolve(import.meta.dirname, "src/index.ts"),
                 formats: ["es", "cjs"],
                 fileName: (format, entryName) => {
                     return `${entryName}.${format === "es" ? "js" : "common.js"}`;
