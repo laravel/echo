@@ -45,8 +45,7 @@ export default class Echo<T extends keyof Broadcaster> {
 
     /**
      * Create a new class instance.
-     */
-    /*
+     *
      * The `broadcaster` intersection drives inference of T from the options literal.
      * Custom connector classes are allowed alongside T: intersecting them with the
      * "function" key itself would produce an impossible type.
