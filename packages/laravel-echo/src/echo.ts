@@ -36,7 +36,7 @@ export default class Echo<T extends keyof Broadcaster> {
     /**
      * The broadcasting connector.
      */
-    connector!: Broadcaster[Exclude<T, "function">]["connector"];
+    connector: Broadcaster[Exclude<T, "function">]["connector"];
 
     /**
      * The Echo options.

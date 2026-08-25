@@ -8,7 +8,7 @@ export abstract class Channel {
     /**
      * The Echo options.
      */
-    options!: EchoOptionsWithDefaults<BroadcastDriver>;
+    options: EchoOptionsWithDefaults<BroadcastDriver>;
 
     /**
      * The name for Broadcast Notification Created events.

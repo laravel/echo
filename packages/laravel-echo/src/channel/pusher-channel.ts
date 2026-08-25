@@ -29,7 +29,7 @@ export class PusherChannel<
     /**
      * The subscription of the channel.
      */
-    subscription!: BasePusherChannel;
+    subscription: BasePusherChannel;
 
     /**
      * Create a new class instance.

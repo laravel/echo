@@ -35,7 +35,7 @@ export class PusherConnector<
     /**
      * The Pusher instance.
      */
-    pusher!: Pusher;
+    pusher: Pusher;
 
     /**
      * All of the subscribed channel names.

@@ -25,7 +25,7 @@ export class SocketIoConnector extends Connector<
     /**
      * The Socket.io connection instance.
      */
-    socket!: Socket;
+    socket: Socket;
 
     /**
      * All of the subscribed channel names.

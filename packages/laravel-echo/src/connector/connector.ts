@@ -50,7 +50,7 @@ export abstract class Connector<
     /**
      * Connector options.
      */
-    options!: EchoOptionsWithDefaults<TBroadcastDriver>;
+    options: EchoOptionsWithDefaults<TBroadcastDriver>;
 
     /**
      * Create a new class instance.
