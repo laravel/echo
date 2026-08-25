@@ -27,6 +27,7 @@
         "prepublish": "pnpm run build",
         "release": "vitest --run && pnpm publish --no-git-checks",
         "test": "vitest",
+        "typecheck": "tsc --noEmit",
         "format": "prettier --write ."
     },
     "devDependencies": {
