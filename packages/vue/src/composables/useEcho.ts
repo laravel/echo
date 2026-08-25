@@ -80,7 +80,7 @@ export function useEcho<
     channelName: string,
     event: TEvent,
     callback: (payload: InferEventPayload<TEvent>) => void,
-    dependencies?: any[],
+    dependencies?: unknown[],
     visibility?: TVisibility,
 ): {
     leaveChannel: (leaveAll?: boolean) => void;
@@ -99,7 +99,7 @@ export function useEcho<
     channelName: string,
     event: TEvent[],
     callback: (payload: InferEventPayload<TEvent>) => void,
-    dependencies?: any[],
+    dependencies?: unknown[],
     visibility?: TVisibility,
 ): {
     leaveChannel: (leaveAll?: boolean) => void;
@@ -118,7 +118,7 @@ export function useEcho<
     channelName: string,
     event?: string | string[],
     callback?: (payload: TPayload) => void,
-    dependencies?: any[],
+    dependencies?: unknown[],
     visibility?: TVisibility,
 ): {
     leaveChannel: (leaveAll?: boolean) => void;
@@ -137,7 +137,7 @@ export function useEcho<
     channelName: string,
     event: string | string[] = [],
     callback: (payload: TPayload) => void = () => {},
-    dependencies: any[] = [],
+    dependencies: unknown[] = [],
     visibility: TVisibility = "private" as TVisibility,
 ) {
     const eventCallback = ref(callback);
@@ -246,7 +246,7 @@ export const useEchoNotification = <
     channelName: string,
     callback: (payload: BroadcastNotification<TPayload>) => void = () => {},
     event: string | string[] = [],
-    dependencies: any[] = [],
+    dependencies: unknown[] = [],
 ) => {
     const result = useEcho<BroadcastNotification<TPayload>, TDriver, "private">(
         channelName,
@@ -325,7 +325,7 @@ export const useEchoPresence = <
     channelName: string,
     event: string | string[] = [],
     callback: (payload: TPayload) => void = () => {},
-    dependencies: any[] = [],
+    dependencies: unknown[] = [],
 ) => {
     return useEcho<TPayload, TDriver, "presence">(
         channelName,
@@ -343,7 +343,7 @@ export const useEchoPublic = <
     channelName: string,
     event: string | string[] = [],
     callback: (payload: TPayload) => void = () => {},
-    dependencies: any[] = [],
+    dependencies: unknown[] = [],
 ) => {
     return useEcho<TPayload, TDriver, "public">(
         channelName,
@@ -418,7 +418,7 @@ export const useEchoModel = <
     identifier: string | number,
     event: ModelEvents<TModel> | ModelEvents<TModel>[] = [],
     callback: (payload: ModelPayload<TPayload>) => void = () => {},
-    dependencies: any[] = [],
+    dependencies: unknown[] = [],
 ) => {
     return useEcho<ModelPayload<TPayload>, TDriver, "private">(
         `${model}.${identifier}`,
