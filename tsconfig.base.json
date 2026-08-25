@@ -1,6 +1,5 @@
 {
     "compilerOptions": {
-        "allowSyntheticDefaultImports": true,
         "declaration": true,
         "emitDeclarationOnly": true,
         "esModuleInterop": true,
@@ -8,8 +7,8 @@
         "lib": ["dom", "es2020"],
         "module": "ES2020",
         "moduleResolution": "bundler",
+        "outDir": "${configDir}/dist",
         "skipLibCheck": true,
-        "sourceMap": false,
         "strict": true,
         "strictPropertyInitialization": false,
         "target": "ES2020",

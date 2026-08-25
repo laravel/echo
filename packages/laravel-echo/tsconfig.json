@@ -1,10 +1,8 @@
 {
     "extends": "../../tsconfig.base.json",
     "compilerOptions": {
-        "declarationDir": "./dist",
-        "outDir": "./dist",
+        // resolves `/// <reference types="window" />` against ./typings
         "typeRoots": ["node_modules/@types", "./typings"]
     },
-    "include": ["./typings/**/*.ts", "./src/**/*.ts", "./tests/**/*.ts"],
-    "exclude": ["./node_modules"]
+    "include": ["./typings/**/*.ts", "./src/**/*.ts", "./tests/**/*.ts"]
 }
