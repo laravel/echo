@@ -116,8 +116,8 @@ export function useEcho<
     TVisibility extends Channel["visibility"] = "private",
 >(
     channelName: string,
-    event: string | string[],
-    callback: (payload: TPayload) => void,
+    event?: string | string[],
+    callback?: (payload: TPayload) => void,
     dependencies?: any[],
     visibility?: TVisibility,
 ): {
