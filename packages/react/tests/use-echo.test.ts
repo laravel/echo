@@ -842,10 +842,10 @@ describe("useEchoPresence hook", async () => {
         expect(typeof result.current.leaveChannel).toBe("function");
         expect(result.current).toHaveProperty("channel");
         expect(result.current.channel).not.toBeNull();
-        expect(typeof result.current.channel().here).toBe("function");
-        expect(typeof result.current.channel().joining).toBe("function");
-        expect(typeof result.current.channel().leaving).toBe("function");
-        expect(typeof result.current.channel().whisper).toBe("function");
+        expect(typeof result.current.channel()!.here).toBe("function");
+        expect(typeof result.current.channel()!.joining).toBe("function");
+        expect(typeof result.current.channel()!.leaving).toBe("function");
+        expect(typeof result.current.channel()!.whisper).toBe("function");
     });
 
     it("handles multiple events", async () => {
