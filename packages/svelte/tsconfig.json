@@ -20,6 +20,6 @@
         "typeRoots": ["node_modules/@types"],
         "lib": ["dom", "es2020"]
     },
-    "include": ["./src/**/*.ts", "./src/**/*.d.ts"],
-    "exclude": ["./node_modules", "./tests/**/*.ts"]
+    "include": ["./src/**/*.ts", "./src/**/*.d.ts", "./tests/**/*.ts"],
+    "exclude": ["./node_modules"]
 }

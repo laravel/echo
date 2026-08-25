@@ -120,7 +120,7 @@ describe("useEcho (Svelte runes)", () => {
 
         expect(() =>
             $effect.root(() => {
-                useEcho("orders.1", "OrderUpdated", vi.fn());
+                useEcho("orders.1", "OrderUpdated", vi.fn(() => {}));
             }),
         ).toThrow("Echo has not been configured");
     });
@@ -176,11 +176,11 @@ describe("useEcho (Svelte runes)", () => {
         const { echoModule, instance } = await setupConfiguredEcho();
 
         const cleanupA = $effect.root(() => {
-            echoModule.useEcho("orders.3", "OrderUpdated", vi.fn());
+            echoModule.useEcho("orders.3", "OrderUpdated", vi.fn(() => {}));
         });
 
         const cleanupB = $effect.root(() => {
-            echoModule.useEcho("orders.3", "OrderUpdated", vi.fn());
+            echoModule.useEcho("orders.3", "OrderUpdated", vi.fn(() => {}));
         });
 
         await tick();
@@ -201,7 +201,7 @@ describe("useEcho (Svelte runes)", () => {
 
     it("can leave a private channel", async () => {
         const { instance, value, cleanup } = await mountRune((echoModule) =>
-            echoModule.useEcho("orders.4", "OrderUpdated", vi.fn()),
+            echoModule.useEcho("orders.4", "OrderUpdated", vi.fn(() => {})),
         );
 
         value.leaveChannel();
@@ -212,7 +212,7 @@ describe("useEcho (Svelte runes)", () => {
 
     it("can leave all private channel variations", async () => {
         const { instance, value, cleanup } = await mountRune((echoModule) =>
-            echoModule.useEcho("orders.4", "OrderUpdated", vi.fn()),
+            echoModule.useEcho("orders.4", "OrderUpdated", vi.fn(() => {})),
         );
 
         value.leave();
@@ -223,7 +223,7 @@ describe("useEcho (Svelte runes)", () => {
 
     it("supports manual listen and stopListening controls", async () => {
         const { instance, value, cleanup } = await mountRune((echoModule) =>
-            echoModule.useEcho("orders.5", "OrderUpdated", vi.fn()),
+            echoModule.useEcho("orders.5", "OrderUpdated", vi.fn(() => {})),
         );
 
         value.stopListening();
@@ -239,7 +239,7 @@ describe("useEcho (Svelte runes)", () => {
 
     it("guards against duplicate listen and stopListening calls", async () => {
         const { instance, value, cleanup } = await mountRune((echoModule) =>
-            echoModule.useEcho("orders.6", "OrderUpdated", vi.fn()),
+            echoModule.useEcho("orders.6", "OrderUpdated", vi.fn(() => {})),
         );
 
         value.listen();
@@ -277,7 +277,7 @@ describe("useEcho (Svelte runes)", () => {
                 version = value;
             };
 
-            echoModule.useEcho("orders.8", "OrderUpdated", vi.fn(), [
+            echoModule.useEcho("orders.8", "OrderUpdated", vi.fn(() => {}), [
                 () => {
                     dependencyRuns += 1;
 
@@ -317,7 +317,7 @@ describe("useEcho (Svelte runes)", () => {
             echoModule.useEcho(
                 () => `orders.${orderId}`,
                 "OrderUpdated",
-                vi.fn(),
+                vi.fn(() => {}),
                 [() => orderId],
             );
         });
@@ -346,7 +346,7 @@ describe("useEcho (Svelte runes)", () => {
                 eventName = value;
             };
 
-            echoModule.useEcho("orders.10", () => eventName, vi.fn(), [
+            echoModule.useEcho("orders.10", () => eventName, vi.fn(() => {}), [
                 () => eventName,
             ]);
         });
@@ -425,7 +425,7 @@ describe("useEcho (Svelte runes)", () => {
         } = await setupConfiguredEcho();
 
         const firstCleanup = $effect.root(() => {
-            echoModule.useEcho("orders.9", "OrderUpdated", vi.fn());
+            echoModule.useEcho("orders.9", "OrderUpdated", vi.fn(() => {}));
         });
 
         await tick();
@@ -438,7 +438,7 @@ describe("useEcho (Svelte runes)", () => {
 
         const secondInstance = configModule.echo() as any;
         const secondCleanup = $effect.root(() => {
-            echoModule.useEcho("orders.9", "OrderUpdated", vi.fn());
+            echoModule.useEcho("orders.9", "OrderUpdated", vi.fn(() => {}));
         });
 
         await tick();
@@ -463,7 +463,7 @@ describe("useEchoPublic", () => {
 
     it("subscribes to a public channel and leaves it on teardown", async () => {
         const { instance, cleanup } = await mountRune((echoModule) =>
-            echoModule.useEchoPublic("posts", "PostPublished", vi.fn()),
+            echoModule.useEchoPublic("posts", "PostPublished", vi.fn(() => {})),
         );
 
         expect(instance.channel).toHaveBeenCalledWith("posts");
@@ -502,7 +502,7 @@ describe("useEchoPresence", () => {
 
     it("subscribes to a presence channel and leaves it on teardown", async () => {
         const { instance, cleanup } = await mountRune((echoModule) =>
-            echoModule.useEchoPresence("chat.1", "MessageSent", vi.fn()),
+            echoModule.useEchoPresence("chat.1", "MessageSent", vi.fn(() => {})),
         );
 
         expect(instance.join).toHaveBeenCalledWith("chat.1");
@@ -541,7 +541,7 @@ describe("useEchoNotification", () => {
 
     it("subscribes to a private channel and registers a notification listener", async () => {
         const { instance, cleanup } = await mountRune((echoModule) =>
-            echoModule.useEchoNotification("users.1", vi.fn()),
+            echoModule.useEchoNotification("users.1", vi.fn(() => {})),
         );
 
         expect(instance.private).toHaveBeenCalledWith("users.1");
@@ -748,7 +748,7 @@ describe("useEchoModel", () => {
                 "App.Models.User",
                 1,
                 "UserCreated",
-                vi.fn(),
+                vi.fn(() => {}),
             ),
         );
 
@@ -767,7 +767,7 @@ describe("useEchoModel", () => {
                 "App.Models.User",
                 1,
                 ["UserCreated", "UserUpdated"],
-                vi.fn(),
+                vi.fn(() => {}),
             ),
         );
 

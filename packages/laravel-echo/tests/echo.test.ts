@@ -34,6 +34,7 @@ describe("Echo", () => {
         ).not.toThrow();
         expect(
             () =>
+                // @ts-expect-error a plain function is not a connector constructor
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 new Echo({ broadcaster: () => {}, withoutInterceptors: true }),
         ).not.toThrow("Broadcaster function is not supported.");
@@ -41,6 +42,7 @@ describe("Echo", () => {
 
     test("it will throw error for unsupported driver", () => {
         expect(
+            // @ts-expect-error unsupported broadcaster string
             () => new Echo({ broadcaster: "foo", withoutInterceptors: true }),
         ).toThrow("Broadcaster string foo is not supported.");
     });
