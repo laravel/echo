@@ -45,8 +45,11 @@ export default class Echo<T extends keyof Broadcaster> {
 
     /**
      * Create a new class instance.
+     *
+     * `broadcaster` accepts custom connector constructors alongside T; intersecting
+     * them with the "function" key itself would produce an impossible type.
      */
-    constructor(options: EchoOptions<T> & { broadcaster: T }) {
+    constructor(options: EchoOptions<T> & { broadcaster: T | Constructor }) {
         this.options = options;
         this.connect();
 

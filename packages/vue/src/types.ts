@@ -21,6 +21,8 @@ export type BroadcastNotification<TPayload> = TPayload & {
     type: string;
 };
 
+export type Dependency = unknown;
+
 export type ChannelReturnType<
     T extends BroadcastDriver,
     V extends Channel["visibility"],
