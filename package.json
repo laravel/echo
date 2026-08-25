@@ -11,11 +11,11 @@
     },
     "packageManager": "pnpm@11.22.0",
     "scripts": {
-        "test": "pnpm -r --if-present run test",
+        "test": "pnpm -r --parallel --no-sort --if-present run test",
         "typecheck": "pnpm -r --parallel --no-sort --if-present run typecheck",
         "build": "pnpm -r --if-present run build",
-        "lint": "pnpm -r --if-present run lint",
-        "format": "pnpm -r --if-present run format",
+        "lint": "pnpm -r --parallel --no-sort --if-present run lint",
+        "format": "pnpm -r --parallel --no-sort --if-present run format",
         "compile": "pnpm -r --if-present run compile",
         "declarations": "pnpm -r --if-present run declarations",
         "dev": "pnpm -r --parallel --filter './packages/*' dev"
