@@ -183,8 +183,8 @@ export function useEcho<
     TVisibility extends Channel["visibility"] = "private",
 >(
     channelName: ReactiveInput<string>,
-    event: ReactiveInput<string | string[]>,
-    callback: CallbackInput<TPayload>,
+    event?: ReactiveInput<string | string[]>,
+    callback?: CallbackInput<TPayload>,
     dependencies?: Dependency[],
     visibility?: TVisibility,
 ): {
