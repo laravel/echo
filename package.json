@@ -9,7 +9,7 @@
     "author": {
         "name": "Taylor Otwell"
     },
-    "packageManager": "pnpm@11.22.0",
+    "packageManager": "pnpm@12.3.4",
     "scripts": {
         "test": "pnpm -r --parallel --no-sort --if-present run test",
         "typecheck": "pnpm -r --parallel --no-sort --if-present run typecheck",
