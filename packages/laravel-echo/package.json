@@ -42,10 +42,10 @@
         "prettier": "^3.5.3",
         "pusher-js": "^8.4.0",
         "socket.io-client": "^4.8.3",
-        "typescript": "^5.8.3",
+        "typescript": "^6.0.3",
         "unplugin-dts": "^1.0.3",
         "vite": "^8.2.2",
-        "vitest": "^4.1.11"
+        "vitest": "^5.0.0"
     },
     "peerDependencies": {
         "pusher-js": "*",
