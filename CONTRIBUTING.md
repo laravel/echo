@@ -4,7 +4,7 @@ Thank you for your interest in contributing to Laravel Echo! Your contributions 
 
 Echo is maintained as a monorepo using [pnpm workspaces](https://pnpm.io/workspaces). Below you'll find an overview of the repository and how to get your development environment running.
 
-> **Note:** You'll need **pnpm version 10 or higher**. If you're unsure which version you have, run `pnpm -v`.
+> **Note:** You'll need **pnpm version 12 or higher**. If you're unsure which version you have, run `pnpm -v`.
 
 ## Repository Overview
 
