@@ -1372,12 +1372,14 @@ describe("MercureConnector", () => {
                 await vi.waitFor(() => expect(first.closed).toBe(true));
                 expect(second.closed).toBe(true);
                 expect(
-                    new URL(whisperEventSource("private-room.1").url)
-                        .searchParams.get("last_event_id"),
+                    new URL(
+                        whisperEventSource("private-room.1").url,
+                    ).searchParams.get("last_event_id"),
                 ).toBe("first-10");
                 expect(
-                    new URL(whisperEventSource("private-room.2").url)
-                        .searchParams.get("last_event_id"),
+                    new URL(
+                        whisperEventSource("private-room.2").url,
+                    ).searchParams.get("last_event_id"),
                 ).toBe("second-20");
             });
 
