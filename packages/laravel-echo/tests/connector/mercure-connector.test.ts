@@ -1187,10 +1187,24 @@ describe("MercureConnector", () => {
             });
         }
 
-        function whisperEventSource(): MockEventSource {
-            // doRefresh opens the main EventSource first, then syncs the
-            // whisper one right after it.
-            return MockEventSource.last();
+        function whisperEventSource(name?: string): MockEventSource {
+            if (name === undefined) {
+                return MockEventSource.last();
+            }
+
+            const source = MockEventSource.instances.find(
+                (instance) =>
+                    !instance.closed &&
+                    new URL(instance.url).searchParams
+                        .getAll("match")
+                        .includes(`${PREFIX}whisper/${name}`),
+            );
+
+            if (!source) {
+                throw new Error(`No whisper stream for ${name}.`);
+            }
+
+            return source;
         }
 
         function hubPublishCalls() {
@@ -1251,7 +1265,7 @@ describe("MercureConnector", () => {
             );
         }
 
-        test("a whisper-only EventSource opens for the guarded channels", async () => {
+        test("one exact-topic whisper EventSource opens per guarded channel", async () => {
             mockWhisperAuth();
 
             const connector = makeConnector();
@@ -1260,15 +1274,245 @@ describe("MercureConnector", () => {
             connector.presenceChannel("lobby");
 
             await vi.waitFor(() =>
-                expect(MockEventSource.instances).toHaveLength(2),
+                expect(MockEventSource.instances).toHaveLength(3),
             );
 
-            const url = new URL(whisperEventSource().url);
-            expect(url.searchParams.getAll("match")).toEqual([
-                `${PREFIX}whisper/private-room.1`,
-                `${PREFIX}whisper/presence-lobby`,
-            ]);
-            expect(whisperEventSource().withCredentials).toBe(true);
+            for (const name of ["private-room.1", "presence-lobby"]) {
+                const source = whisperEventSource(name);
+                const url = new URL(source.url);
+                expect(url.searchParams.getAll("match")).toEqual([
+                    `${PREFIX}whisper/${name}`,
+                ]);
+                expect(url.searchParams.has("match_urlpattern")).toBe(false);
+                expect(source.withCredentials).toBe(true);
+            }
+        });
+
+        describe("channel isolation", () => {
+            function envelope(name: string): string {
+                return JSON.stringify({
+                    channels: [name],
+                    event: "client-typing",
+                    payload: { name: "alice" },
+                });
+            }
+
+            test.each(["private", "presence", "public"])(
+                "a whisper cannot target another joined %s channel",
+                async (kind) => {
+                    mockWhisperAuth();
+                    const connector = makeConnector();
+                    const sender = connector.privateChannel("room.1");
+                    const target =
+                        kind === "private"
+                            ? connector.privateChannel("room.2")
+                            : kind === "presence"
+                              ? connector.presenceChannel("room.2")
+                              : connector.channel("news");
+                    const callback = vi.fn();
+                    target.listen(".client-typing", callback);
+                    const senderCallback = vi.fn();
+                    sender.listenForWhisper("typing", senderCallback);
+
+                    const stream = await vi.waitFor(() =>
+                        whisperEventSource("private-room.1"),
+                    );
+                    stream.emitMessage(envelope(target.name));
+
+                    expect(callback).not.toHaveBeenCalled();
+                    expect(senderCallback).not.toHaveBeenCalled();
+
+                    stream.emitMessage(envelope(sender.name));
+                    expect(senderCallback).toHaveBeenCalledWith({
+                        name: "alice",
+                    });
+                },
+            );
+
+            test("a mismatched encrypted envelope is rejected before key import", async () => {
+                const name = "private-encrypted-orders.1";
+                const jwk = makeJwk();
+                mockWhisperAuth({ channels: [{ name, jwk }] });
+                const connector = makeConnector();
+                connector.privateChannel("room.1");
+                connector.encryptedPrivateChannel("orders.1");
+                const stream = await vi.waitFor(() =>
+                    whisperEventSource("private-room.1"),
+                );
+                const data = await makeJwe(jwk, envelope(name));
+                const importKey = vi.spyOn(crypto.subtle, "importKey");
+
+                try {
+                    stream.emitMessage(
+                        JSON.stringify({ channels: [name], data }),
+                    );
+                    await Promise.resolve();
+                    await Promise.resolve();
+
+                    expect(importKey).not.toHaveBeenCalled();
+                } finally {
+                    importKey.mockRestore();
+                }
+            });
+
+            test("each whisper stream retains only its own replay cursor", async () => {
+                mockWhisperAuth();
+                const connector = makeConnector();
+                connector.privateChannel("room.1");
+                connector.privateChannel("room.2");
+                const first = await vi.waitFor(() =>
+                    whisperEventSource("private-room.1"),
+                );
+                const second = whisperEventSource("private-room.2");
+
+                first.emitMessage(envelope("private-room.1"), "first-10");
+                second.emitMessage(envelope("private-room.2"), "second-20");
+                connector.channel("news");
+
+                await vi.waitFor(() => expect(first.closed).toBe(true));
+                expect(second.closed).toBe(true);
+                expect(
+                    new URL(whisperEventSource("private-room.1").url)
+                        .searchParams.get("last_event_id"),
+                ).toBe("first-10");
+                expect(
+                    new URL(whisperEventSource("private-room.2").url)
+                        .searchParams.get("last_event_id"),
+                ).toBe("second-20");
+            });
+
+            test("leaving a channel immediately closes its stream and forgets its cursor", async () => {
+                mockWhisperAuth();
+                const connector = makeConnector();
+                connector.privateChannel("room.1");
+                connector.privateChannel("room.2");
+                const previous = await vi.waitFor(() =>
+                    whisperEventSource("private-room.1"),
+                );
+                previous.emitMessage(envelope("private-room.1"), "old-10");
+
+                connector.leaveChannel("private-room.1");
+                expect(previous.closed).toBe(true);
+
+                const callback = vi.fn();
+                connector
+                    .privateChannel("room.1")
+                    .listenForWhisper("typing", callback);
+                const current = await vi.waitFor(() =>
+                    whisperEventSource("private-room.1"),
+                );
+
+                expect(
+                    new URL(current.url).searchParams.has("last_event_id"),
+                ).toBe(false);
+                previous.emitMessage(envelope("private-room.1"), "stale-20");
+                expect(callback).not.toHaveBeenCalled();
+                current.emitMessage(envelope("private-room.1"));
+                expect(callback).toHaveBeenCalledTimes(1);
+            });
+
+            test("replaced whisper streams cannot dispatch or schedule reconnects", async () => {
+                mockWhisperAuth();
+                const connector = makeConnector();
+                const callback = vi.fn();
+                connector
+                    .privateChannel("room.1")
+                    .listenForWhisper("typing", callback);
+                const previous = await vi.waitFor(() =>
+                    whisperEventSource("private-room.1"),
+                );
+                connector.channel("news");
+                await vi.waitFor(() => expect(previous.closed).toBe(true));
+                const count = MockEventSource.instances.length;
+
+                vi.useFakeTimers();
+                try {
+                    previous.emitMessage(envelope("private-room.1"));
+                    previous.readyState = MockEventSource.CLOSED;
+                    previous.emitError();
+                    await vi.advanceTimersByTimeAsync(1000);
+
+                    expect(callback).not.toHaveBeenCalled();
+                    expect(MockEventSource.instances).toHaveLength(count);
+                } finally {
+                    vi.useRealTimers();
+                }
+            });
+
+            test("terminal whisper failures share one reauthentication cycle", async () => {
+                mockWhisperAuth();
+                const connector = makeConnector();
+                connector.privateChannel("room.1");
+                connector.privateChannel("room.2");
+                const first = await vi.waitFor(() =>
+                    whisperEventSource("private-room.1"),
+                );
+                const second = whisperEventSource("private-room.2");
+
+                vi.useFakeTimers();
+                try {
+                    first.readyState = MockEventSource.CLOSED;
+                    second.readyState = MockEventSource.CLOSED;
+                    first.emitError();
+                    second.emitError();
+                    await vi.advanceTimersByTimeAsync(1000);
+
+                    expect(
+                        fetchMock.mock.calls.filter(
+                            ([url]) => url === "/broadcasting/auth",
+                        ),
+                    ).toHaveLength(2);
+                    expect(
+                        MockEventSource.instances.filter(
+                            (source) => !source.closed,
+                        ),
+                    ).toHaveLength(3);
+                    expect(whisperEventSource("private-room.1")).not.toBe(
+                        first,
+                    );
+                    expect(whisperEventSource("private-room.2")).not.toBe(
+                        second,
+                    );
+                } finally {
+                    vi.useRealTimers();
+                }
+            });
+
+            test("disabling client events closes every whisper stream", async () => {
+                mockWhisperAuth();
+                const connector = makeConnector();
+                connector.privateChannel("room.1");
+                connector.privateChannel("room.2");
+                const first = await vi.waitFor(() =>
+                    whisperEventSource("private-room.1"),
+                );
+                const second = whisperEventSource("private-room.2");
+
+                mockWhisperAuth({ clientEvents: false });
+                connector.channel("news");
+                await vi.waitFor(() => expect(first.closed).toBe(true));
+
+                expect(second.closed).toBe(true);
+                expect(
+                    MockEventSource.instances.filter(
+                        (source) => !source.closed,
+                    ),
+                ).toHaveLength(1);
+            });
+
+            test("disconnect closes every whisper stream", async () => {
+                mockWhisperAuth();
+                const connector = makeConnector();
+                connector.privateChannel("room.1");
+                connector.privateChannel("room.2");
+                await vi.waitFor(() => whisperEventSource("private-room.1"));
+
+                connector.disconnect();
+
+                expect(
+                    MockEventSource.instances.every((source) => source.closed),
+                ).toBe(true);
+            });
         });
 
         test("no whisper EventSource opens for public-only channels", async () => {
@@ -1658,15 +1902,22 @@ describe("MercureConnector", () => {
                 "whisper-42",
             );
 
-            // A topology change reopens both EventSources.
+            // A topology change reopens existing streams and adds the new one.
             connector.privateChannel("room.2");
 
             await vi.waitFor(() =>
-                expect(MockEventSource.instances).toHaveLength(4),
+                expect(MockEventSource.instances).toHaveLength(5),
             );
 
             const mainUrl = new URL(MockEventSource.instances[2].url);
-            const whisperUrl = new URL(MockEventSource.instances[3].url);
+            const whisperUrl = new URL(
+                whisperEventSource("private-room.1").url,
+            );
+            const newcomerUrl = new URL(
+                whisperEventSource("private-room.2").url,
+            );
+
+            expect(newcomerUrl.searchParams.has("last_event_id")).toBe(false);
 
             expect(whisperUrl.searchParams.get("last_event_id")).toBe(
                 "whisper-42",
