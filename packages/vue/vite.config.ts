@@ -8,13 +8,18 @@ import dts from "unplugin-dts/vite";
  * build verbatim. The guard makes non-Vite (e.g. CJS) consumers resolve to undefined instead of
  * throwing: format rendering lowers `import.meta` in CJS output, turning the guard condition
  * falsy while the guarded access is never evaluated.
+ *
+ * Skipped under Vitest: its worker cannot evaluate import.meta-based defines, and tests run with a
+ * real import.meta.env so no replacement is needed there.
  */
 const guardedEnvVariables = (names: string[]): Record<string, string> =>
     Object.fromEntries(
-        names.map((name) => [
-            `import.meta.env.${name}`,
-            `(typeof import.meta.env !== 'undefined' ? import.meta.env.${name} : undefined)`,
-        ]),
+        process.env.VITEST
+            ? []
+            : names.map((name) => [
+                  `import.meta.env.${name}`,
+                  `(typeof import.meta.env !== 'undefined' ? import.meta.env.${name} : undefined)`,
+              ]),
     );
 
 const config: UserConfig = (() => {
