@@ -1,6 +1,27 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v2.4.0...2.x)
+## [Unreleased](https://github.com/laravel/echo/compare/v2.5.0...2.x)
+
+## [v2.5.0](https://github.com/laravel/echo/compare/v2.4.0...v2.5.0) - 2026-09-08
+
+### What's Changed
+
+* Bump the github-actions group with 3 updates by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/533
+* Bump actions/setup-node from 6.4.0 to 7.0.0 in the github-actions group by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/534
+* Bump axios from 1.16.0 to 1.18.0 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/535
+* Bump the github-actions group with 4 updates by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/536
+* Bump the github-actions group with 4 updates by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/537
+* build: resolve pnpm/Node toolchain mismatch, prune obsolete overrides, upgrade [@testing-library](https://github.com/testing-library)/react by [@pataar](https://github.com/pataar) in https://github.com/laravel/echo/pull/540
+* build: upgrade eslint to 10 and testing-library packages by [@pataar](https://github.com/pataar) in https://github.com/laravel/echo/pull/541
+* Bump the github-actions group with 3 updates by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/543
+* build: upgrade to vite 8 and migrate to unplugin-dts by [@pataar](https://github.com/pataar) in https://github.com/laravel/echo/pull/542
+* [2.x] Resolve React Native consumers to the CommonJS bundle by [@pataar](https://github.com/pataar) in https://github.com/laravel/echo/pull/544
+* [2.x] Add tsc type checking to CI and fix the type errors it surfaced by [@pataar](https://github.com/pataar) in https://github.com/laravel/echo/pull/545
+* Bump the github-actions group with 3 updates by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/546
+* [2.x] Upgrade to pnpm 12 and resolve vulnerabilities by [@pataar](https://github.com/pataar) in https://github.com/laravel/echo/pull/547
+* [2.x] Upgrade TypeScript to v6 and Vitest to v5 by [@pataar](https://github.com/pataar) in https://github.com/laravel/echo/pull/548
+
+**Full Changelog**: https://github.com/laravel/echo/compare/v2.4.0...v2.5.0
 
 ## [v2.4.0](https://github.com/laravel/echo/compare/v2.3.7...v2.4.0) - 2026-07-11
 
