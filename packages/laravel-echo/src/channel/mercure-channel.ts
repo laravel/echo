@@ -10,6 +10,8 @@ import type { BroadcastDriver } from "../echo";
  */
 export interface MercureWhisperPublisher {
     whisper(channel: string, event: string, data: unknown): void;
+
+    listenForWhispers(channel: string): void;
 }
 
 /**

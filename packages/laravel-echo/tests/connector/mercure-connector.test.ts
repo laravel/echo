@@ -1265,13 +1265,23 @@ describe("MercureConnector", () => {
             );
         }
 
-        test("one exact-topic whisper EventSource opens per guarded channel", async () => {
+        test("one exact-topic whisper EventSource opens per whisper-listening guarded channel", async () => {
             mockWhisperAuth();
 
             const connector = makeConnector();
             connector.channel("news");
-            connector.privateChannel("room.1");
-            connector.presenceChannel("lobby");
+            const room = connector.privateChannel("room.1");
+            const lobby = connector.presenceChannel("lobby");
+
+            // No whisper listeners yet: only the main EventSource opens.
+            await vi.waitFor(() =>
+                expect(MockEventSource.instances).toHaveLength(1),
+            );
+            await new Promise((resolve) => setTimeout(resolve, 20));
+            expect(MockEventSource.instances).toHaveLength(1);
+
+            room.listenForWhisper("typing", () => {});
+            lobby.listenForWhisper("typing", () => {});
 
             await vi.waitFor(() =>
                 expect(MockEventSource.instances).toHaveLength(3),
@@ -1334,7 +1344,9 @@ describe("MercureConnector", () => {
                 const jwk = makeJwk();
                 mockWhisperAuth({ channels: [{ name, jwk }] });
                 const connector = makeConnector();
-                connector.privateChannel("room.1");
+                connector
+                    .privateChannel("room.1")
+                    .listenForWhisper("typing", () => {});
                 connector.encryptedPrivateChannel("orders.1");
                 const stream = await vi.waitFor(() =>
                     whisperEventSource("private-room.1"),
@@ -1358,8 +1370,12 @@ describe("MercureConnector", () => {
             test("each whisper stream retains only its own replay cursor", async () => {
                 mockWhisperAuth();
                 const connector = makeConnector();
-                connector.privateChannel("room.1");
-                connector.privateChannel("room.2");
+                connector
+                    .privateChannel("room.1")
+                    .listenForWhisper("typing", () => {});
+                connector
+                    .privateChannel("room.2")
+                    .listenForWhisper("typing", () => {});
                 const first = await vi.waitFor(() =>
                     whisperEventSource("private-room.1"),
                 );
@@ -1367,26 +1383,37 @@ describe("MercureConnector", () => {
 
                 first.emitMessage(envelope("private-room.1"), "first-10");
                 second.emitMessage(envelope("private-room.2"), "second-20");
-                connector.channel("news");
 
-                await vi.waitFor(() => expect(first.closed).toBe(true));
-                expect(second.closed).toBe(true);
-                expect(
-                    new URL(
-                        whisperEventSource("private-room.1").url,
-                    ).searchParams.get("last_event_id"),
-                ).toBe("first-10");
-                expect(
-                    new URL(
-                        whisperEventSource("private-room.2").url,
-                    ).searchParams.get("last_event_id"),
-                ).toBe("second-20");
+                // Dead streams are replaced with each channel's own cursor.
+                vi.useFakeTimers();
+                try {
+                    first.readyState = MockEventSource.CLOSED;
+                    second.readyState = MockEventSource.CLOSED;
+                    first.emitError();
+                    second.emitError();
+                    await vi.advanceTimersByTimeAsync(1000);
+
+                    expect(
+                        new URL(
+                            whisperEventSource("private-room.1").url,
+                        ).searchParams.get("last_event_id"),
+                    ).toBe("first-10");
+                    expect(
+                        new URL(
+                            whisperEventSource("private-room.2").url,
+                        ).searchParams.get("last_event_id"),
+                    ).toBe("second-20");
+                } finally {
+                    vi.useRealTimers();
+                }
             });
 
             test("leaving a channel immediately closes its stream and forgets its cursor", async () => {
                 mockWhisperAuth();
                 const connector = makeConnector();
-                connector.privateChannel("room.1");
+                connector
+                    .privateChannel("room.1")
+                    .listenForWhisper("typing", () => {});
                 connector.privateChannel("room.2");
                 const previous = await vi.waitFor(() =>
                     whisperEventSource("private-room.1"),
@@ -1423,16 +1450,21 @@ describe("MercureConnector", () => {
                 const previous = await vi.waitFor(() =>
                     whisperEventSource("private-room.1"),
                 );
-                connector.channel("news");
-                await vi.waitFor(() => expect(previous.closed).toBe(true));
-                const count = MockEventSource.instances.length;
 
                 vi.useFakeTimers();
                 try {
-                    previous.emitMessage(envelope("private-room.1"));
                     previous.readyState = MockEventSource.CLOSED;
                     previous.emitError();
                     await vi.advanceTimersByTimeAsync(1000);
+
+                    expect(whisperEventSource("private-room.1")).not.toBe(
+                        previous,
+                    );
+
+                    const count = MockEventSource.instances.length;
+                    previous.emitMessage(envelope("private-room.1"));
+                    previous.emitError();
+                    await vi.advanceTimersByTimeAsync(60000);
 
                     expect(callback).not.toHaveBeenCalled();
                     expect(MockEventSource.instances).toHaveLength(count);
@@ -1444,8 +1476,12 @@ describe("MercureConnector", () => {
             test("terminal whisper failures share one reauthentication cycle", async () => {
                 mockWhisperAuth();
                 const connector = makeConnector();
-                connector.privateChannel("room.1");
-                connector.privateChannel("room.2");
+                connector
+                    .privateChannel("room.1")
+                    .listenForWhisper("typing", () => {});
+                connector
+                    .privateChannel("room.2")
+                    .listenForWhisper("typing", () => {});
                 const first = await vi.waitFor(() =>
                     whisperEventSource("private-room.1"),
                 );
@@ -1483,8 +1519,12 @@ describe("MercureConnector", () => {
             test("disabling client events closes every whisper stream", async () => {
                 mockWhisperAuth();
                 const connector = makeConnector();
-                connector.privateChannel("room.1");
-                connector.privateChannel("room.2");
+                connector
+                    .privateChannel("room.1")
+                    .listenForWhisper("typing", () => {});
+                connector
+                    .privateChannel("room.2")
+                    .listenForWhisper("typing", () => {});
                 const first = await vi.waitFor(() =>
                     whisperEventSource("private-room.1"),
                 );
@@ -1505,8 +1545,12 @@ describe("MercureConnector", () => {
             test("disconnect closes every whisper stream", async () => {
                 mockWhisperAuth();
                 const connector = makeConnector();
-                connector.privateChannel("room.1");
-                connector.privateChannel("room.2");
+                connector
+                    .privateChannel("room.1")
+                    .listenForWhisper("typing", () => {});
+                connector
+                    .privateChannel("room.2")
+                    .listenForWhisper("typing", () => {});
                 await vi.waitFor(() => whisperEventSource("private-room.1"));
 
                 connector.disconnect();
@@ -1552,12 +1596,15 @@ describe("MercureConnector", () => {
             const channel = connector.privateChannel("room.1");
 
             await vi.waitFor(() =>
-                expect(MockEventSource.instances).toHaveLength(2),
+                expect(MockEventSource.instances).toHaveLength(1),
             );
 
             channel.whisper("typing", { name: "alice" });
 
             await vi.waitFor(() => expect(hubPublishCalls()).toHaveLength(1));
+
+            // Sending is a plain POST: no whisper stream was opened.
+            expect(MockEventSource.instances).toHaveLength(1);
 
             const [, init] = hubPublishCalls()[0] as [string, RequestInit];
             const body = init.body as URLSearchParams;
@@ -1628,6 +1675,7 @@ describe("MercureConnector", () => {
             const channel = connector.privateChannel("room.1");
             const callback = vi.fn();
             channel.listen("OrderShipped", callback);
+            channel.listenForWhisper("typing", () => {});
 
             await vi.waitFor(() =>
                 expect(MockEventSource.instances).toHaveLength(2),
@@ -1713,7 +1761,7 @@ describe("MercureConnector", () => {
             const channel = connector.encryptedPrivateChannel("orders.1");
 
             await vi.waitFor(() =>
-                expect(MockEventSource.instances).toHaveLength(2),
+                expect(MockEventSource.instances).toHaveLength(1),
             );
 
             channel.whisper("typing", { name: "alice" });
@@ -1804,7 +1852,7 @@ describe("MercureConnector", () => {
             channel.error(error);
 
             await vi.waitFor(() =>
-                expect(MockEventSource.instances).toHaveLength(2),
+                expect(MockEventSource.instances).toHaveLength(1),
             );
 
             const authCallsBefore = fetchMock.mock.calls.filter(
@@ -1832,7 +1880,7 @@ describe("MercureConnector", () => {
             channel.error(error);
 
             await vi.waitFor(() =>
-                expect(MockEventSource.instances).toHaveLength(2),
+                expect(MockEventSource.instances).toHaveLength(1),
             );
 
             channel.whisper("typing", {});
@@ -1865,7 +1913,9 @@ describe("MercureConnector", () => {
 
             const connector = makeConnector();
             connector.channel("news");
-            connector.privateChannel("room.1");
+            connector
+                .privateChannel("room.1")
+                .listenForWhisper("typing", () => {});
 
             await vi.waitFor(() =>
                 expect(MockEventSource.instances).toHaveLength(2),
@@ -1885,46 +1935,39 @@ describe("MercureConnector", () => {
             );
         });
 
-        test("the whisper EventSource resumes from its own last event id", async () => {
+        test("healthy whisper streams survive unrelated topology changes", async () => {
             mockWhisperAuth();
 
             const connector = makeConnector();
-            connector.privateChannel("room.1");
+            const callback = vi.fn();
+            connector
+                .privateChannel("room.1")
+                .listenForWhisper("typing", callback);
 
-            await vi.waitFor(() =>
-                expect(MockEventSource.instances).toHaveLength(2),
+            const stream = await vi.waitFor(() =>
+                whisperEventSource("private-room.1"),
             );
 
-            whisperEventSource().emitMessage(
+            // Joining an unrelated channel reopens the main EventSource
+            // only: the whisper stream is kept, not replaced.
+            connector.channel("news");
+
+            await vi.waitFor(() =>
+                expect(MockEventSource.instances).toHaveLength(3),
+            );
+
+            expect(stream.closed).toBe(false);
+            expect(whisperEventSource("private-room.1")).toBe(stream);
+
+            stream.emitMessage(
                 JSON.stringify({
                     channels: ["private-room.1"],
                     event: "client-typing",
-                    payload: {},
+                    payload: { name: "bob" },
                 }),
-                "whisper-42",
             );
 
-            // A topology change reopens existing streams and adds the new one.
-            connector.privateChannel("room.2");
-
-            await vi.waitFor(() =>
-                expect(MockEventSource.instances).toHaveLength(5),
-            );
-
-            const mainUrl = new URL(MockEventSource.instances[2].url);
-            const whisperUrl = new URL(
-                whisperEventSource("private-room.1").url,
-            );
-            const newcomerUrl = new URL(
-                whisperEventSource("private-room.2").url,
-            );
-
-            expect(newcomerUrl.searchParams.has("last_event_id")).toBe(false);
-
-            expect(whisperUrl.searchParams.get("last_event_id")).toBe(
-                "whisper-42",
-            );
-            expect(mainUrl.searchParams.get("last_event_id")).toBeNull();
+            expect(callback).toHaveBeenCalledWith({ name: "bob" });
         });
     });
 });

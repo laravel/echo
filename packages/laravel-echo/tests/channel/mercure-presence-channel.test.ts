@@ -74,7 +74,7 @@ describe("MercurePresenceChannel", () => {
     });
 
     test("whisper() delegates to the connector like a private channel", () => {
-        const whisperer = { whisper: vi.fn() };
+        const whisperer = { whisper: vi.fn(), listenForWhispers: vi.fn() };
         const channel = new MercurePresenceChannel(
             "presence-room.1",
             {

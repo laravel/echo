@@ -30,8 +30,12 @@ export class MercurePrivateChannel extends MercureChannel {
      *
      * Reimplements the base Channel behavior instead of calling super, to
      * skip the public-channel warning MercureChannel adds on top of it.
+     * The first listener opens the channel's whisper stream, which then
+     * lives until the channel is left.
      */
     listenForWhisper(event: string, callback: CallableFunction): this {
+        this.whisperer?.listenForWhispers(this.name);
+
         return this.listen(".client-" + event, callback);
     }
 }

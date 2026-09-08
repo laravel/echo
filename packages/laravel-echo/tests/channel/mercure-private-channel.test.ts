@@ -20,7 +20,7 @@ function makeChannel(whisperer?: MercureWhisperPublisher) {
 
 describe("MercurePrivateChannel", () => {
     test("whisper() delegates to the connector and returns the channel", () => {
-        const whisperer = { whisper: vi.fn() };
+        const whisperer = { whisper: vi.fn(), listenForWhispers: vi.fn() };
         const channel = makeChannel(whisperer);
 
         expect(channel.whisper("typing", { name: "alice" })).toBe(channel);
@@ -34,6 +34,17 @@ describe("MercurePrivateChannel", () => {
     test("whisper() throws when constructed without a connector", () => {
         expect(() => makeChannel().whisper("typing", {})).toThrow(
             "without a connector",
+        );
+    });
+
+    test("listenForWhisper() asks the connector to open the whisper stream", () => {
+        const whisperer = { whisper: vi.fn(), listenForWhispers: vi.fn() };
+        const channel = makeChannel(whisperer);
+
+        channel.listenForWhisper("typing", () => {});
+
+        expect(whisperer.listenForWhispers).toHaveBeenCalledWith(
+            "private-room.1",
         );
     });
 
@@ -55,7 +66,7 @@ describe("MercurePrivateChannel", () => {
     });
 
     test("an encrypted private channel whispers like a private one", () => {
-        const whisperer = { whisper: vi.fn() };
+        const whisperer = { whisper: vi.fn(), listenForWhispers: vi.fn() };
         const channel = new MercureEncryptedPrivateChannel(
             "private-encrypted-room.1",
             {

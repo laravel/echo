@@ -87,17 +87,20 @@ const WHISPER_EVENT_PREFIX = "client-";
  * relays them without ever holding a key. The channel fails closed — a
  * plaintext update targeting an encrypted channel is never dispatched.
  *
- * Whispers (client events) use one EventSource per guarded channel, each
- * subscribed to that channel's exact whisper topic. Native EventSource
- * does not expose the publishing topic: multiplexing these topics would
- * let a member of one channel route a whisper to another through its
- * untrusted envelope. The envelope must name the stream's own channel.
+ * Whispers (client events) use one EventSource per guarded channel with
+ * whisper listeners, each subscribed to that channel's exact whisper
+ * topic. Native EventSource does not expose the publishing topic:
+ * multiplexing these topics would let a member of one channel route a
+ * whisper to another through its untrusted envelope. The envelope must
+ * name the stream's own channel.
  *
  * Each whisper stream dispatches only "client-*" events, independently
- * from the main server-event stream. This requires one additional SSE
- * connection per guarded channel when client events are enabled; HTTP/2
- * or HTTP/3 is recommended to avoid HTTP/1.1 connection limits. Payloads
- * are still peer-generated: never treat them as server truth.
+ * from the main server-event stream. Streams open lazily on the first
+ * listenForWhisper() of their channel — sending is a plain POST and needs
+ * none — so the extra SSE connections cost only what whispers are
+ * actually used for; HTTP/2 or HTTP/3 is still recommended to avoid
+ * HTTP/1.1 connection limits. Payloads are peer-generated: never treat
+ * them as server truth.
  */
 export class MercureConnector extends Connector<
     "mercure",
@@ -140,6 +143,13 @@ export class MercureConnector extends Connector<
      * another channel's cursor when the streams are reopened.
      */
     private whisperLastEventIds = new Map<string, string>();
+
+    /**
+     * Names of the channels with at least one whisper listener — the only
+     * ones needing a whisper stream. A name stays in the set until its
+     * channel is left, so removing the last listener keeps the stream.
+     */
+    private whisperListening = new Set<string>();
 
     /**
      * Whether the server mints whisper (client event) grants, as reported
@@ -403,7 +413,7 @@ export class MercureConnector extends Connector<
             this.refresh();
         }
 
-        return this.channels[name] as MercureChannel;
+        return this.channels[name];
     }
 
     /**
@@ -421,7 +431,7 @@ export class MercureConnector extends Connector<
             this.refresh();
         }
 
-        return this.channels[fullName] as MercurePrivateChannel;
+        return this.channels[fullName];
     }
 
     /**
@@ -439,7 +449,7 @@ export class MercureConnector extends Connector<
             this.refresh();
         }
 
-        return this.channels[fullName] as MercureEncryptedPrivateChannel;
+        return this.channels[fullName];
     }
 
     /**
@@ -518,6 +528,22 @@ export class MercureConnector extends Connector<
                 },
             ),
         );
+    }
+
+    /**
+     * Mark the given channel as listening for whispers, opening its
+     * whisper stream when the channel is already authorized (otherwise
+     * the next refresh opens it).
+     *
+     * @internal called by the channel.
+     */
+    listenForWhispers(name: string): void {
+        if (this.whisperListening.has(name) || !this.channels[name]) {
+            return;
+        }
+
+        this.whisperListening.add(name);
+        this.syncWhisperEventSources();
     }
 
     /**
@@ -623,6 +649,7 @@ export class MercureConnector extends Connector<
         this.importedKeys.clear();
         this.lastEventId = "";
         this.whisperLastEventIds.clear();
+        this.whisperListening.clear();
         this.clientEventsEnabled = false;
         this.topicPrefix = "";
 
@@ -665,6 +692,7 @@ export class MercureConnector extends Connector<
         this.whisperEventSources.get(name)?.close();
         this.whisperEventSources.delete(name);
         this.whisperLastEventIds.delete(name);
+        this.whisperListening.delete(name);
     }
 
     /**
@@ -1062,14 +1090,35 @@ export class MercureConnector extends Connector<
     }
 
     /**
-     * Open one exact-topic whisper stream for each authorized guarded
-     * channel. Receiving-only clients need these streams too, so they are
-     * opened alongside the main EventSource rather than on first publish.
+     * Reconcile the per-channel whisper streams with the channels that
+     * currently need one: authorized guarded channels with at least one
+     * whisper listener. Streams are opened lazily — sending needs no
+     * stream (whisper() is a POST, and senders never receive their own
+     * whispers) — so clients that never call listenForWhisper() pay no
+     * extra connections. Healthy streams survive unrelated topology
+     * changes; only dead (terminally closed) ones are replaced.
      * Connection status still tracks the main stream; terminal failures
      * use the existing shared re-authentication and reconnect path.
      */
     private syncWhisperEventSources(): void {
-        this.closeWhisperEventSources();
+        const CLOSED = this.eventSourceClass().CLOSED;
+
+        const desired = new Set(
+            this.clientEventsEnabled
+                ? this.guardedChannelNames().filter(
+                      (name) =>
+                          this.authorizedChannels.has(name) &&
+                          this.whisperListening.has(name),
+                  )
+                : [],
+        );
+
+        this.whisperEventSources.forEach((source, name) => {
+            if (!desired.has(name) || source.readyState === CLOSED) {
+                source.close();
+                this.whisperEventSources.delete(name);
+            }
+        });
 
         if (!this.clientEventsEnabled) {
             this.whisperLastEventIds.clear();
@@ -1077,41 +1126,48 @@ export class MercureConnector extends Connector<
             return;
         }
 
+        desired.forEach((name) => {
+            if (!this.whisperEventSources.has(name)) {
+                this.openWhisperEventSource(name);
+            }
+        });
+    }
+
+    /**
+     * Open the exact-topic whisper stream of the given guarded channel,
+     * resuming from its own replay cursor.
+     */
+    private openWhisperEventSource(name: string): void {
         const EventSourceImplementation = this.eventSourceClass();
 
-        this.guardedChannelNames()
-            .filter((name) => this.authorizedChannels.has(name))
-            .forEach((name) => {
-                const eventSource = new EventSourceImplementation(
-                    this.buildSubscribeUrl(
-                        [this.whisperTopic(name)],
-                        [],
-                        this.whisperLastEventIds.get(name) ?? "",
-                    ).toString(),
-                    { withCredentials: true },
-                );
+        const eventSource = new EventSourceImplementation(
+            this.buildSubscribeUrl(
+                [this.whisperTopic(name)],
+                [],
+                this.whisperLastEventIds.get(name) ?? "",
+            ).toString(),
+            { withCredentials: true },
+        );
 
-                this.whisperEventSources.set(name, eventSource);
+        this.whisperEventSources.set(name, eventSource);
 
-                eventSource.onmessage = (event: MessageEvent) => {
-                    if (this.whisperEventSources.get(name) !== eventSource) {
-                        return;
-                    }
+        eventSource.onmessage = (event: MessageEvent) => {
+            if (this.whisperEventSources.get(name) !== eventSource) {
+                return;
+            }
 
-                    this.whisperLastEventIds.set(name, event.lastEventId);
-                    this.handleWhisperMessage(event, name);
-                };
+            this.whisperLastEventIds.set(name, event.lastEventId);
+            this.handleWhisperMessage(event, name);
+        };
 
-                eventSource.onerror = () => {
-                    if (
-                        this.whisperEventSources.get(name) === eventSource &&
-                        eventSource.readyState ===
-                            EventSourceImplementation.CLOSED
-                    ) {
-                        this.scheduleReconnect();
-                    }
-                };
-            });
+        eventSource.onerror = () => {
+            if (
+                this.whisperEventSources.get(name) === eventSource &&
+                eventSource.readyState === EventSourceImplementation.CLOSED
+            ) {
+                this.scheduleReconnect();
+            }
+        };
     }
 
     /**
@@ -1665,7 +1721,7 @@ export class MercureConnector extends Connector<
                 ) {
                     this.channelJwks.set(
                         channel.name,
-                        channel.jwk as JsonWebKey,
+                        channel.jwk,
                     );
                 }
             });
