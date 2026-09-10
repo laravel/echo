@@ -1,6 +1,6 @@
 {
     "name": "laravel-echo",
-    "version": "2.4.0",
+    "version": "2.5.0",
     "description": "Laravel Echo library for beautiful Pusher, Socket.IO, and Mercure integration",
     "keywords": [
         "laravel",
