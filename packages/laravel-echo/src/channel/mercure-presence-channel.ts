@@ -28,7 +28,7 @@ export class MercurePresenceChannel
     here(callback: CallableFunction): this {
         this.hereCallbacks.push(callback);
 
-        // Immediately notify callbacks registered after seeding.
+        // Immediately notify callbacks registered after seeding...
         if (this.seeded) {
             this.invoke(callback, this.uniqueMembers());
         }
