@@ -155,7 +155,7 @@ export class MercureConnector extends Connector<
         }
 
         try {
-            // Resolve relative hub paths against the page.
+            // Resolve relative hub paths against the page...
             this.url = new URL(
                 this.options.host ?? DEFAULT_HUB_PATH,
                 inBrowser ? window.location.origin : undefined,
@@ -376,7 +376,7 @@ export class MercureConnector extends Connector<
             fetch(`${this.url.origin}${this.url.pathname}`, {
                 method: "POST",
                 credentials: "include",
-                // URLSearchParams keeps this a simple request without CORS preflight.
+                // URLSearchParams keeps this a simple request without CORS preflight...
                 body: new URLSearchParams({
                     topic: this.whisperTopic(name),
                     data: updateData,
@@ -433,7 +433,7 @@ export class MercureConnector extends Connector<
 
     /** Disconnect from Mercure. */
     disconnect(): void {
-        this.epoch++; // strands any in-flight refresh (see doRefresh)
+        this.epoch++; // strands any in-flight refresh (see doRefresh)...
         this.channels = Object.create(null) as Record<
             string,
             AnyMercureChannel
@@ -534,7 +534,7 @@ export class MercureConnector extends Connector<
 
         void work()
             .catch((error) => {
-                // Surface callback failures without stranding the connection.
+                // Surface callback failures without stranding the connection...
                 this.notifyAllError(error);
 
                 if (Object.keys(this.channels).length > 0) {
@@ -575,7 +575,7 @@ export class MercureConnector extends Connector<
                     return;
                 }
 
-                // Rebuild if a delayed timer allowed the cookie to expire.
+                // Rebuild if a delayed timer allowed the cookie to expire...
                 if (
                     this.tokenTtl !== null &&
                     Date.now() - this.lastAuthAt >= this.tokenTtl * 1000
@@ -595,7 +595,7 @@ export class MercureConnector extends Connector<
                     }
 
                     if (auth.ok) {
-                        // Rebuild without channels revoked mid-session.
+                        // Rebuild without channels revoked mid-session...
                         if (auth.denied.length > 0) {
                             this.evict(
                                 auth.denied,
@@ -608,7 +608,7 @@ export class MercureConnector extends Connector<
 
                         this.scheduleTokenRefresh();
                     } else {
-                        // Retry before the hub drops the expired connection.
+                        // Retry before the hub drops the expired connection...
                         this.notifyAllError(auth.error);
                         this.scheduleReconnect();
                     }
@@ -648,7 +648,7 @@ export class MercureConnector extends Connector<
     private async doRefresh(): Promise<void> {
         const epoch = this.epoch;
 
-        // Coalesce same-tick joins and leaves into one auth request.
+        // Coalesce same-tick joins and leaves into one auth request...
         await Promise.resolve();
 
         if (epoch !== this.epoch) {
@@ -683,7 +683,7 @@ export class MercureConnector extends Connector<
             this.setStatus("connecting");
         }
 
-        // Keep the previous stream alive until authentication succeeds.
+        // Keep the previous stream alive until authentication succeeds...
         const auth = await this.authenticate(channelNames);
 
         if (epoch !== this.epoch) {
@@ -696,7 +696,7 @@ export class MercureConnector extends Connector<
                     !this.authorizedChannels.has(name) && this.channels[name],
             );
 
-            // A rejected batch evicts only its newly joined channels.
+            // A rejected batch evicts only its newly joined channels...
             if (auth.rejected && newcomers.length > 0) {
                 this.evict(
                     newcomers,
@@ -709,7 +709,7 @@ export class MercureConnector extends Connector<
                 return;
             }
 
-            // Keep the current stream alive while retrying transient failures.
+            // Keep the current stream alive while retrying transient failures...
             this.notifyAllError(auth.error);
             this.setStatus("reconnecting");
             this.scheduleReconnect();
@@ -722,7 +722,7 @@ export class MercureConnector extends Connector<
             this.reconnectTimer = null;
         }
 
-        // Continue with the granted subset after individual denials.
+        // Continue with the granted subset after individual denials...
         if (auth.denied.length > 0) {
             this.evict(
                 auth.denied,
@@ -747,7 +747,7 @@ export class MercureConnector extends Connector<
         this.authorizedChannels = new Set(channelNames);
         this.scheduleTokenRefresh();
 
-        // Buffer live presence events before fetching initial snapshots.
+        // Buffer live presence events before fetching initial snapshots...
         channelNames
             .filter(
                 (name) =>
@@ -795,7 +795,7 @@ export class MercureConnector extends Connector<
                 }
             });
 
-            // Fetch after opening so the snapshot includes this subscriber.
+            // Fetch after opening so the snapshot includes this subscriber...
             void this.seedPresenceChannels(epoch);
         };
 
@@ -809,7 +809,7 @@ export class MercureConnector extends Connector<
             this.setStatus("reconnecting");
 
             if (eventSource.readyState === EventSourceImplementation.CLOSED) {
-                // A terminal stream needs fresh auth, presence, and subscriptions.
+                // A terminal stream needs fresh auth, presence, and subscriptions...
                 this.subscribedNotified.clear();
                 this.seededPresenceChannels.clear();
                 this.pendingSubscriptionEvents.clear();
@@ -958,7 +958,7 @@ export class MercureConnector extends Connector<
                             ),
                     );
                 } catch (error) {
-                    // Report failure rather than faking an empty room.
+                    // Report failure rather than faking an empty room...
                     channel.notifyError(error);
                 } finally {
                     this.pendingSubscriptionEvents.delete(name);
@@ -987,7 +987,7 @@ export class MercureConnector extends Connector<
             (name): name is string => typeof name === "string",
         );
 
-        // Queue encrypted dispatches to preserve event order.
+        // Queue encrypted dispatches to preserve event order...
         if (typeof message.data === "string") {
             const data = message.data;
 
@@ -1015,7 +1015,7 @@ export class MercureConnector extends Connector<
         }
 
         channels.forEach((name) => {
-            // Never dispatch plaintext to an encrypted channel.
+            // Never dispatch plaintext to an encrypted channel...
             if (
                 !name.startsWith(ENCRYPTED_PREFIX) &&
                 hasOwn(this.channels, name)
@@ -1104,7 +1104,7 @@ export class MercureConnector extends Connector<
                 );
             }
 
-            // Channel members cannot inject server events through whispers.
+            // Channel members cannot inject server events through whispers...
             if (whisper && !message.event.startsWith(WHISPER_EVENT_PREFIX)) {
                 return;
             }
@@ -1250,7 +1250,7 @@ export class MercureConnector extends Connector<
         }
 
         if (subscription.active && subscription.payload == null) {
-            return; // an unauthorized (phantom) subscription: not a member
+            return; // an unauthorized (phantom) subscription: not a member...
         }
 
         const name = this.channelNameFromTopic(subscription.match);
@@ -1311,7 +1311,7 @@ export class MercureConnector extends Connector<
 
         return (snapshot.subscriptions ?? [])
             .filter(
-                // Only authorized subscribers receive a member payload.
+                // Only authorized subscribers receive a member payload...
                 (subscription) =>
                     subscription.active && subscription.payload != null,
             )
@@ -1365,7 +1365,7 @@ export class MercureConnector extends Connector<
             );
         }
 
-        // Treat 4xx responses as rejected batches and retry other failures.
+        // Treat 4xx responses as rejected batches and retry other failures...
         return {
             ok: false,
             rejected: status !== null && status < 500,

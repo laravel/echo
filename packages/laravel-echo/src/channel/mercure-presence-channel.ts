@@ -58,6 +58,7 @@ export class MercurePresenceChannel
                 normalizeMember(payload),
             ]),
         );
+
         this.memberCounts = new Map();
 
         for (const member of this.members.values()) {
@@ -97,7 +98,7 @@ export class MercurePresenceChannel
                 );
             }
         } else {
-            // Ignore leaves from unknown or unauthorized subscribers.
+            // Ignore leaves from unknown or unauthorized subscribers...
             const member = this.members.get(subscriber);
 
             if (!member) {
