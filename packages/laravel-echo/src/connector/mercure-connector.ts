@@ -111,7 +111,10 @@ export class MercureConnector extends Connector<
     /**
      * All of the subscribed channels, keyed by their full (prefixed) name.
      */
-    channels: Record<string, AnyMercureChannel> = {};
+    channels: Record<string, AnyMercureChannel> = Object.create(null) as Record<
+        string,
+        AnyMercureChannel
+    >;
 
     /**
      * The base URL of the Mercure hub.
@@ -602,7 +605,19 @@ export class MercureConnector extends Connector<
             const auth = await this.authenticate(Object.keys(this.channels));
 
             if (auth.ok) {
-                response = await publish();
+                if (auth.denied.length > 0) {
+                    this.evict(
+                        auth.denied,
+                        new Error(
+                            `The broadcasting auth request denied access to [${auth.denied.join(", ")}].`,
+                        ),
+                    );
+                    this.refresh();
+                }
+
+                if (this.channels[name]) {
+                    response = await publish();
+                }
             }
         }
 
@@ -640,7 +655,10 @@ export class MercureConnector extends Connector<
      */
     disconnect(): void {
         this.epoch++; // strands any in-flight refresh (see doRefresh)
-        this.channels = {};
+        this.channels = Object.create(null) as Record<
+            string,
+            AnyMercureChannel
+        >;
         this.authorizedChannels.clear();
         this.subscribedNotified.clear();
         this.seededPresenceChannels.clear();
@@ -983,6 +1001,11 @@ export class MercureConnector extends Connector<
             return;
         }
 
+        if (this.reconnectTimer) {
+            clearTimeout(this.reconnectTimer);
+            this.reconnectTimer = null;
+        }
+
         // Denied channels are reported individually: evict them and carry
         // on with the granted subset, so one revoked channel never takes
         // down the others.
@@ -1044,11 +1067,17 @@ export class MercureConnector extends Connector<
         this.eventSource = eventSource;
 
         eventSource.onopen = () => {
+            if (this.eventSource !== eventSource) {
+                return;
+            }
+
             this.reconnectDelay = 1000;
             this.setStatus("connected");
 
-            Object.entries(this.channels).forEach(([name, channel]) => {
-                if (!this.subscribedNotified.has(name)) {
+            channelNames.forEach((name) => {
+                const channel = this.channels[name];
+
+                if (channel && !this.subscribedNotified.has(name)) {
                     this.subscribedNotified.add(name);
                     channel.notifySubscribed();
                 }
@@ -1062,6 +1091,10 @@ export class MercureConnector extends Connector<
         };
 
         eventSource.onerror = (event) => {
+            if (this.eventSource !== eventSource) {
+                return;
+            }
+
             this.notifyAllError(event);
 
             this.setStatus("reconnecting");
@@ -1083,12 +1116,17 @@ export class MercureConnector extends Connector<
             // Otherwise native EventSource retry is already in progress.
         };
 
-        eventSource.onmessage = (event: MessageEvent) =>
-            this.handleMessage(event);
+        eventSource.onmessage = (event: MessageEvent) => {
+            if (this.eventSource === eventSource) {
+                this.handleMessage(event);
+            }
+        };
 
-        eventSource.addEventListener(SUBSCRIPTION_EVENT_TYPE, (event) =>
-            this.handleSubscriptionEvent(event),
-        );
+        eventSource.addEventListener(SUBSCRIPTION_EVENT_TYPE, (event) => {
+            if (this.eventSource === eventSource) {
+                this.handleSubscriptionEvent(event);
+            }
+        });
 
         this.syncWhisperEventSources();
     }

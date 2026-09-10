@@ -14,6 +14,8 @@ interface ImportMetaEnv {
 
     readonly VITE_SOCKET_IO_HOST: string;
 
+    readonly VITE_MERCURE_HUB_URL: string;
+
     readonly VITE_ABLY_PUBLIC_KEY: string;
 }
 

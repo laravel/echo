@@ -302,6 +302,31 @@ describe("MercureConnector", () => {
         expect(callback).toHaveBeenCalled();
     });
 
+    test.each(["__proto__", "constructor", "toString"])(
+        'a public channel named "%s" can be joined',
+        async (name) => {
+            const connector = makeConnector();
+            const channel = connector.channel(name);
+            const callback = vi.fn();
+            channel.listen("Tick", callback);
+
+            await vi.waitFor(() =>
+                expect(MockEventSource.instances).toHaveLength(1),
+            );
+
+            MockEventSource.last().emitMessage(
+                JSON.stringify({
+                    channels: [name],
+                    event: "Tick",
+                    payload: {},
+                }),
+            );
+
+            expect(connector.channel(name)).toBe(channel);
+            expect(callback).toHaveBeenCalled();
+        },
+    );
+
     test("an incoming message matching this connection's own socket id is ignored", async () => {
         const connector = makeConnector();
         const news = connector.channel("news");
@@ -706,6 +731,76 @@ describe("MercureConnector", () => {
         expect(subscribedA).toHaveBeenCalledTimes(1);
     });
 
+    test("an EventSource only notifies channels included in its auth request", async () => {
+        const authResolvers: Array<(value: unknown) => void> = [];
+        fetchMock.mockImplementation((url: string) => {
+            if (url === "/broadcasting/auth") {
+                return new Promise((resolve) => authResolvers.push(resolve));
+            }
+
+            return Promise.resolve(jsonResponse({}));
+        });
+
+        const connector = makeConnector();
+        const subscribedA = vi.fn();
+        const subscribedB = vi.fn();
+        connector.channel("a").subscribed(subscribedA);
+
+        await vi.waitFor(() => expect(authResolvers).toHaveLength(1));
+        connector.channel("b").subscribed(subscribedB);
+        authResolvers[0](jsonResponse({}));
+
+        await vi.waitFor(() =>
+            expect(MockEventSource.instances).toHaveLength(1),
+        );
+        await vi.waitFor(() => expect(authResolvers).toHaveLength(2));
+        MockEventSource.instances[0].emitOpen();
+
+        expect(subscribedA).toHaveBeenCalledTimes(1);
+        expect(subscribedB).not.toHaveBeenCalled();
+
+        authResolvers[1](jsonResponse({}));
+        await vi.waitFor(() =>
+            expect(MockEventSource.instances).toHaveLength(2),
+        );
+        MockEventSource.instances[1].emitOpen();
+
+        expect(subscribedB).toHaveBeenCalledTimes(1);
+    });
+
+    test("callbacks from a replaced EventSource are ignored", async () => {
+        const connector = makeConnector();
+        const callback = vi.fn();
+        const error = vi.fn();
+        connector.channel("news").listen("Tick", callback).error(error);
+
+        await vi.waitFor(() =>
+            expect(MockEventSource.instances).toHaveLength(1),
+        );
+        const previous = MockEventSource.instances[0];
+
+        connector.channel("weather");
+        await vi.waitFor(() =>
+            expect(MockEventSource.instances).toHaveLength(2),
+        );
+        MockEventSource.instances[1].emitOpen();
+
+        previous.emitMessage(
+            JSON.stringify({
+                channels: ["news"],
+                event: "Tick",
+                payload: {},
+            }),
+            "stale-10",
+        );
+        previous.readyState = MockEventSource.CLOSED;
+        previous.emitError();
+
+        expect(callback).not.toHaveBeenCalled();
+        expect(error).not.toHaveBeenCalled();
+        expect(connector.connectionStatus()).toBe("connected");
+    });
+
     test("subscribed() fires again after the connection was actually lost", async () => {
         const connector = makeConnector();
         const subscribed = vi.fn();
@@ -800,6 +895,51 @@ describe("MercureConnector", () => {
             await vi.advanceTimersByTimeAsync(1000);
 
             expect(MockEventSource.instances).toHaveLength(2);
+        } finally {
+            vi.useRealTimers();
+        }
+    });
+
+    test("a successful refresh cancels a pending reconnect", async () => {
+        let authStatus = 200;
+        fetchMock.mockImplementation((url: string) =>
+            Promise.resolve(
+                jsonResponse(
+                    {},
+                    url === "/broadcasting/auth" ? authStatus : 200,
+                ),
+            ),
+        );
+
+        vi.useFakeTimers();
+
+        try {
+            const connector = makeConnector();
+            connector.channel("news");
+            await vi.advanceTimersByTimeAsync(0);
+            expect(MockEventSource.instances).toHaveLength(1);
+
+            authStatus = 500;
+            connector.channel("weather");
+            await vi.advanceTimersByTimeAsync(0);
+            expect(connector.connectionStatus()).toBe("reconnecting");
+
+            authStatus = 200;
+            connector.channel("sports");
+            await vi.advanceTimersByTimeAsync(0);
+            expect(MockEventSource.instances).toHaveLength(2);
+
+            const authCalls = fetchMock.mock.calls.filter(
+                ([url]) => url === "/broadcasting/auth",
+            ).length;
+            await vi.advanceTimersByTimeAsync(1000);
+
+            expect(MockEventSource.instances).toHaveLength(2);
+            expect(
+                fetchMock.mock.calls.filter(
+                    ([url]) => url === "/broadcasting/auth",
+                ),
+            ).toHaveLength(authCalls);
         } finally {
             vi.useRealTimers();
         }
@@ -1964,6 +2104,53 @@ describe("MercureConnector", () => {
                 ).length,
             ).toBe(authCallsBefore + 1);
             expect(error).not.toHaveBeenCalled();
+        });
+
+        test("a channel denied while recovering a 401 publish is evicted without retrying", async () => {
+            let authCalls = 0;
+            fetchMock.mockImplementation((url: string) => {
+                if (url === "/broadcasting/auth") {
+                    authCalls++;
+
+                    return Promise.resolve(
+                        jsonResponse({
+                            expires_in: 300,
+                            topic_prefix: PREFIX,
+                            client_events: true,
+                            channel_names:
+                                authCalls === 1
+                                    ? [{ name: "private-room.1" }]
+                                    : [
+                                          {
+                                              name: "private-room.1",
+                                              denied: true,
+                                          },
+                                      ],
+                        }),
+                    );
+                }
+
+                if (url === HUB) {
+                    return Promise.resolve(jsonResponse({}, 401));
+                }
+
+                return Promise.resolve(jsonResponse({}));
+            });
+
+            const connector = makeConnector();
+            const channel = connector.privateChannel("room.1");
+            const error = vi.fn();
+            channel.error(error);
+
+            await vi.waitFor(() =>
+                expect(MockEventSource.instances).toHaveLength(1),
+            );
+            channel.whisper("typing", {});
+
+            await vi.waitFor(() => expect(error).toHaveBeenCalledTimes(1));
+            expect(String(error.mock.calls[0][0])).toContain("private-room.1");
+            expect(connector.channels).not.toHaveProperty("private-room.1");
+            expect(hubPublishCalls()).toHaveLength(1);
         });
 
         test("a persistently failing publish surfaces on the channel's error callbacks", async () => {

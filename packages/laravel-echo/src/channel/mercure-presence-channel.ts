@@ -218,7 +218,7 @@ function normalizeMember(payload: unknown): NormalizedMember {
         payload !== null &&
         typeof payload === "object" &&
         "user_id" in payload &&
-        typeof (payload as { user_id: unknown }).user_id === "string"
+        typeof payload.user_id === "string"
     ) {
         const wrapped = payload as { user_id: string; user_info?: unknown };
 
