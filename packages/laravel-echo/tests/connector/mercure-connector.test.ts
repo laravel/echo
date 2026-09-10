@@ -85,11 +85,7 @@ function makeJwk(): JsonWebKey {
     };
 }
 
-/**
- * Build a compact JWE the way the server-side MercureChannelEncrypter
- * does: direct encryption under AES-256-GCM, the protected-header segment
- * as additional authenticated data.
- */
+/** Build a server-compatible A256GCM JWE with the protected header as AAD. */
 async function makeJwe(jwk: JsonWebKey, plaintext: string): Promise<string> {
     const key = await crypto.subtle.importKey(
         "jwk",
@@ -143,8 +139,7 @@ describe("MercureConnector", () => {
     });
 
     afterEach(() => {
-        // Stops reconnect/refresh timers, so no connector leaks an
-        // EventSource into a later test.
+        // Prevent timers and EventSources from leaking between tests.
         connectors.forEach((connector) => connector.disconnect());
         vi.unstubAllGlobals();
     });
@@ -238,8 +233,7 @@ describe("MercureConnector", () => {
             expect(MockEventSource.instances).toHaveLength(1),
         );
 
-        // The snapshot is only fetched after the EventSource opened, so it
-        // includes this subscriber's own subscription.
+        // The post-open snapshot includes this subscriber.
         expect(here).not.toHaveBeenCalled();
 
         MockEventSource.instances[0].emitOpen();
@@ -393,8 +387,7 @@ describe("MercureConnector", () => {
         MockEventSource.instances[0].emitOpen();
         await vi.waitFor(() => expect(here).toHaveBeenCalled());
 
-        // An unauthorized subscriber merely requesting the topic gets a
-        // subscription event too, but never a server-attached payload.
+        // Unauthorized subscribers lack a server-attached payload.
         MockEventSource.instances[0].emitNamed(
             "mercure",
             JSON.stringify({
@@ -405,8 +398,7 @@ describe("MercureConnector", () => {
             }),
         );
 
-        // A urlpattern subscription whose pattern equals the channel name
-        // is not an exact member either.
+        // URL pattern subscriptions are not exact members.
         MockEventSource.instances[0].emitNamed(
             "mercure",
             JSON.stringify({
@@ -448,7 +440,6 @@ describe("MercureConnector", () => {
         MockEventSource.instances[0].emitOpen();
         await vi.waitFor(() => expect(fetchMock).toHaveBeenCalled());
 
-        // Arrives while the snapshot is still in flight.
         MockEventSource.instances[0].emitNamed(
             "mercure",
             JSON.stringify({
@@ -564,8 +555,6 @@ describe("MercureConnector", () => {
 
         expect(String(error.mock.calls[0][0])).toContain("419");
 
-        // The denied channel is evicted, so the connector winds down
-        // instead of retrying a batch the server already rejected.
         await vi.waitFor(() =>
             expect(connector.connectionStatus()).toBe("disconnected"),
         );
@@ -599,12 +588,9 @@ describe("MercureConnector", () => {
         const error = vi.fn();
         connector.privateChannel("secret").error(error);
 
-        // Exactly one error, the eviction-specific one.
         await vi.waitFor(() => expect(error).toHaveBeenCalledTimes(1));
         expect(String(error.mock.calls[0][0])).toContain("private-secret");
 
-        // The trailing refresh re-authenticates the surviving set and
-        // reopens the connection for it.
         await vi.waitFor(() =>
             expect(MockEventSource.instances).toHaveLength(2),
         );
@@ -612,7 +598,6 @@ describe("MercureConnector", () => {
         const url = new URL(MockEventSource.instances[1].url);
         expect(url.searchParams.getAll("match")).toEqual(["news"]);
 
-        // The surviving channel recovered transparently: no false alarm.
         expect(survivorError).not.toHaveBeenCalled();
     });
 
@@ -631,8 +616,6 @@ describe("MercureConnector", () => {
 
         await vi.waitFor(() => expect(error).toHaveBeenCalled());
 
-        // No eviction, no teardown: the previous EventSource keeps serving
-        // the already-working channel while the retry backs off.
         expect(connector.connectionStatus()).toBe("reconnecting");
         expect(MockEventSource.instances).toHaveLength(1);
         expect(MockEventSource.instances[0].closed).toBe(false);
@@ -858,16 +841,12 @@ describe("MercureConnector", () => {
             expect(MockEventSource.instances).toHaveLength(1);
             expect(authCalls()).toBe(1);
 
-            // 80% of the 300s TTL.
             await vi.advanceTimersByTimeAsync(240_000);
             expect(authCalls()).toBe(2);
 
-            // The refresh re-arms itself.
             await vi.advanceTimersByTimeAsync(240_000);
             expect(authCalls()).toBe(3);
 
-            // The cookie is refreshed under the running connection: no
-            // teardown, no new EventSource.
             expect(MockEventSource.instances).toHaveLength(1);
         } finally {
             vi.useRealTimers();
@@ -1078,8 +1057,6 @@ describe("MercureConnector", () => {
                 expect(MockEventSource.instances).toHaveLength(1),
             );
 
-            // A compromised hub injecting a plaintext broadcast envelope
-            // must not reach listeners on an encrypted channel.
             MockEventSource.instances[0].emitMessage(
                 JSON.stringify({
                     channels: [CHANNEL],
@@ -1104,7 +1081,7 @@ describe("MercureConnector", () => {
                 expect(MockEventSource.instances).toHaveLength(1),
             );
 
-            // Encrypted under a different key: the GCM tag check fails.
+            // A different key fails GCM authentication.
             const jwe = await makeJwe(
                 makeJwk(),
                 JSON.stringify({ event: "OrderShipped", payload: {} }),
@@ -1247,8 +1224,6 @@ describe("MercureConnector", () => {
 
                 denied = ["private-secret"];
 
-                // The proactive cookie refresh at 80% of the TTL surfaces
-                // the revocation; the trailing refresh drops the channel.
                 await vi.advanceTimersByTimeAsync(240_000);
 
                 expect(error).toHaveBeenCalled();
@@ -1311,8 +1286,7 @@ describe("MercureConnector", () => {
             );
 
             const url = new URL(MockEventSource.instances[0].url);
-            // Byte-identical to PHP's rawurlencode(), the derivation the
-            // server-minted grants rely on.
+            // Topic encoding must match PHP's rawurlencode().
             expect(url.searchParams.getAll("match")).toContain(
                 `${PREFIX}channel/private-room%2F1%20%21%27%28%29%2A`,
             );
@@ -1370,8 +1344,6 @@ describe("MercureConnector", () => {
                 `https://hub.example.com/.well-known/mercure/subscriptions/exact/${encodedTopic}`,
             );
 
-            // The hub reports subscription events on the topic, not the
-            // channel name: they must map back.
             MockEventSource.instances[0].emitNamed(
                 "mercure",
                 JSON.stringify({
@@ -1508,7 +1480,6 @@ describe("MercureConnector", () => {
             const room = connector.privateChannel("room.1");
             const lobby = connector.presenceChannel("lobby");
 
-            // No whisper listeners yet: only the main EventSource opens.
             await vi.waitFor(() =>
                 expect(MockEventSource.instances).toHaveLength(1),
             );
@@ -1619,7 +1590,6 @@ describe("MercureConnector", () => {
                 first.emitMessage(envelope("private-room.1"), "first-10");
                 second.emitMessage(envelope("private-room.2"), "second-20");
 
-                // Dead streams are replaced with each channel's own cursor.
                 vi.useFakeTimers();
                 try {
                     first.readyState = MockEventSource.CLOSED;
@@ -1838,7 +1808,6 @@ describe("MercureConnector", () => {
 
             await vi.waitFor(() => expect(hubPublishCalls()).toHaveLength(1));
 
-            // Sending is a plain POST: no whisper stream was opened.
             expect(MockEventSource.instances).toHaveLength(1);
 
             const [, init] = hubPublishCalls()[0] as [string, RequestInit];
@@ -2015,7 +1984,7 @@ describe("MercureConnector", () => {
             );
             expect(envelope.channels).toEqual(["private-encrypted-orders.1"]);
 
-            // Byte-compatible with the server-published JWE format.
+            // The whisper JWE must match the server format.
             expect(JSON.parse(await decryptJwe(jwk, envelope.data))).toEqual({
                 event: "client-typing",
                 payload: { name: "alice" },
@@ -2058,8 +2027,7 @@ describe("MercureConnector", () => {
                 expect(whisperCallback).toHaveBeenCalledWith({ name: "bob" }),
             );
 
-            // Sealed under the right key but not a client event: a channel
-            // member forging a server event through the whisper topic.
+            // Channel members cannot forge server events through whispers.
             whisperEventSource().emitMessage(
                 JSON.stringify({
                     channels: ["private-encrypted-orders.1"],
@@ -2230,8 +2198,6 @@ describe("MercureConnector", () => {
                 whisperEventSource("private-room.1"),
             );
 
-            // Joining an unrelated channel reopens the main EventSource
-            // only: the whisper stream is kept, not replaced.
             connector.channel("news");
 
             await vi.waitFor(() =>

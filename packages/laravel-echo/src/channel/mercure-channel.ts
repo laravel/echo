@@ -3,55 +3,34 @@ import { Channel } from "./channel";
 import type { EchoOptionsWithDefaults } from "../connector";
 import type { BroadcastDriver } from "../echo";
 
-/**
- * The connector-side whisper publisher a channel delegates whisper() to.
- * A structural interface rather than the MercureConnector class itself,
- * to avoid a runtime import cycle between the channel and the connector.
- */
+/** Structural interface that avoids a runtime channel/connector import cycle. */
 export interface MercureWhisperPublisher {
     whisper(channel: string, event: string, data: unknown): void;
 
     listenForWhispers(channel: string): void;
 }
 
-/**
- * This class represents a Mercure channel.
- */
+/** A Mercure channel. */
 export class MercureChannel extends Channel {
-    /**
-     * The name of the channel.
-     */
+    /** The channel name. */
     name: string;
 
-    /**
-     * The event formatter.
-     */
+    /** The event formatter. */
     eventFormatter: EventFormatter;
 
-    /**
-     * User supplied callbacks for events on this channel, keyed by their
-     * formatted (wire) event name.
-     */
+    /** Event callbacks keyed by wire event name. */
     private listeners: Map<string, CallableFunction[]> = new Map();
 
-    /**
-     * Callbacks to run once the shared connection (re)subscribes.
-     */
+    /** Subscription callbacks. */
     private subscribedCallbacks: CallableFunction[] = [];
 
-    /**
-     * Callbacks to run whenever the shared connection errors.
-     */
+    /** Error callbacks. */
     private errorCallbacks: CallableFunction[] = [];
 
-    /**
-     * The connector to publish whispers through, when constructed by one.
-     */
+    /** The connector used to publish whispers. */
     protected whisperer?: MercureWhisperPublisher;
 
-    /**
-     * Create a new class instance.
-     */
+    /** Create a channel. */
     constructor(
         name: string,
         options: EchoOptionsWithDefaults<BroadcastDriver>,
@@ -65,9 +44,7 @@ export class MercureChannel extends Channel {
         this.eventFormatter = new EventFormatter(this.options.namespace);
     }
 
-    /**
-     * Listen for an event on the channel instance.
-     */
+    /** Listen for an event. */
     listen(event: string, callback: CallableFunction): this {
         const formatted = this.eventFormatter.format(event);
 
@@ -79,9 +56,7 @@ export class MercureChannel extends Channel {
         return this;
     }
 
-    /**
-     * Stop listening for an event on the channel instance.
-     */
+    /** Stop listening for an event. */
     stopListening(event: string, callback?: CallableFunction): this {
         const formatted = this.eventFormatter.format(event);
 
@@ -102,43 +77,28 @@ export class MercureChannel extends Channel {
         return this;
     }
 
-    /**
-     * Register a callback to be called anytime a subscription succeeds.
-     */
+    /** Register a subscription callback. */
     subscribed(callback: CallableFunction): this {
         this.subscribedCallbacks.push(callback);
 
         return this;
     }
 
-    /**
-     * Register a callback to be called anytime an error occurs.
-     */
+    /** Register an error callback. */
     error(callback: CallableFunction): this {
         this.errorCallbacks.push(callback);
 
         return this;
     }
 
-    /**
-     * Send a whisper event to other clients in the channel.
-     *
-     * Only guarded channels support whispers (see
-     * {@see MercurePrivateChannel.whisper}): a public channel has no
-     * authorized member set to scope a client publish grant to.
-     */
+    /** Public channels cannot scope whisper grants to authorized members. */
     whisper(_eventName: string, _data: Record<any, any>): this {
         throw new Error(
             "Public Mercure channels do not support whisper(): use a private or presence channel, whose members are granted a whisper topic.",
         );
     }
 
-    /**
-     * Listen for a whisper event on the channel instance.
-     *
-     * No client can whisper on a public Mercure channel (see whisper()),
-     * so warn: a listener that never fires is otherwise a silent trap.
-     */
+    /** Warn when registering a whisper listener that cannot receive events. */
     listenForWhisper(event: string, callback: CallableFunction): this {
         // eslint-disable-next-line no-console
         console.warn(
@@ -148,32 +108,19 @@ export class MercureChannel extends Channel {
         return super.listenForWhisper(event, callback);
     }
 
-    /**
-     * Dispatch an incoming broadcast payload to every listener registered
-     * for the given (already wire-formatted) event name.
-     *
-     * @internal called by the connector.
-     */
+    /** Dispatch an incoming event. */
     dispatch(event: string, payload: unknown): void {
         (this.listeners.get(event) ?? []).forEach((callback) =>
             callback(payload),
         );
     }
 
-    /**
-     * Notify this channel that the shared connection (re)subscribed.
-     *
-     * @internal called by the connector.
-     */
+    /** Notify subscription callbacks. */
     notifySubscribed(): void {
         this.subscribedCallbacks.forEach((callback) => callback());
     }
 
-    /**
-     * Notify this channel that the shared connection errored.
-     *
-     * @internal called by the connector.
-     */
+    /** Notify error callbacks. */
     notifyError(error: unknown): void {
         this.errorCallbacks.forEach((callback) => callback(error));
     }

@@ -104,8 +104,6 @@ describe("MercurePresenceChannel", () => {
         const here = vi.fn();
         const joining = vi.fn();
 
-        // Two distinct users whose channel callbacks returned the same
-        // info must stay two members.
         channel.here(here);
         channel.setInitialMembers([
             ["urn:uuid:a", { user_id: "1", user_info: { role: "admin" } }],
@@ -117,7 +115,6 @@ describe("MercurePresenceChannel", () => {
             { role: "admin" },
         ]);
 
-        // One user in a second tab is still one member.
         channel.joining(joining);
         channel.applySubscriptionEvent("urn:uuid:a2", true, {
             user_id: "1",
@@ -184,7 +181,6 @@ describe("MercurePresenceChannel", () => {
         channel.joining(joining);
         channel.leaving(leaving);
 
-        // Two tabs, same user payload.
         channel.setInitialMembers([
             ["urn:uuid:tab-a", { id: 7, name: "alice" }],
             ["urn:uuid:tab-b", { id: 7, name: "alice" }],
@@ -192,14 +188,12 @@ describe("MercurePresenceChannel", () => {
 
         expect(here).toHaveBeenCalledWith([{ id: 7, name: "alice" }]);
 
-        // A third connection joins: still the same member.
         channel.applySubscriptionEvent("urn:uuid:tab-c", true, {
             id: 7,
             name: "alice",
         });
         expect(joining).not.toHaveBeenCalled();
 
-        // leaving() only fires once the last connection is gone.
         channel.applySubscriptionEvent("urn:uuid:tab-a", false, null);
         channel.applySubscriptionEvent("urn:uuid:tab-b", false, null);
         expect(leaving).not.toHaveBeenCalled();

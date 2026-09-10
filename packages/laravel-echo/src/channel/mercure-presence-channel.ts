@@ -1,66 +1,34 @@
 import type { PresenceChannel } from "./presence-channel";
 import { MercurePrivateChannel } from "./mercure-private-channel";
 
-/**
- * This class represents a Mercure presence channel, built on top of the
- * Mercure hub's subscription API rather than a dedicated presence
- * primitive: every subscriber connect/disconnect is itself published as
- * an "active: true/false" update on a reserved topic, which the
- * connector subscribes to alongside the channel's own topic.
- *
- * Subscriptions are per-connection, so members are deduplicated on their
- * payload: one user in two tabs is one member, joining() fires on their
- * first connection and leaving() on their last. Because the connection is
- * shared across all joined channels, joining or leaving an unrelated
- * channel reopens it under a new subscriber id: other members see this
- * user leave and rejoin, which the dedupe cannot hide across connections.
- *
- * @see https://mercure.rocks/spec#active-subscriptions
- */
+/** Presence synthesized from Mercure subscriptions with users deduplicated across connections. */
 export class MercurePresenceChannel
     extends MercurePrivateChannel
     implements PresenceChannel
 {
-    /**
-     * Callbacks to run once the initial member list is known.
-     */
+    /** Initial member-list callbacks. */
     private hereCallbacks: CallableFunction[] = [];
 
-    /**
-     * Callbacks to run whenever a new subscriber joins.
-     */
+    /** Member joining callbacks. */
     private joiningCallbacks: CallableFunction[] = [];
 
-    /**
-     * Callbacks to run whenever a subscriber leaves.
-     */
+    /** Member leaving callbacks. */
     private leavingCallbacks: CallableFunction[] = [];
 
-    /**
-     * The currently known members, keyed by their hub-assigned (opaque,
-     * per-connection) subscriber id.
-     */
+    /** Members keyed by hub subscriber id. */
     private members: Map<string, NormalizedMember> = new Map();
 
-    /**
-     * How many live subscriptions each distinct member currently has,
-     * keyed by the member's identity (see normalizeMember()).
-     */
+    /** Live subscription counts keyed by member identity. */
     private memberCounts: Map<string, number> = new Map();
 
-    /**
-     * Whether the initial member list has been seeded yet.
-     */
+    /** Whether the initial member list has been seeded. */
     private seeded = false;
 
-    /**
-     * Register a callback to be called anytime the member list changes.
-     */
+    /** Register an initial member-list callback. */
     here(callback: CallableFunction): this {
         this.hereCallbacks.push(callback);
 
-        // A late registration (after the snapshot already landed) still
-        // deserves the current member list — it would otherwise never fire.
+        // Immediately notify callbacks registered after seeding.
         if (this.seeded) {
             this.invoke(callback, this.uniqueMembers());
         }
@@ -68,30 +36,21 @@ export class MercurePresenceChannel
         return this;
     }
 
-    /**
-     * Listen for someone joining the channel.
-     */
+    /** Listen for members joining. */
     joining(callback: CallableFunction): this {
         this.joiningCallbacks.push(callback);
 
         return this;
     }
 
-    /**
-     * Listen for someone leaving the channel.
-     */
+    /** Listen for members leaving. */
     leaving(callback: CallableFunction): this {
         this.leavingCallbacks.push(callback);
 
         return this;
     }
 
-    /**
-     * Seed the member list from the subscription API snapshot fetched
-     * when the channel was joined.
-     *
-     * @internal called by the connector.
-     */
+    /** Seed members from the subscription API snapshot. */
     setInitialMembers(members: Array<[string, unknown]>): void {
         this.members = new Map(
             members.map(([subscriber, payload]) => [
@@ -115,11 +74,7 @@ export class MercurePresenceChannel
         );
     }
 
-    /**
-     * Apply a live active:true/false subscription event for this channel.
-     *
-     * @internal called by the connector.
-     */
+    /** Apply a live subscription event. */
     applySubscriptionEvent(
         subscriber: string,
         active: boolean,
@@ -142,9 +97,7 @@ export class MercurePresenceChannel
                 );
             }
         } else {
-            // Ignore subscribers never seen joining: a replayed or
-            // unauthorized subscription's leave event is not a member
-            // leaving.
+            // Ignore leaves from unknown or unauthorized subscribers.
             const member = this.members.get(subscriber);
 
             if (!member) {
@@ -166,9 +119,7 @@ export class MercurePresenceChannel
         }
     }
 
-    /**
-     * The current members' info, one entry per distinct member.
-     */
+    /** Return one info entry per distinct member. */
     private uniqueMembers(): unknown[] {
         const seen = new Set<string>();
         const unique: unknown[] = [];
@@ -183,10 +134,7 @@ export class MercurePresenceChannel
         return unique;
     }
 
-    /**
-     * Run a user callback without letting an exception it throws take the
-     * whole connection-refresh cycle (and the other callbacks) down with it.
-     */
+    /** Isolate user callback failures from the connection refresh. */
     private invoke(callback: CallableFunction, argument: unknown): void {
         try {
             callback(argument);
@@ -197,22 +145,10 @@ export class MercurePresenceChannel
     }
 }
 
-/**
- * A member as tracked internally: the identity deduplicating one user's
- * multiple connections (tabs, devices), and the info exposed to here(),
- * joining(), and leaving() callbacks.
- */
+/** A deduplication key and its callback payload. */
 type NormalizedMember = { key: string; info: unknown };
 
-/**
- * Normalize a hub-delivered member payload.
- *
- * The server wraps the channel callback's result as {user_id, user_info}
- * (matching the other Echo drivers), so the identifier deduplicates even
- * when two users' callback results are identical, and callbacks receive
- * the info alone. A payload without that shape (an older server) falls
- * back to serialized-payload identity.
- */
+/** Use wrapped user_id identity and user_info payload, with payload identity for older servers. */
 function normalizeMember(payload: unknown): NormalizedMember {
     if (
         payload !== null &&

@@ -95,8 +95,7 @@ describe("MercureChannel", () => {
 
             expect(warn).toHaveBeenCalled();
 
-            // The listener is still registered, in case the app later
-            // swaps to a guarded channel.
+            // The listener remains registered despite the warning.
             channel.dispatch("client-typing", {});
             expect(callback).toHaveBeenCalled();
         } finally {
