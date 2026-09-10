@@ -37,14 +37,14 @@ export class MercurePresenceChannel
     private leavingCallbacks: CallableFunction[] = [];
 
     /**
-     * The currently known member payloads, keyed by their hub-assigned
-     * (opaque, per-connection) subscriber id.
+     * The currently known members, keyed by their hub-assigned (opaque,
+     * per-connection) subscriber id.
      */
-    private members: Map<string, unknown> = new Map();
+    private members: Map<string, NormalizedMember> = new Map();
 
     /**
-     * How many live subscriptions each distinct member payload currently
-     * has, keyed by the payload's identity (see identity()).
+     * How many live subscriptions each distinct member currently has,
+     * keyed by the member's identity (see normalizeMember()).
      */
     private memberCounts: Map<string, number> = new Map();
 
@@ -93,13 +93,19 @@ export class MercurePresenceChannel
      * @internal called by the connector.
      */
     setInitialMembers(members: Array<[string, unknown]>): void {
-        this.members = new Map(members);
+        this.members = new Map(
+            members.map(([subscriber, payload]) => [
+                subscriber,
+                normalizeMember(payload),
+            ]),
+        );
         this.memberCounts = new Map();
 
-        for (const payload of this.members.values()) {
-            const key = identity(payload);
-
-            this.memberCounts.set(key, (this.memberCounts.get(key) ?? 0) + 1);
+        for (const member of this.members.values()) {
+            this.memberCounts.set(
+                member.key,
+                (this.memberCounts.get(member.key) ?? 0) + 1,
+            );
         }
 
         this.seeded = true;
@@ -124,56 +130,53 @@ export class MercurePresenceChannel
                 return;
             }
 
-            const member = payload ?? {};
-            const key = identity(member);
-            const count = (this.memberCounts.get(key) ?? 0) + 1;
+            const member = normalizeMember(payload ?? {});
+            const count = (this.memberCounts.get(member.key) ?? 0) + 1;
 
             this.members.set(subscriber, member);
-            this.memberCounts.set(key, count);
+            this.memberCounts.set(member.key, count);
 
             if (count === 1) {
                 this.joiningCallbacks.forEach((callback) =>
-                    this.invoke(callback, member),
+                    this.invoke(callback, member.info),
                 );
             }
         } else {
             // Ignore subscribers never seen joining: a replayed or
             // unauthorized subscription's leave event is not a member
             // leaving.
-            if (!this.members.has(subscriber)) {
+            const member = this.members.get(subscriber);
+
+            if (!member) {
                 return;
             }
 
-            const member = this.members.get(subscriber);
-            const key = identity(member);
-            const count = (this.memberCounts.get(key) ?? 1) - 1;
+            const count = (this.memberCounts.get(member.key) ?? 1) - 1;
 
             this.members.delete(subscriber);
 
             if (count <= 0) {
-                this.memberCounts.delete(key);
+                this.memberCounts.delete(member.key);
                 this.leavingCallbacks.forEach((callback) =>
-                    this.invoke(callback, member),
+                    this.invoke(callback, member.info),
                 );
             } else {
-                this.memberCounts.set(key, count);
+                this.memberCounts.set(member.key, count);
             }
         }
     }
 
     /**
-     * The current members, one entry per distinct payload.
+     * The current members' info, one entry per distinct member.
      */
     private uniqueMembers(): unknown[] {
         const seen = new Set<string>();
         const unique: unknown[] = [];
 
-        for (const payload of this.members.values()) {
-            const key = identity(payload);
-
-            if (!seen.has(key)) {
-                seen.add(key);
-                unique.push(payload);
+        for (const member of this.members.values()) {
+            if (!seen.has(member.key)) {
+                seen.add(member.key);
+                unique.push(member.info);
             }
         }
 
@@ -195,10 +198,35 @@ export class MercurePresenceChannel
 }
 
 /**
- * The identity of a member payload, for deduplicating one user's multiple
- * connections (tabs, devices): payloads produced by the same server-side
- * channel callback for the same user serialize identically.
+ * A member as tracked internally: the identity deduplicating one user's
+ * multiple connections (tabs, devices), and the info exposed to here(),
+ * joining(), and leaving() callbacks.
  */
-function identity(payload: unknown): string {
-    return JSON.stringify(payload) ?? "undefined";
+type NormalizedMember = { key: string; info: unknown };
+
+/**
+ * Normalize a hub-delivered member payload.
+ *
+ * The server wraps the channel callback's result as {user_id, user_info}
+ * (matching the other Echo drivers), so the identifier deduplicates even
+ * when two users' callback results are identical, and callbacks receive
+ * the info alone. A payload without that shape (an older server) falls
+ * back to serialized-payload identity.
+ */
+function normalizeMember(payload: unknown): NormalizedMember {
+    if (
+        payload !== null &&
+        typeof payload === "object" &&
+        "user_id" in payload &&
+        typeof (payload as { user_id: unknown }).user_id === "string"
+    ) {
+        const wrapped = payload as { user_id: string; user_info?: unknown };
+
+        return { key: "user:" + wrapped.user_id, info: wrapped.user_info };
+    }
+
+    return {
+        key: "payload:" + (JSON.stringify(payload) ?? "undefined"),
+        info: payload,
+    };
 }

@@ -835,6 +835,19 @@ export class MercureConnector extends Connector<
                     }
 
                     if (auth.ok) {
+                        // Access revoked mid-session: drop the denied
+                        // channels and rebuild the streams without them,
+                        // leaving the others uninterrupted.
+                        if (auth.denied.length > 0) {
+                            this.evict(
+                                auth.denied,
+                                new Error(
+                                    `The broadcasting auth request denied access to [${auth.denied.join(", ")}].`,
+                                ),
+                            );
+                            this.refresh();
+                        }
+
                         this.scheduleTokenRefresh();
                     } else {
                         // Retry the full cycle with backoff rather than
@@ -968,6 +981,30 @@ export class MercureConnector extends Connector<
             this.scheduleReconnect();
 
             return;
+        }
+
+        // Denied channels are reported individually: evict them and carry
+        // on with the granted subset, so one revoked channel never takes
+        // down the others.
+        if (auth.denied.length > 0) {
+            this.evict(
+                auth.denied,
+                new Error(
+                    `The broadcasting auth request denied access to [${auth.denied.join(", ")}].`,
+                ),
+            );
+
+            channelNames = channelNames.filter((name) => this.channels[name]);
+
+            if (channelNames.length === 0) {
+                this.eventSource?.close();
+                this.eventSource = null;
+                this.closeWhisperEventSources();
+                this.authorizedChannels.clear();
+                this.setStatus("disconnected");
+
+                return;
+            }
         }
 
         this.authorizedChannels = new Set(channelNames);
@@ -1637,6 +1674,7 @@ export class MercureConnector extends Connector<
         ok: boolean;
         rejected: boolean;
         status: number | null;
+        denied: string[];
         error?: Error;
     }> {
         let error: Error;
@@ -1656,9 +1694,13 @@ export class MercureConnector extends Connector<
 
             if (response.ok) {
                 this.lastAuthAt = Date.now();
-                this.readAuthResponse(await parseBody(response));
 
-                return { ok: true, rejected: false, status: response.status };
+                return {
+                    ok: true,
+                    rejected: false,
+                    status: response.status,
+                    denied: this.readAuthResponse(await parseBody(response)),
+                };
             }
 
             status = response.status;
@@ -1679,16 +1721,18 @@ export class MercureConnector extends Connector<
             ok: false,
             rejected: status !== null && status < 500,
             status,
+            denied: [],
             error,
         };
     }
 
     /**
-     * Record what the auth endpoint reported: the cookie TTL driving the
+     * Record what the auth endpoint reported — the cookie TTL driving the
      * proactive refresh, and the per-channel decryption JWKs of the
-     * authorized end-to-end encrypted channels.
+     * authorized end-to-end encrypted channels — and return the channels
+     * the server denied individually.
      */
-    private readAuthResponse(body: unknown): void {
+    private readAuthResponse(body: unknown): string[] {
         const response = (body ?? {}) as {
             expires_in?: unknown;
             channel_names?: unknown;
@@ -1707,25 +1751,33 @@ export class MercureConnector extends Connector<
 
         this.channelJwks.clear();
 
+        const denied: string[] = [];
+
         if (Array.isArray(response.channel_names)) {
             response.channel_names.forEach((entry: unknown) => {
                 const channel = (entry ?? {}) as {
                     name?: unknown;
                     jwk?: unknown;
+                    denied?: unknown;
                 };
 
-                if (
-                    typeof channel.name === "string" &&
-                    channel.jwk !== null &&
-                    typeof channel.jwk === "object"
-                ) {
-                    this.channelJwks.set(
-                        channel.name,
-                        channel.jwk,
-                    );
+                if (typeof channel.name !== "string") {
+                    return;
+                }
+
+                if (channel.denied === true) {
+                    denied.push(channel.name);
+
+                    return;
+                }
+
+                if (channel.jwk !== null && typeof channel.jwk === "object") {
+                    this.channelJwks.set(channel.name, channel.jwk);
                 }
             });
         }
+
+        return denied;
     }
 
     /**

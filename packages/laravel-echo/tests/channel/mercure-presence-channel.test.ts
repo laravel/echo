@@ -99,6 +99,58 @@ describe("MercurePresenceChannel", () => {
         expect(() => channel.whisper("typing", {})).toThrow();
     });
 
+    test("wrapped members expose their info and deduplicate on user_id", () => {
+        const channel = makeChannel();
+        const here = vi.fn();
+        const joining = vi.fn();
+
+        // Two distinct users whose channel callbacks returned the same
+        // info must stay two members.
+        channel.here(here);
+        channel.setInitialMembers([
+            ["urn:uuid:a", { user_id: "1", user_info: { role: "admin" } }],
+            ["urn:uuid:b", { user_id: "2", user_info: { role: "admin" } }],
+        ]);
+
+        expect(here).toHaveBeenCalledWith([
+            { role: "admin" },
+            { role: "admin" },
+        ]);
+
+        // One user in a second tab is still one member.
+        channel.joining(joining);
+        channel.applySubscriptionEvent("urn:uuid:a2", true, {
+            user_id: "1",
+            user_info: { role: "admin" },
+        });
+
+        expect(joining).not.toHaveBeenCalled();
+
+        channel.applySubscriptionEvent("urn:uuid:c", true, {
+            user_id: "3",
+            user_info: { role: "guest" },
+        });
+
+        expect(joining).toHaveBeenCalledWith({ role: "guest" });
+    });
+
+    test("a wrapped member only leaves once its last connection closes", () => {
+        const channel = makeChannel();
+        const leaving = vi.fn();
+
+        channel.setInitialMembers([
+            ["urn:uuid:a", { user_id: "1", user_info: { name: "alice" } }],
+            ["urn:uuid:a2", { user_id: "1", user_info: { name: "alice" } }],
+        ]);
+        channel.leaving(leaving);
+
+        channel.applySubscriptionEvent("urn:uuid:a", false, null);
+        expect(leaving).not.toHaveBeenCalled();
+
+        channel.applySubscriptionEvent("urn:uuid:a2", false, null);
+        expect(leaving).toHaveBeenCalledWith({ name: "alice" });
+    });
+
     test("here() registered after seeding fires immediately with the current members", () => {
         const channel = makeChannel();
         const here = vi.fn();

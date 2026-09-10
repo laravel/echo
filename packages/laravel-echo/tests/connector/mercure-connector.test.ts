@@ -1028,6 +1028,101 @@ describe("MercureConnector", () => {
         });
     });
 
+    describe("per-channel denials", () => {
+        function mockAuthDenying(deniedNames: () => string[]) {
+            fetchMock.mockImplementation((url: string, init?: RequestInit) => {
+                if (url === "/broadcasting/auth") {
+                    const body = JSON.parse(String(init?.body)) as {
+                        channel_names: string[];
+                    };
+
+                    return Promise.resolve(
+                        jsonResponse({
+                            expires_in: 300,
+                            channel_names: body.channel_names.map((name) => ({
+                                name,
+                                ...(deniedNames().includes(name)
+                                    ? { denied: true }
+                                    : {}),
+                            })),
+                        }),
+                    );
+                }
+
+                return Promise.resolve(jsonResponse({}));
+            });
+        }
+
+        test("a denied channel is evicted and the granted ones stay up", async () => {
+            mockAuthDenying(() => ["private-secret"]);
+
+            const connector = makeConnector();
+            const survivorError = vi.fn();
+            const error = vi.fn();
+            connector.channel("news").error(survivorError);
+            connector.privateChannel("secret").error(error);
+
+            await vi.waitFor(() => expect(error).toHaveBeenCalled());
+            expect(String(error.mock.calls[0][0])).toContain("private-secret");
+
+            await vi.waitFor(() =>
+                expect(MockEventSource.instances).toHaveLength(1),
+            );
+
+            const url = new URL(MockEventSource.instances[0].url);
+            expect(url.searchParams.getAll("match")).toEqual(["news"]);
+            expect(Object.keys(connector.channels)).toEqual(["news"]);
+            expect(survivorError).not.toHaveBeenCalled();
+        });
+
+        test("a fully denied batch winds the connection down", async () => {
+            mockAuthDenying(() => ["private-secret"]);
+
+            const connector = makeConnector();
+            const error = vi.fn();
+            connector.privateChannel("secret").error(error);
+
+            await vi.waitFor(() => expect(error).toHaveBeenCalled());
+            await vi.waitFor(() =>
+                expect(connector.connectionStatus()).toBe("disconnected"),
+            );
+            expect(MockEventSource.instances).toHaveLength(0);
+        });
+
+        test("revoking one channel mid-session drops it and keeps the others", async () => {
+            let denied: string[] = [];
+            mockAuthDenying(() => denied);
+
+            vi.useFakeTimers();
+
+            try {
+                const connector = makeConnector();
+                const error = vi.fn();
+                const survivorError = vi.fn();
+                connector.channel("news").error(survivorError);
+                connector.privateChannel("secret").error(error);
+
+                await vi.advanceTimersByTimeAsync(0);
+                expect(MockEventSource.instances).toHaveLength(1);
+
+                denied = ["private-secret"];
+
+                // The proactive cookie refresh at 80% of the TTL surfaces
+                // the revocation; the trailing refresh drops the channel.
+                await vi.advanceTimersByTimeAsync(240_000);
+
+                expect(error).toHaveBeenCalled();
+                expect(Object.keys(connector.channels)).toEqual(["news"]);
+
+                const url = new URL(MockEventSource.last().url);
+                expect(url.searchParams.getAll("match")).toEqual(["news"]);
+                expect(survivorError).not.toHaveBeenCalled();
+            } finally {
+                vi.useRealTimers();
+            }
+        });
+    });
+
     describe("topic namespacing", () => {
         const PREFIX = "https://laravel.alt/echo/";
 
