@@ -31,6 +31,9 @@
         "typecheck": "tsc --noEmit",
         "format": "prettier --write ."
     },
+    "dependencies": {
+        "laravel-echo": "workspace:^"
+    },
     "devDependencies": {
         "@microsoft/api-extractor": "^7.58.13",
         "@types/node": "^24.13.3",
@@ -39,7 +42,6 @@
         "@vue/test-utils": "^2.4.11",
         "eslint": "^10.8.1",
         "jsdom": "^30.0.0",
-        "laravel-echo": "workspace:^",
         "prettier": "^3.5.3",
         "pusher-js": "^8.4.0",
         "socket.io-client": "^4.8.1",
