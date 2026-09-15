@@ -84,5 +84,8 @@
             "import": "./dist/index.js",
             "require": "./dist/index.common.js"
         }
-    }
+    },
+    "files": [
+        "dist"
+    ]
 }

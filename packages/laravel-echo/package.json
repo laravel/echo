@@ -76,5 +76,8 @@
             "require": "./dist/echo.common.js"
         },
         "./iife": "./dist/echo.iife.js"
-    }
+    },
+    "files": [
+        "dist"
+    ]
 }
