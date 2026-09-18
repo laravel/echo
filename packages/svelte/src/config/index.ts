@@ -103,5 +103,4 @@ export const configureEcho = <T extends keyof Broadcaster>(
 
 export const echo = <
     T extends keyof Broadcaster = BroadcastDriver,
->(): Echo<T> =>
-    getEchoInstance<T>();
+>(): Echo<T> => getEchoInstance<T>();
