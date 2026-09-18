@@ -37,4 +37,26 @@ describe("echo helper", async () => {
 
         expect(echoIsConfigured()).toBe(true);
     });
+
+    it("creates Echo instance from a custom connector class", async () => {
+        const { configureEcho, echo } = await import("../src/config");
+
+        class CustomConnector {
+            options: unknown;
+
+            constructor(options: unknown) {
+                this.options = options;
+            }
+        }
+
+        configureEcho({
+            broadcaster: CustomConnector,
+            authEndpoint: "/custom/auth",
+        });
+
+        const instance = echo();
+
+        expect(instance.connector).toBeInstanceOf(CustomConnector);
+        expect(instance.options.authEndpoint).toBe("/custom/auth");
+    });
 });
