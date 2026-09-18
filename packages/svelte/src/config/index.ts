@@ -1,11 +1,20 @@
-import Echo, { type BroadcastDriver, type EchoOptions } from "laravel-echo";
+import Echo, {
+    type BroadcastDriver,
+    type Broadcaster,
+    type EchoOptions,
+} from "laravel-echo";
 import Pusher from "pusher-js";
 import type { ConfigDefaults } from "../types";
 
-let echoInstance: Echo<BroadcastDriver> | null = null;
-let echoConfig: EchoOptions<BroadcastDriver> | null = null;
+/**
+ * The Echo constructor argument, which allows a custom connector class as the broadcaster.
+ */
+type EchoConfig = ConstructorParameters<typeof Echo<keyof Broadcaster>>[0];
 
-const getEchoInstance = <T extends BroadcastDriver>(): Echo<T> => {
+let echoInstance: Echo<keyof Broadcaster> | null = null;
+let echoConfig: EchoConfig | null = null;
+
+const getEchoInstance = <T extends keyof Broadcaster>(): Echo<T> => {
     if (echoInstance) {
         return echoInstance as Echo<T>;
     }
@@ -18,7 +27,7 @@ const getEchoInstance = <T extends BroadcastDriver>(): Echo<T> => {
 
     echoConfig.Pusher ??= Pusher;
 
-    echoInstance = new Echo(echoConfig);
+    echoInstance = new Echo<keyof Broadcaster>(echoConfig);
 
     return echoInstance as Echo<T>;
 };
@@ -28,9 +37,11 @@ export const echoIsConfigured = () => echoConfig !== null;
 /**
  * Configure the Echo instance with sensible defaults.
  *
+ * `broadcaster` accepts a built-in driver name or a custom connector class.
+ *
  * @link https://laravel.com/docs/broadcasting#client-side-installation
  */
-export const configureEcho = <T extends BroadcastDriver>(
+export const configureEcho = <T extends keyof Broadcaster>(
     config: EchoOptions<T>,
 ): void => {
     const defaults: ConfigDefaults<BroadcastDriver> = {
@@ -75,10 +86,13 @@ export const configureEcho = <T extends BroadcastDriver>(
         },
     };
 
+    // Custom connector classes have no defaults to merge in...
+    const { broadcaster } = config;
+
     echoConfig = {
-        ...defaults[config.broadcaster],
+        ...(typeof broadcaster === "string" ? defaults[broadcaster] : null),
         ...config,
-    } as EchoOptions<BroadcastDriver>;
+    } as EchoConfig;
 
     // Reset the instance if it was already created
     if (echoInstance) {
@@ -87,5 +101,5 @@ export const configureEcho = <T extends BroadcastDriver>(
     }
 };
 
-export const echo = <T extends BroadcastDriver>(): Echo<T> =>
+export const echo = <T extends keyof Broadcaster>(): Echo<T> =>
     getEchoInstance<T>();

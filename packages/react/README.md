@@ -27,6 +27,17 @@ In the above example, the configuration would also fill in the following keys if
 }
 ```
 
+You may also pass a custom connector class instead of a built-in driver name. No defaults are merged in for custom connectors, so pass everything the connector needs:
+
+```ts
+import { configureEcho } from "@laravel/echo-react";
+import { WaveConnector } from "laravel-wave";
+
+configureEcho({
+    broadcaster: WaveConnector,
+});
+```
+
 ## Connection Status
 
 You can get the current WebSocket connection status using the `useConnectionStatus` hook or the `echo().connectionStatus()` utility function.
