@@ -70,6 +70,16 @@ export abstract class Connector<
             broadcaster: options.broadcaster as TBroadcastDriver,
         };
 
+        this.options.auth = {
+            ...this.options.auth,
+            headers: { ...this.options.auth.headers },
+        };
+
+        this.options.userAuthentication = {
+            ...this.options.userAuthentication,
+            headers: { ...this.options.userAuthentication.headers },
+        };
+
         let token = this.csrfToken();
 
         if (token) {
