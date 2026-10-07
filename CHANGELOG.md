@@ -1,6 +1,25 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v2.5.0...2.x)
+## [Unreleased](https://github.com/laravel/echo/compare/v2.6.0...2.x)
+
+## [v2.6.0](https://github.com/laravel/echo/compare/v2.5.0...v2.6.0) - 2026-10-07
+
+### What's Changed
+
+* Add a Mercure connector by [@dunglas](https://github.com/dunglas) in https://github.com/laravel/echo/pull/549
+* Bump the github-actions group with 4 updates by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/551
+* fix: exclude internal tsconfig files from npm packages by [@HeinHtet109](https://github.com/HeinHtet109) in https://github.com/laravel/echo/pull/553
+* Allow custom connector classes in the React, Vue, and Svelte wrappers by [@sebestenyb](https://github.com/sebestenyb) in https://github.com/laravel/echo/pull/554
+* Bump the github-actions group with 3 updates by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/555
+* Bump the github-actions group with 3 updates by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/556
+
+### New Contributors
+
+* [@dunglas](https://github.com/dunglas) made their first contribution in https://github.com/laravel/echo/pull/549
+* [@HeinHtet109](https://github.com/HeinHtet109) made their first contribution in https://github.com/laravel/echo/pull/553
+* [@sebestenyb](https://github.com/sebestenyb) made their first contribution in https://github.com/laravel/echo/pull/554
+
+**Full Changelog**: https://github.com/laravel/echo/compare/v2.5.0...v2.6.0
 
 ## [v2.5.0](https://github.com/laravel/echo/compare/v2.4.0...v2.5.0) - 2026-09-08
 
