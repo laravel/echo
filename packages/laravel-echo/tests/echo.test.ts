@@ -49,6 +49,25 @@ describe("Echo", () => {
         ).not.toThrow("Broadcaster function is not supported.");
     });
 
+    test("it does not share auth headers between instances", () => {
+        const first = new Echo({
+            broadcaster: "null",
+            bearerToken: "first-token",
+            withoutInterceptors: true,
+        });
+
+        const second = new Echo({
+            broadcaster: "null",
+            withoutInterceptors: true,
+        });
+
+        expect(first.connector.options.auth.headers).toEqual({
+            Authorization: "Bearer first-token",
+        });
+        expect(second.connector.options.auth.headers).toEqual({});
+        expect(second.connector.options.userAuthentication.headers).toEqual({});
+    });
+
     test("it will throw error for unsupported driver", () => {
         expect(
             // @ts-expect-error unsupported broadcaster string
