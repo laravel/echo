@@ -1,6 +1,14 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v2.6.0...2.x)
+## [Unreleased](https://github.com/laravel/echo/compare/v2.6.1...2.x)
+
+## [v2.6.1](https://github.com/laravel/echo/compare/v2.6.0...v2.6.1) - 2026-10-07
+
+### What's Changed
+
+* pnpm audit fixes by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/echo/pull/558
+
+**Full Changelog**: https://github.com/laravel/echo/compare/v2.6.0...v2.6.1
 
 ## [v2.6.0](https://github.com/laravel/echo/compare/v2.5.0...v2.6.0) - 2026-10-07
 
