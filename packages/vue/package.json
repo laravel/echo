@@ -79,6 +79,7 @@
         }
     },
     "files": [
-        "dist"
+        "dist",
+        "resources/boost"
     ]
 }

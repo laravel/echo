@@ -78,6 +78,7 @@
         "./iife": "./dist/echo.iife.js"
     },
     "files": [
-        "dist"
+        "dist",
+        "resources/boost"
     ]
 }
