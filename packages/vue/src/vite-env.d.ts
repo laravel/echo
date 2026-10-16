@@ -1,4 +1,4 @@
-/// <reference types="vite/client" />
+/// <reference types="vite-plus/client" />
 
 interface ImportMetaEnv {
     readonly VITE_PUSHER_APP_CLUSTER: string;

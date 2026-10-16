@@ -11,7 +11,9 @@ import type { ConnectionStatus } from "../echo";
 import { Connector } from "./connector";
 
 type AnySocketIoChannel =
-    SocketIoChannel | SocketIoPrivateChannel | SocketIoPresenceChannel;
+    | SocketIoChannel
+    | SocketIoPrivateChannel
+    | SocketIoPresenceChannel;
 
 /**
  * This class creates a connector to a Socket.io server.

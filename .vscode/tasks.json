@@ -11,7 +11,7 @@
             },
             "problemMatcher": [],
             "label": "pnpm: build",
-            "detail": "vite build && FORMAT=iife vite build"
+            "detail": "pnpm -r --if-present run build"
         }
     ]
 }

@@ -84,7 +84,8 @@ type ModelEvent =
     | "Replicating";
 
 export type ModelEvents<T extends string> =
-    `.${ModelName<T>}${ModelEvent}` | `${ModelName<T>}${ModelEvent}`;
+    | `.${ModelName<T>}${ModelEvent}`
+    | `${ModelName<T>}${ModelEvent}`;
 
 /**
  * Global Events interface for type inference

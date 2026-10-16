@@ -1,6 +1,5 @@
 import { resolve } from "path";
-import { defineConfig, UserConfig } from "vite";
-import dts from "unplugin-dts/vite";
+import { defineConfig, UserConfig } from "vite-plus";
 
 /*
  * Laravel exposes its broadcasting defaults as VITE_* variables, and the consuming app's Vite
@@ -55,13 +54,6 @@ const config: UserConfig = (() => {
     }
 
     return {
-        plugins: [
-            dts({
-                insertTypesEntry: true,
-                bundleTypes: true,
-                include: ["src/**/*.ts"],
-            }),
-        ],
         define: guardedEnvVariables([
             "VITE_ABLY_PUBLIC_KEY",
             "VITE_PUSHER_APP_CLUSTER",

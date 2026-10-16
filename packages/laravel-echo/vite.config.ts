@@ -1,6 +1,5 @@
 import { resolve } from "path";
-import { defineConfig, UserConfig } from "vite";
-import dts from "unplugin-dts/vite";
+import { defineConfig, UserConfig } from "vite-plus";
 
 const config: UserConfig = (() => {
     const common: Partial<UserConfig["build"]> = {
@@ -35,13 +34,6 @@ const config: UserConfig = (() => {
     }
 
     return {
-        plugins: [
-            dts({
-                insertTypesEntry: true,
-                bundleTypes: true,
-                include: ["src/**/*.ts"],
-            }),
-        ],
         build: {
             lib: {
                 entry: resolve(import.meta.dirname, "src/echo.ts"),
