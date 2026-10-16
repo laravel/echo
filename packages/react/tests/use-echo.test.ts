@@ -194,9 +194,7 @@ describe("useEcho hook", async () => {
         const channelName = "test-channel";
         const event = "test-event";
 
-        const { unmount } = renderHook(() =>
-            echoModule.useEcho(channelName, event, mockCallback),
-        );
+        renderHook(() => echoModule.useEcho(channelName, event, mockCallback));
 
         expect(echoInstance.private).toHaveBeenCalledWith(channelName);
 
@@ -633,7 +631,7 @@ describe("useEchoModel hook", async () => {
         const identifier = "123";
         const event = "ProfileCreated";
 
-        const { result } = renderHook(() =>
+        renderHook(() =>
             echoModule.useEchoModel<any, typeof model>(
                 model,
                 identifier,

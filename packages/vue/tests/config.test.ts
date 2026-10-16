@@ -33,7 +33,7 @@ describe("echo helper", async () => {
     });
 
     it("checks if Echo is configured", async () => {
-        const { configureEcho, echoIsConfigured: echoIsConfigured } =
+        const { configureEcho, echoIsConfigured } =
             await import("../src/config");
 
         expect(echoIsConfigured()).toBe(false);
