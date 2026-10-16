@@ -26,8 +26,7 @@
         "dev": "vp dev",
         "prepublish": "pnpm run build",
         "release": "vp test --run && pnpm publish --no-git-checks",
-        "test": "vp test",
-        "typecheck": "tsc --noEmit"
+        "test": "vp test"
     },
     "devDependencies": {
         "@types/node": "^24.13.3",

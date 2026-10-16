@@ -2,11 +2,10 @@ import { defineConfig } from "vite-plus";
 
 export default defineConfig({
     lint: {
-        ignorePatterns: ["**/tests/**"],
         jsPlugins: [
             { name: "vite-plus", specifier: "vite-plus/oxlint-plugin" },
         ],
-        options: { typeAware: true },
+        options: { typeAware: true, typeCheck: true },
         rules: {
             "no-console": "warn",
             "typescript/no-floating-promises": "error",
@@ -18,6 +17,16 @@ export default defineConfig({
             "vite-plus/prefer-vite-plus-imports": "error",
         },
         overrides: [
+            {
+                files: ["packages/*/tests/**"],
+                rules: {
+                    "typescript/no-unsafe-assignment": "off",
+                    "typescript/no-unsafe-call": "off",
+                    "typescript/no-unsafe-member-access": "off",
+                    "typescript/no-unsafe-return": "off",
+                    "typescript/unbound-method": "off",
+                },
+            },
             {
                 files: ["packages/react/**"],
                 plugins: ["react"],

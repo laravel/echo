@@ -12,7 +12,6 @@
     "packageManager": "pnpm@12.3.4",
     "scripts": {
         "test": "pnpm -r --parallel --no-sort --if-present run test",
-        "typecheck": "pnpm -r --parallel --no-sort --if-present run typecheck",
         "build": "pnpm -r --if-present run build",
         "lint": "vp lint",
         "format": "vp fmt",
