@@ -44,7 +44,7 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: ESLint
+      - name: Lint
         run: pnpm run lint
 
       - name: Type check

@@ -36,8 +36,7 @@
         "pusher-js": "^8.4.0",
         "socket.io-client": "^4.8.1",
         "svelte": "^5.55.7",
-        "typescript": "^7.0.2",
-        "vite": "catalog:",
+        "typescript": "catalog:",
         "vite-plus": "catalog:"
     },
     "peerDependencies": {

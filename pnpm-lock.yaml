@@ -107,9 +107,9 @@ settings:
 
 catalogs:
   default:
-    vite:
-      specifier: npm:@voidzero-dev/vite-plus-core@1.2.0
-      version: 1.2.0
+    typescript:
+      specifier: ^7.0.2
+      version: 7.0.2
     vite-plus:
       specifier: 1.2.0
       version: 1.2.0
@@ -146,11 +146,8 @@ importers:
         specifier: ^4.8.3
         version: 4.8.3(supports-color@8.1.1)
       typescript:
-        specifier: ^7.0.2
-        version: 7.0.2
-      vite:
         specifier: 'catalog:'
-        version: '@voidzero-dev/vite-plus-core@1.2.0(@types/node@24.13.3)(@volar/typescript@2.4.28(typescript@7.0.2))(typescript@7.0.2)'
+        version: 7.0.2
       vite-plus:
         specifier: 'catalog:'
         version: 1.2.0(@types/node@24.13.3)(@vitest/ui@5.0.4)(@volar/typescript@2.4.28(typescript@7.0.2))(jsdom@30.0.1)(svelte@5.57.0(@typescript-eslint/types@8.69.0))(typescript@7.0.2)
@@ -191,11 +188,8 @@ importers:
         specifier: ^4.8.1
         version: 4.8.3(supports-color@8.1.1)
       typescript:
-        specifier: ^7.0.2
-        version: 7.0.2
-      vite:
         specifier: 'catalog:'
-        version: '@voidzero-dev/vite-plus-core@1.2.0(@types/node@24.13.3)(@volar/typescript@2.4.28(typescript@7.0.2))(typescript@7.0.2)'
+        version: 7.0.2
       vite-plus:
         specifier: 'catalog:'
         version: 1.2.0(@types/node@24.13.3)(@vitest/ui@5.0.4)(@volar/typescript@2.4.28(typescript@7.0.2))(jsdom@30.0.1)(svelte@5.57.0(@typescript-eslint/types@8.69.0))(typescript@7.0.2)
@@ -221,11 +215,8 @@ importers:
         specifier: ^5.55.7
         version: 5.57.0(@typescript-eslint/types@8.69.0)
       typescript:
-        specifier: ^7.0.2
-        version: 7.0.2
-      vite:
         specifier: 'catalog:'
-        version: '@voidzero-dev/vite-plus-core@1.2.0(@types/node@24.13.3)(@volar/typescript@2.4.28(typescript@7.0.2))(typescript@7.0.2)'
+        version: 7.0.2
       vite-plus:
         specifier: 'catalog:'
         version: 1.2.0(@types/node@24.13.3)(@vitest/ui@5.0.4)(@volar/typescript@2.4.28(typescript@7.0.2))(jsdom@30.0.1)(svelte@5.57.0(@typescript-eslint/types@8.69.0))(typescript@7.0.2)
@@ -251,11 +242,8 @@ importers:
         specifier: ^4.8.1
         version: 4.8.3(supports-color@8.1.1)
       typescript:
-        specifier: ^7.0.2
-        version: 7.0.2
-      vite:
         specifier: 'catalog:'
-        version: '@voidzero-dev/vite-plus-core@1.2.0(@types/node@24.13.3)(@volar/typescript@2.4.28(typescript@7.0.2))(typescript@7.0.2)'
+        version: 7.0.2
       vite-plus:
         specifier: 'catalog:'
         version: 1.2.0(@types/node@24.13.3)(@vitest/ui@5.0.4)(@volar/typescript@2.4.28(typescript@7.0.2))(jsdom@30.0.1)(svelte@5.57.0(@typescript-eslint/types@8.69.0))(typescript@7.0.2)

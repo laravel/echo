@@ -36,8 +36,7 @@
         "jsdom": "^30.0.0",
         "pusher-js": "^8.4.0",
         "socket.io-client": "^4.8.3",
-        "typescript": "^7.0.2",
-        "vite": "catalog:",
+        "typescript": "catalog:",
         "vite-plus": "catalog:"
     },
     "peerDependencies": {
