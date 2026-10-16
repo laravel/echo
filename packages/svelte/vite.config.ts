@@ -1,7 +1,11 @@
 import { resolve } from "path";
 import { compileModule } from "svelte/compiler";
-import { defineConfig, PluginOption, transformWithOxc, UserConfig } from "vite";
-import dts from "unplugin-dts/vite";
+import {
+    defineConfig,
+    PluginOption,
+    transformWithOxc,
+    UserConfig,
+} from "vite-plus";
 
 const srcDir = resolve(import.meta.dirname, "src");
 const testsDir = resolve(import.meta.dirname, "tests");
@@ -75,12 +79,7 @@ const config: UserConfig = (() => {
                 id.startsWith("svelte/") ||
                 id === "pusher-js",
             output: {
-                globals: (id) => {
-                    if (id === "svelte" || id.startsWith("svelte/"))
-                        return "Svelte";
-                    if (id === "pusher-js") return "Pusher";
-                    return undefined;
-                },
+                globals: (id) => (id === "pusher-js" ? "Pusher" : "Svelte"),
             },
         },
         outDir: resolve(import.meta.dirname, "dist"),
@@ -105,14 +104,7 @@ const config: UserConfig = (() => {
     }
 
     return {
-        plugins: [
-            svelteRunesTsPlugin(),
-            dts({
-                insertTypesEntry: true,
-                bundleTypes: true,
-                include: ["src/**/*.ts"],
-            }),
-        ],
+        plugins: [svelteRunesTsPlugin()],
         define: guardedEnvVariables([
             "VITE_ABLY_PUBLIC_KEY",
             "VITE_PUSHER_APP_CLUSTER",

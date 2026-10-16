@@ -6,3 +6,33 @@ auditConfig:
     - GHSA-hp3w-g68c-fv3c
 
 autoInstallPeers: false
+catalog:
+  vite: npm:@voidzero-dev/vite-plus-core@1.3.0
+  vite-plus: 1.3.0
+minimumReleaseAgeExclude:
+  - "@vitest/browser-preview@5.0.5"
+  - "@vitest/browser@5.0.5"
+  - "@vitest/mocker@5.0.5"
+  - "@vitest/pretty-format@5.0.5"
+  - "@vitest/snapshot@5.0.5"
+  - "@vitest/spy@5.0.5"
+  - "@vitest/ui@5.0.5"
+  - "@vitest/utils@5.0.5"
+  - "@voidzero-dev/vite-plus-core@1.3.0"
+  - "@voidzero-dev/vite-plus-darwin-arm64@1.3.0"
+  - "@voidzero-dev/vite-plus-darwin-x64@1.3.0"
+  - "@voidzero-dev/vite-plus-linux-arm64-gnu@1.3.0"
+  - "@voidzero-dev/vite-plus-linux-arm64-musl@1.3.0"
+  - "@voidzero-dev/vite-plus-linux-x64-gnu@1.3.0"
+  - "@voidzero-dev/vite-plus-linux-x64-musl@1.3.0"
+  - "@voidzero-dev/vite-plus-win32-arm64-msvc@1.3.0"
+  - "@voidzero-dev/vite-plus-win32-x64-msvc@1.3.0"
+  - vite-plus@1.3.0
+  - vitest@5.0.5
+overrides:
+  vite@*: "catalog:"
+peerDependencyRules:
+  allowAny:
+    - vite
+  allowedVersions:
+    vite: "*"

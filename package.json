@@ -14,10 +14,13 @@
         "test": "pnpm -r --parallel --no-sort --if-present run test",
         "typecheck": "pnpm -r --parallel --no-sort --if-present run typecheck",
         "build": "pnpm -r --if-present run build",
-        "lint": "pnpm -r --parallel --no-sort --if-present run lint",
-        "format": "pnpm -r --parallel --no-sort --if-present run format",
+        "lint": "vp lint",
+        "format": "vp fmt",
         "compile": "pnpm -r --if-present run compile",
         "declarations": "pnpm -r --if-present run declarations",
         "dev": "pnpm -r --parallel --filter './packages/*' dev"
+    },
+    "devDependencies": {
+        "vite-plus": "catalog:"
     }
 }

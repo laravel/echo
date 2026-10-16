@@ -1,6 +1,13 @@
 import { mount } from "@vue/test-utils";
 import Echo from "laravel-echo";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+    afterEach,
+    beforeEach,
+    describe,
+    expect,
+    it,
+    vi,
+} from "vite-plus/test";
 import { defineComponent } from "vue";
 import {
     useConnectionStatus,
