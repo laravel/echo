@@ -6,7 +6,6 @@ import {
     test,
     vi,
 } from "vite-plus/test";
-import { MercurePresenceChannel } from "../../src/channel";
 import { MercureConnector } from "../../src/connector";
 
 class MockEventSource {
@@ -570,7 +569,7 @@ describe("MercureConnector", () => {
     test("a denied join evicts only the new channel and keeps the working set alive", async () => {
         fetchMock.mockImplementation((url: string, init?: RequestInit) => {
             if (url === "/broadcasting/auth") {
-                const body = JSON.parse(String(init?.body)) as {
+                const body = JSON.parse(init?.body as string) as {
                     channel_names: string[];
                 };
 
@@ -1156,7 +1155,7 @@ describe("MercureConnector", () => {
         function mockAuthDenying(deniedNames: () => string[]) {
             fetchMock.mockImplementation((url: string, init?: RequestInit) => {
                 if (url === "/broadcasting/auth") {
-                    const body = JSON.parse(String(init?.body)) as {
+                    const body = JSON.parse(init?.body as string) as {
                         channel_names: string[];
                     };
 

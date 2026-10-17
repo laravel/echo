@@ -1054,14 +1054,8 @@ describe("useEchoNotification hook", async () => {
 });
 
 describe.skip("useConnectionStatus composable", async () => {
-    let echoInstance: Echo<"null">;
-
     beforeEach(async () => {
         vi.resetModules();
-
-        echoInstance = new Echo({
-            broadcaster: "null",
-        });
     });
 
     afterEach(() => {
