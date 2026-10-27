@@ -1,6 +1,23 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/echo/compare/v2.6.1...2.x)
+## [Unreleased](https://github.com/laravel/echo/compare/v2.6.2...2.x)
+
+## [v2.6.2](https://github.com/laravel/echo/compare/v2.6.1...v2.6.2) - 2026-10-27
+
+### What's Changed
+
+* Ship the Boost skills in the published packages again by [@christophstockinger](https://github.com/christophstockinger) in https://github.com/laravel/echo/pull/560
+* Bump the github-actions group with 4 updates by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/561
+* Remove security policy in favor of the org-wide default by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/echo/pull/563
+* Modernize toolchain: Vite+ and TypeScript 7 by [@pataar](https://github.com/pataar) in https://github.com/laravel/echo/pull/564
+* Resolve lint warnings in test suites by [@pataar](https://github.com/pataar) in https://github.com/laravel/echo/pull/565
+* Bump the github-actions group with 3 updates by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/echo/pull/566
+
+### New Contributors
+
+* [@christophstockinger](https://github.com/christophstockinger) made their first contribution in https://github.com/laravel/echo/pull/560
+
+**Full Changelog**: https://github.com/laravel/echo/compare/v2.6.1...v2.6.2
 
 ## [v2.6.1](https://github.com/laravel/echo/compare/v2.6.0...v2.6.1) - 2026-10-07
 
