@@ -45,7 +45,7 @@ export type ConnectionStatus =
 export type ChannelType = "public" | "private" | "encrypted" | "presence";
 
 /**
- * A channel held through share() or borrow(), released through its own handle.
+ * A channel held through share(), released through its own handle.
  */
 export type SharedChannel<C> = {
     channel: C;
@@ -66,16 +66,6 @@ const channelPrefixes: Record<ChannelType, string> = {
 };
 
 /**
- * A channel held through share() or borrow().
- */
-type HeldChannel = {
-    count: number;
-    existing: boolean;
-    shared: boolean;
-    channel: unknown;
-};
-
-/**
  * This class is the primary API for interacting with broadcasting.
  */
 export default class Echo<T extends keyof Broadcaster> {
@@ -90,9 +80,9 @@ export default class Echo<T extends keyof Broadcaster> {
     options: EchoOptions<T>;
 
     /**
-     * The channels held through share() or borrow(), keyed by full name.
+     * The number of holds on each channel taken through share(), keyed by full name.
      */
-    private heldChannels = new Map<string, HeldChannel>();
+    private heldChannels = new Map<string, number>();
 
     /**
      * Create a new class instance.
@@ -123,58 +113,14 @@ export default class Echo<T extends keyof Broadcaster> {
         channel: string,
         type: V = "public" as V,
     ): SharedChannel<Broadcaster[T][V]> {
-        return this.holdChannel(channel, type, false);
-    }
-
-    /**
-     * Share a channel like share(), but never leave one that was joined without share() or
-     * borrow(), since the borrower did not open it.
-     */
-    borrow<V extends ChannelType = "public">(
-        channel: string,
-        type: V = "public" as V,
-    ): SharedChannel<Broadcaster[T][V]> {
-        return this.holdChannel(channel, type, true);
-    }
-
-    /**
-     * Take one hold on a channel, joining it through the connector unless it is already held.
-     */
-    private holdChannel<V extends ChannelType>(
-        channel: string,
-        type: V,
-        borrowed: boolean,
-    ): SharedChannel<Broadcaster[T][V]> {
         const name = channelPrefixes[type] + channel;
-        const channels = this.connectorChannels();
-        const existing =
-            channels !== undefined &&
-            Object.prototype.hasOwnProperty.call(channels, name);
 
-        let entry = this.heldChannels.get(name);
-
-        if (!entry) {
-            entry = {
-                count: 0,
-                existing,
-                shared: false,
-                channel: this.channelOfType(channel, type),
-            };
-
-            this.heldChannels.set(name, entry);
-        } else if (channels !== undefined && channels[name] !== entry.channel) {
-            // Something left the channel behind share()'s back, so join it again
-            entry.existing = existing;
-            entry.channel = this.channelOfType(channel, type);
-        }
-
-        entry.count += 1;
-        entry.shared ||= !borrowed;
+        this.heldChannels.set(name, (this.heldChannels.get(name) ?? 0) + 1);
 
         let released = false;
 
         return {
-            channel: entry.channel as Broadcaster[T][V],
+            channel: this.channelOfType(channel, type) as Broadcaster[T][V],
             release: (): boolean => {
                 if (released) {
                     return false;
@@ -191,31 +137,15 @@ export default class Echo<T extends keyof Broadcaster> {
      * Drop one hold on a shared channel and leave it after the last one.
      */
     private releaseChannel(name: string): boolean {
-        const entry = this.heldChannels.get(name);
+        const count = (this.heldChannels.get(name) ?? 0) - 1;
 
-        if (!entry) {
-            return false;
-        }
+        if (count > 0) {
+            this.heldChannels.set(name, count);
 
-        entry.count -= 1;
-
-        if (entry.count > 0) {
             return false;
         }
 
         this.heldChannels.delete(name);
-
-        const channels = this.connectorChannels();
-        const replaced =
-            channels !== undefined &&
-            Object.prototype.hasOwnProperty.call(channels, name) &&
-            channels[name] !== entry.channel;
-
-        // Deciding from every holder, not just the last to release, keeps the result independent of release order
-        if (!entry.shared && (entry.existing || replaced)) {
-            return false;
-        }
-
         this.leaveChannel(name);
 
         return true;
@@ -238,19 +168,6 @@ export default class Echo<T extends keyof Broadcaster> {
         }
 
         return this.channel(channel);
-    }
-
-    /**
-     * Get the connector's channel cache, if it keeps one.
-     */
-    private connectorChannels(): Record<string, unknown> | undefined {
-        const { channels } = this.connector as { channels?: unknown };
-
-        if (typeof channels !== "object" || channels === null) {
-            return undefined;
-        }
-
-        return channels as Record<string, unknown>;
     }
 
     /**
@@ -318,7 +235,7 @@ export default class Echo<T extends keyof Broadcaster> {
 
     /**
      * Leave the given channel and its private and presence variants, skipping any still held
-     * through share() or borrow().
+     * through share().
      */
     leaveUnheld(channel: string): void {
         for (const prefix of Object.values(channelPrefixes)) {

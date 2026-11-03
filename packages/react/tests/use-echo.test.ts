@@ -309,7 +309,7 @@ describe("useEcho hook", async () => {
         );
     });
 
-    it("keeps a variant another holder borrowed when leaving all variants", async () => {
+    it("keeps a variant another holder shares when leaving all variants", async () => {
         const { default: ActualEcho } =
             await vi.importActual<typeof import("laravel-echo")>(
                 "laravel-echo",
@@ -325,7 +325,7 @@ describe("useEcho hook", async () => {
             echoModule.useEcho(channelName, "test-event", vi.fn()),
         );
 
-        const presence = instance.borrow(channelName, "presence");
+        const presence = instance.share(channelName, "presence");
 
         result.current.leave();
 
