@@ -123,9 +123,6 @@ export function useEcho<
     const channel: Channel = useMemo(
         () => ({
             name: channelName,
-            id: ["private", "presence"].includes(visibility)
-                ? `${visibility}-${channelName}`
-                : channelName,
             visibility,
         }),
         [channelName, visibility],
@@ -367,9 +364,6 @@ export function useChannel<
     const channel: Channel = useMemo(
         () => ({
             name: channelName,
-            id: ["private", "presence"].includes(visibility)
-                ? `${visibility}-${channelName}`
-                : channelName,
             visibility,
         }),
         [channelName, visibility],

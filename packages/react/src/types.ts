@@ -7,7 +7,6 @@ export type Connection<T extends BroadcastDriver> =
 
 export type Channel = {
     name: string;
-    id: string;
     visibility: "private" | "public" | "presence";
 };
 

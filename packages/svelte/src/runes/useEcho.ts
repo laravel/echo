@@ -85,9 +85,6 @@ const resolveChannel = <TVisibility extends Channel["visibility"]>(
 
     return {
         name: resolvedChannelName,
-        id: ["private", "presence"].includes(visibility)
-            ? `${visibility}-${resolvedChannelName}`
-            : resolvedChannelName,
         visibility,
     };
 };

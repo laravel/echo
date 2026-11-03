@@ -125,9 +125,6 @@ export function useEcho<
 
     const channel: Channel = {
         name: channelName,
-        id: ["private", "presence"].includes(visibility)
-            ? `${visibility}-${channelName}`
-            : channelName,
         visibility,
     };
 
@@ -338,9 +335,6 @@ export function useChannel<
 >(channelName: string, visibility: TVisibility = "private" as TVisibility) {
     const channel: Channel = {
         name: channelName,
-        id: ["private", "presence"].includes(visibility)
-            ? `${visibility}-${channelName}`
-            : channelName,
         visibility,
     };
 
