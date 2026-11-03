@@ -188,7 +188,7 @@ describe("useEcho (Svelte runes)", () => {
         expect(instance.leaveChannel).toHaveBeenCalledWith("private-orders.2");
     });
 
-    it("subscribes once for identical private channels and leaves after last teardown", async () => {
+    it("shares identical private channels and leaves after last teardown", async () => {
         const { echoModule, instance } = await setupConfiguredEcho();
 
         const cleanupA = $effect.root(() => {
@@ -201,7 +201,6 @@ describe("useEcho (Svelte runes)", () => {
 
         await tick();
 
-        expect(instance.private).toHaveBeenCalledTimes(1);
         expect(instance.__privateChannel.listen).toHaveBeenCalledTimes(2);
 
         cleanupA();

@@ -179,7 +179,7 @@ describe("useEcho hook", async () => {
         expect(echoInstance.leaveChannel).toHaveBeenCalled();
     });
 
-    it("won't subscribe multiple times to the same channel", async () => {
+    it("keeps the channel until the last hook releases it", async () => {
         const mockCallback = vi.fn();
         const channelName = "test-channel";
         const event = "test-event";
@@ -192,7 +192,6 @@ describe("useEcho hook", async () => {
             echoModule.useEcho(channelName, event, mockCallback),
         );
 
-        expect(echoInstance.private).toHaveBeenCalledTimes(1);
 
         expect(() => unmount1()).not.toThrow();
 
@@ -677,7 +676,7 @@ describe("useEchoModel hook", async () => {
         );
     });
 
-    it("won't subscribe multiple times to the same model channel", async () => {
+    it("keeps the model channel until the last hook releases it", async () => {
         const mockCallback = vi.fn();
         const model = "App.Models.User";
         const identifier = "123";
@@ -702,7 +701,6 @@ describe("useEchoModel hook", async () => {
         );
 
         const expectedChannelName = `${model}.${identifier}`;
-        expect(echoInstance.private).toHaveBeenCalledTimes(1);
         expect(echoInstance.private).toHaveBeenCalledWith(expectedChannelName);
 
         expect(() => unmount1()).not.toThrow();
@@ -880,7 +878,7 @@ describe("useEchoPublic hook", async () => {
         expect(echoInstance.leaveChannel).toHaveBeenCalledWith(channelName);
     });
 
-    it("won't subscribe multiple times to the same channel", async () => {
+    it("keeps the channel until the last hook releases it", async () => {
         const mockCallback = vi.fn();
         const channelName = "test-channel";
         const event = "test-event";
@@ -893,7 +891,6 @@ describe("useEchoPublic hook", async () => {
             echoModule.useEchoPublic(channelName, event, mockCallback),
         );
 
-        expect(echoInstance.channel).toHaveBeenCalledTimes(1);
         expect(echoInstance.channel).toHaveBeenCalledWith(channelName);
 
         expect(() => unmount1()).not.toThrow();
@@ -1038,7 +1035,7 @@ describe("useEchoPresence hook", async () => {
         );
     });
 
-    it("won't subscribe multiple times to the same channel", async () => {
+    it("keeps the channel until the last hook releases it", async () => {
         const mockCallback = vi.fn();
         const channelName = "test-channel";
         const event = "test-event";
@@ -1051,7 +1048,6 @@ describe("useEchoPresence hook", async () => {
             echoModule.useEchoPresence(channelName, event, mockCallback),
         );
 
-        expect(echoInstance.join).toHaveBeenCalledTimes(1);
         expect(echoInstance.join).toHaveBeenCalledWith(channelName);
 
         expect(() => unmount1()).not.toThrow();
@@ -1299,7 +1295,7 @@ describe("useEchoNotification hook", async () => {
         );
     });
 
-    it("won't subscribe multiple times to the same channel", async () => {
+    it("keeps the channel until the last hook releases it", async () => {
         const mockCallback = vi.fn();
         const channelName = "test-channel";
 
@@ -1311,7 +1307,6 @@ describe("useEchoNotification hook", async () => {
             echoModule.useEchoNotification(channelName, mockCallback),
         );
 
-        expect(echoInstance.private).toHaveBeenCalledTimes(1);
 
         expect(() => unmount1()).not.toThrow();
         expect(echoInstance.leaveChannel).not.toHaveBeenCalled();

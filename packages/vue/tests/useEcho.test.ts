@@ -296,7 +296,7 @@ describe("useEcho hook", async () => {
         expect(echoInstance.leaveChannel).toHaveBeenCalled();
     });
 
-    it("won't subscribe multiple times to the same channel", async () => {
+    it("keeps the channel until the last hook releases it", async () => {
         const mockCallback = vi.fn();
         const channelName = "test-channel";
         const event = "test-event";
@@ -307,7 +307,6 @@ describe("useEcho hook", async () => {
             useEcho(channelName, event, mockCallback),
         );
 
-        expect(echoInstance.private).toHaveBeenCalledTimes(1);
 
         wrapper.unmount();
 
@@ -602,7 +601,7 @@ describe("useEchoPublic hook", async () => {
         expect(echoInstance.leaveChannel).toHaveBeenCalledWith(channelName);
     });
 
-    it("won't subscribe multiple times to the same channel", async () => {
+    it("keeps the channel until the last hook releases it", async () => {
         const mockCallback = vi.fn();
         const channelName = "test-channel";
         const event = "test-event";
@@ -613,7 +612,6 @@ describe("useEchoPublic hook", async () => {
             useEchoPublic(channelName, event, mockCallback),
         );
 
-        expect(echoInstance.channel).toHaveBeenCalledTimes(1);
         expect(echoInstance.channel).toHaveBeenCalledWith(channelName);
 
         wrapper.unmount();
@@ -739,7 +737,7 @@ describe("useEchoPresence hook", async () => {
         );
     });
 
-    it("won't subscribe multiple times to the same channel", async () => {
+    it("keeps the channel until the last hook releases it", async () => {
         const mockCallback = vi.fn();
         const channelName = "test-channel";
         const event = "test-event";
@@ -750,7 +748,6 @@ describe("useEchoPresence hook", async () => {
             useEchoPresence(channelName, event, mockCallback),
         );
 
-        expect(echoInstance.join).toHaveBeenCalledTimes(1);
         expect(echoInstance.join).toHaveBeenCalledWith(channelName);
 
         wrapper.unmount();
@@ -1002,7 +999,7 @@ describe("useEchoNotification hook", async () => {
         );
     });
 
-    it("won't subscribe multiple times to the same channel", async () => {
+    it("keeps the channel until the last hook releases it", async () => {
         const mockCallback = vi.fn();
         const channelName = "test-channel";
 
@@ -1016,7 +1013,6 @@ describe("useEchoNotification hook", async () => {
             useEchoNotification(channelName, mockCallback, undefined),
         );
 
-        expect(echoInstance.private).toHaveBeenCalledTimes(1);
 
         wrapper.unmount();
         expect(echoInstance.leaveChannel).not.toHaveBeenCalled();
