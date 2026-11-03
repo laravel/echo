@@ -17,11 +17,21 @@ import type {
 } from "../types";
 import { toArray } from "../util";
 
-const channels: Record<string, ChannelData<BroadcastDriver>> = {};
+const channels: Record<
+    string,
+    ChannelData<BroadcastDriver> & {
+        instance: Echo<BroadcastDriver>;
+        channel: Channel;
+    }
+> = {};
 let activeEchoInstance: Echo<BroadcastDriver> | null = null;
 
 const clearChannelCache = (): void => {
     Object.keys(channels).forEach((channelId) => {
+        const { instance, channel } = channels[channelId];
+
+        instance.release(channel.name, channel.visibility, { leave: false });
+
         delete channels[channelId];
     });
 };
@@ -46,29 +56,19 @@ const resolveChannelSubscription = <T extends BroadcastDriver>(
         return channels[channel.id].connection;
     }
 
-    const channelSubscription = subscribeToChannel<T>(instance, channel);
+    const channelSubscription = instance.acquire(
+        channel.name,
+        channel.visibility,
+    );
 
     channels[channel.id] = {
         count: 1,
         connection: channelSubscription,
+        instance,
+        channel,
     };
 
     return channelSubscription;
-};
-
-const subscribeToChannel = <T extends BroadcastDriver>(
-    instance: Echo<T>,
-    channel: Channel,
-): Connection<T> => {
-    if (channel.visibility === "presence") {
-        return instance.join(channel.name);
-    }
-
-    if (channel.visibility === "private") {
-        return instance.private(channel.name);
-    }
-
-    return instance.channel(channel.name);
 };
 
 const leaveChannel = (channel: Channel, leaveAll: boolean = false): void => {
@@ -82,7 +82,17 @@ const leaveChannel = (channel: Channel, leaveAll: boolean = false): void => {
         return;
     }
 
+    const { instance } = channels[channel.id];
+
     delete channels[channel.id];
+
+    if (instance === echo()) {
+        instance.release(channel.name, channel.visibility, { leaveAll });
+
+        return;
+    }
+
+    instance.release(channel.name, channel.visibility, { leave: false });
 
     if (leaveAll) {
         echo().leave(channel.name);

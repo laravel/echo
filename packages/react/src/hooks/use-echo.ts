@@ -1,3 +1,4 @@
+import type Echo from "laravel-echo";
 import { type BroadcastDriver, type ConnectionStatus } from "laravel-echo";
 import {
     type DependencyList,
@@ -22,23 +23,10 @@ import type {
 } from "../types";
 import { toArray } from "../util";
 
-const channels: Record<string, ChannelData<BroadcastDriver>> = {};
-
-const subscribeToChannel = <T extends BroadcastDriver>(
-    channel: Channel,
-): Connection<T> => {
-    const instance = echo<T>();
-
-    if (channel.visibility === "presence") {
-        return instance.join(channel.name);
-    }
-
-    if (channel.visibility === "private") {
-        return instance.private(channel.name);
-    }
-
-    return instance.channel(channel.name);
-};
+const channels: Record<
+    string,
+    ChannelData<BroadcastDriver> & { instance: Echo<BroadcastDriver> }
+> = {};
 
 const leaveChannel = (channel: Channel, leaveAll: boolean): void => {
     if (!channels[channel.id]) {
@@ -50,6 +38,17 @@ const leaveChannel = (channel: Channel, leaveAll: boolean): void => {
     if (channels[channel.id].count > 0) {
         return;
     }
+
+    const { instance } = channels[channel.id];
+
+    if (instance === echo()) {
+        instance.release(channel.name, channel.visibility, { leaveAll });
+        delete channels[channel.id];
+
+        return;
+    }
+
+    instance.release(channel.name, channel.visibility, { leave: false });
 
     if (leaveAll) {
         echo().leave(channel.name);
@@ -69,11 +68,16 @@ const resolveChannelSubscription = <T extends BroadcastDriver>(
         return channels[channel.id].connection;
     }
 
-    const channelSubscription = subscribeToChannel<T>(channel);
+    const instance = echo<T>();
+    const channelSubscription = instance.acquire(
+        channel.name,
+        channel.visibility,
+    );
 
     channels[channel.id] = {
         count: 1,
         connection: channelSubscription,
+        instance,
     };
 
     return channelSubscription;

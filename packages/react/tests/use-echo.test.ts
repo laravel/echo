@@ -12,7 +12,10 @@ import {
 const getEchoModule = async () => import("../src/hooks/use-echo");
 const getConfigModule = async () => import("../src/config/index");
 
-vi.mock("laravel-echo", () => {
+vi.mock("laravel-echo", async (importOriginal) => {
+    const { default: ActualEcho } =
+        await importOriginal<typeof import("laravel-echo")>();
+
     const mockPrivateChannel = {
         leaveChannel: vi.fn(),
         listen: vi.fn(),
@@ -47,6 +50,8 @@ vi.mock("laravel-echo", () => {
     Echo.prototype.leaveChannel = vi.fn();
     Echo.prototype.leaveAllChannels = vi.fn();
     Echo.prototype.join = vi.fn(() => mockPresenceChannel);
+    Echo.prototype.acquire = ActualEcho.prototype.acquire;
+    Echo.prototype.release = ActualEcho.prototype.release;
     Echo.prototype.connectionStatus = vi.fn(() => "connected");
     Echo.prototype.socketId = vi.fn(() => undefined);
     Echo.prototype.connector = { onConnectionChange: vi.fn(() => () => {}) };
@@ -187,6 +192,27 @@ describe("useEcho hook", async () => {
         expect(() => unmount2()).not.toThrow();
 
         expect(echoInstance.leaveChannel).toHaveBeenCalled();
+    });
+
+    it("keeps the channel while another acquire still holds it", async () => {
+        const mockCallback = vi.fn();
+        const channelName = "test-channel";
+        const event = "test-event";
+
+        const { unmount } = renderHook(() =>
+            echoModule.useEcho(channelName, event, mockCallback),
+        );
+
+        configModule.echo().acquire(channelName, "private");
+        unmount();
+
+        expect(echoInstance.leaveChannel).not.toHaveBeenCalled();
+
+        configModule.echo().release(channelName, "private");
+
+        expect(echoInstance.leaveChannel).toHaveBeenCalledWith(
+            `private-${channelName}`,
+        );
     });
 
     it("will register callbacks for events", async () => {

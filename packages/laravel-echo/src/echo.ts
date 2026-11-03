@@ -40,6 +40,69 @@ export type ConnectionStatus =
     | "failed";
 
 /**
+ * The channel types that can be acquired and released.
+ */
+export type ChannelType = "public" | "private" | "encrypted" | "presence";
+
+/**
+ * The full channel name prefix for each channel type.
+ */
+const channelPrefixes: Record<ChannelType, string> = {
+    public: "",
+    private: "private-",
+    encrypted: "private-encrypted-",
+    presence: "presence-",
+};
+
+/**
+ * A channel held through acquire().
+ */
+type AcquiredChannel = { count: number; existing: boolean; channel: unknown };
+
+/**
+ * The channels held through acquire() for each Echo instance, keyed by full name.
+ */
+const acquiredChannels = new WeakMap<object, Map<string, AcquiredChannel>>();
+
+/**
+ * Get a channel instance through the public getter for its type.
+ */
+function channelOfType<T extends keyof Broadcaster>(
+    echo: Echo<T>,
+    channel: string,
+    type: ChannelType,
+): unknown {
+    if (type === "presence") {
+        return echo.join(channel);
+    }
+
+    if (type === "private") {
+        return echo.private(channel);
+    }
+
+    if (type === "encrypted") {
+        return echo.encryptedPrivate(channel);
+    }
+
+    return echo.channel(channel);
+}
+
+/**
+ * Get the connector's channel cache, if it keeps one.
+ */
+function connectorChannels<T extends keyof Broadcaster>(
+    echo: Echo<T>,
+): Record<string, unknown> | undefined {
+    const { channels } = echo.connector as { channels?: unknown };
+
+    if (typeof channels !== "object" || channels === null) {
+        return undefined;
+    }
+
+    return channels as Record<string, unknown>;
+}
+
+/**
  * This class is the primary API for interacting with broadcasting.
  */
 export default class Echo<T extends keyof Broadcaster> {
@@ -73,6 +136,105 @@ export default class Echo<T extends keyof Broadcaster> {
      */
     channel(channel: string): Broadcaster[T]["public"] {
         return this.connector.channel(channel);
+    }
+
+    /**
+     * Acquire a reference to a channel, sharing one channel between all holders.
+     */
+    acquire<V extends ChannelType = "public">(
+        channel: string,
+        type: V = "public" as V,
+    ): Broadcaster[T][V] {
+        const name = channelPrefixes[type] + channel;
+
+        let acquired = acquiredChannels.get(this);
+
+        if (!acquired) {
+            acquired = new Map();
+            acquiredChannels.set(this, acquired);
+        }
+
+        const channels = connectorChannels(this);
+        const existing =
+            channels !== undefined &&
+            Object.prototype.hasOwnProperty.call(channels, name);
+        const previous = acquired.get(name);
+        const stillJoined =
+            previous !== undefined &&
+            channels !== undefined &&
+            channels[name] === previous.channel;
+
+        let entry = previous;
+
+        if (!entry || entry.count <= 0) {
+            entry = {
+                count: 0,
+                existing: stillJoined ? previous.existing : existing,
+                channel: channelOfType(this, channel, type),
+            };
+
+            acquired.set(name, entry);
+        } else if (channels !== undefined && !stillJoined) {
+            entry.existing = existing;
+            entry.channel = channelOfType(this, channel, type);
+        }
+
+        entry.count += 1;
+
+        return entry.channel as Broadcaster[T][V];
+    }
+
+    /**
+     * Release a reference taken by acquire() and leave the channel after the last one, returning
+     * false while references remain or the channel is kept. `keepExisting` keeps channels joined by
+     * other code, `leaveAll` leaves every variant and `leave: false` leaves nothing.
+     */
+    release(
+        channel: string,
+        type: ChannelType = "public",
+        options: {
+            keepExisting?: boolean;
+            leave?: boolean;
+            leaveAll?: boolean;
+        } = {},
+    ): boolean {
+        const name = channelPrefixes[type] + channel;
+        const acquired = acquiredChannels.get(this);
+        const entry = acquired?.get(name);
+
+        if (!acquired || !entry) {
+            return false;
+        }
+
+        entry.count -= 1;
+
+        if (entry.count > 0) {
+            return false;
+        }
+
+        const channels = connectorChannels(this);
+        const replaced =
+            channels !== undefined &&
+            Object.prototype.hasOwnProperty.call(channels, name) &&
+            channels[name] !== entry.channel;
+
+        if (options.keepExisting && (entry.existing || replaced)) {
+            acquired.delete(name);
+
+            return false;
+        }
+
+        if (options.leaveAll) {
+            this.leave(channel);
+        } else if (options.leave !== false) {
+            this.leaveChannel(name);
+        }
+
+        if (acquired.get(name) === entry) {
+            acquired.delete(name);
+        }
+
+        return true;
     }
 
     /**

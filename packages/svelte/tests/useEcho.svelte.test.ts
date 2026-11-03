@@ -35,7 +35,10 @@ const createMockPresenceChannel = () => ({
     whisper: vi.fn(),
 });
 
-vi.mock("laravel-echo", () => {
+vi.mock("laravel-echo", async (importOriginal) => {
+    const { default: ActualEcho } =
+        await importOriginal<typeof import("laravel-echo")>();
+
     const Echo = vi.fn(function (config: unknown) {
         const privateChannel = createMockPrivateChannel();
         const publicChannel = createMockPublicChannel();
@@ -48,6 +51,8 @@ vi.mock("laravel-echo", () => {
             private: vi.fn(() => privateChannel),
             channel: vi.fn(() => publicChannel),
             join: vi.fn(() => presenceChannel),
+            acquire: ActualEcho.prototype.acquire,
+            release: ActualEcho.prototype.release,
             leave: vi.fn(),
             leaveChannel: vi.fn(),
             leaveAllChannels: vi.fn(),
@@ -206,6 +211,23 @@ describe("useEcho (Svelte runes)", () => {
         await tick();
 
         expect(instance.leaveChannel).toHaveBeenCalledWith("private-orders.3");
+    });
+
+    it("keeps the channel while another acquire still holds it", async () => {
+        const { configModule, instance, cleanup } = await mountRune(
+            (echoModule) =>
+                echoModule.useEcho("orders.12", "OrderUpdated", noop),
+        );
+
+        configModule.echo().acquire("orders.12", "private");
+        cleanup();
+        await tick();
+
+        expect(instance.leaveChannel).not.toHaveBeenCalled();
+
+        configModule.echo().release("orders.12", "private");
+
+        expect(instance.leaveChannel).toHaveBeenCalledWith("private-orders.12");
     });
 
     it("can leave a private channel", async () => {

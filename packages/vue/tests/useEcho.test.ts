@@ -17,7 +17,7 @@ import {
     useEchoPublic,
     useSocketId,
 } from "../src/composables/useEcho";
-import { configureEcho } from "../src/config/index";
+import { configureEcho, echo } from "../src/config/index";
 
 const getUnConfiguredTestComponent = (
     channelName: string,
@@ -137,7 +137,10 @@ const getNotificationTestComponent = (
     return mount(TestComponent);
 };
 
-vi.mock("laravel-echo", () => {
+vi.mock("laravel-echo", async (importOriginal) => {
+    const { default: ActualEcho } =
+        await importOriginal<typeof import("laravel-echo")>();
+
     const mockPrivateChannel = {
         leaveChannel: vi.fn(),
         listen: vi.fn(),
@@ -172,6 +175,8 @@ vi.mock("laravel-echo", () => {
     Echo.prototype.leaveChannel = vi.fn();
     Echo.prototype.leaveAllChannels = vi.fn();
     Echo.prototype.join = vi.fn(() => mockPresenceChannel);
+    Echo.prototype.acquire = ActualEcho.prototype.acquire;
+    Echo.prototype.release = ActualEcho.prototype.release;
     Echo.prototype.connectionStatus = vi.fn(() => "connected");
     Echo.prototype.socketId = vi.fn(() => undefined);
     Echo.prototype.connector = { onConnectionChange: vi.fn(() => () => {}) };
@@ -296,6 +301,25 @@ describe("useEcho hook", async () => {
         wrapper2.unmount();
 
         expect(echoInstance.leaveChannel).toHaveBeenCalled();
+    });
+
+    it("keeps the channel while another acquire still holds it", async () => {
+        const mockCallback = vi.fn();
+        const channelName = "test-channel";
+        const event = "test-event";
+
+        wrapper = getTestComponent(channelName, event, mockCallback);
+
+        echo().acquire(channelName, "private");
+        wrapper.unmount();
+
+        expect(echoInstance.leaveChannel).not.toHaveBeenCalled();
+
+        echo().release(channelName, "private");
+
+        expect(echoInstance.leaveChannel).toHaveBeenCalledWith(
+            `private-${channelName}`,
+        );
     });
 
     it("will register callbacks for events", async () => {
