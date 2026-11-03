@@ -40,6 +40,32 @@ export type ConnectionStatus =
     | "failed";
 
 /**
+ * The channel types that can be shared.
+ */
+export type ChannelType = "public" | "private" | "encrypted" | "presence";
+
+/**
+ * A channel held through share(), released through its own handle.
+ */
+export type SharedChannel<C> = {
+    channel: C;
+    /**
+     * Give up this hold, returning whether the channel was left. Calling it again does nothing.
+     */
+    release: () => boolean;
+};
+
+/**
+ * The full channel name prefix for each channel type.
+ */
+const channelPrefixes: Record<ChannelType, string> = {
+    public: "",
+    private: "private-",
+    encrypted: "private-encrypted-",
+    presence: "presence-",
+};
+
+/**
  * This class is the primary API for interacting with broadcasting.
  */
 export default class Echo<T extends keyof Broadcaster> {
@@ -52,6 +78,11 @@ export default class Echo<T extends keyof Broadcaster> {
      * The Echo options.
      */
     options: EchoOptions<T>;
+
+    /**
+     * The number of holds on each channel taken through share(), keyed by full name.
+     */
+    private heldChannels = new Map<string, number>();
 
     /**
      * Create a new class instance.
@@ -73,6 +104,70 @@ export default class Echo<T extends keyof Broadcaster> {
      */
     channel(channel: string): Broadcaster[T]["public"] {
         return this.connector.channel(channel);
+    }
+
+    /**
+     * Share a channel between every holder, leaving it once the last one releases it.
+     */
+    share<V extends ChannelType = "public">(
+        channel: string,
+        type: V = "public" as V,
+    ): SharedChannel<Broadcaster[T][V]> {
+        const name = channelPrefixes[type] + channel;
+
+        this.heldChannels.set(name, (this.heldChannels.get(name) ?? 0) + 1);
+
+        let released = false;
+
+        return {
+            channel: this.channelOfType(channel, type) as Broadcaster[T][V],
+            release: (): boolean => {
+                if (released) {
+                    return false;
+                }
+
+                released = true;
+
+                return this.releaseChannel(name);
+            },
+        };
+    }
+
+    /**
+     * Drop one hold on a shared channel and leave it after the last one.
+     */
+    private releaseChannel(name: string): boolean {
+        const count = (this.heldChannels.get(name) ?? 0) - 1;
+
+        if (count > 0) {
+            this.heldChannels.set(name, count);
+
+            return false;
+        }
+
+        this.heldChannels.delete(name);
+        this.leaveChannel(name);
+
+        return true;
+    }
+
+    /**
+     * Get a channel instance through the public getter for its type.
+     */
+    private channelOfType(channel: string, type: ChannelType): unknown {
+        if (type === "presence") {
+            return this.join(channel);
+        }
+
+        if (type === "private") {
+            return this.private(channel);
+        }
+
+        if (type === "encrypted") {
+            return this.encryptedPrivate(channel);
+        }
+
+        return this.channel(channel);
     }
 
     /**
@@ -136,6 +231,18 @@ export default class Echo<T extends keyof Broadcaster> {
      */
     leaveChannel(channel: string): void {
         this.connector.leaveChannel(channel);
+    }
+
+    /**
+     * Leave the given channel and its private and presence variants, skipping any still held
+     * through share().
+     */
+    leaveUnheld(channel: string): void {
+        for (const prefix of Object.values(channelPrefixes)) {
+            if (!this.heldChannels.has(prefix + channel)) {
+                this.leaveChannel(prefix + channel);
+            }
+        }
     }
 
     /**

@@ -12,7 +12,10 @@ import {
 const getEchoModule = async () => import("../src/hooks/use-echo");
 const getConfigModule = async () => import("../src/config/index");
 
-vi.mock("laravel-echo", () => {
+vi.mock("laravel-echo", async (importOriginal) => {
+    const { default: ActualEcho } =
+        await importOriginal<typeof import("laravel-echo")>();
+
     const mockPrivateChannel = {
         leaveChannel: vi.fn(),
         listen: vi.fn(),
@@ -37,13 +40,24 @@ vi.mock("laravel-echo", () => {
         whisper: vi.fn(),
     };
 
-    const Echo = vi.fn();
+    // Starts from the real Echo methods so share() and its helpers run for real, then mocks the rest
+    const Echo = vi.fn(function (this: { heldChannels: Map<string, unknown> }) {
+        this.heldChannels = new Map();
+    });
+
+    for (const key of Object.getOwnPropertyNames(ActualEcho.prototype)) {
+        if (key !== "constructor") {
+            Echo.prototype[key] =
+                ActualEcho.prototype[key as keyof Echo<"null">];
+        }
+    }
 
     Echo.prototype.private = vi.fn(() => mockPrivateChannel);
     Echo.prototype.channel = vi.fn(() => mockPublicChannel);
     Echo.prototype.encryptedPrivate = vi.fn();
     Echo.prototype.listen = vi.fn();
     Echo.prototype.leave = vi.fn();
+    Echo.prototype.leaveUnheld = vi.fn();
     Echo.prototype.leaveChannel = vi.fn();
     Echo.prototype.leaveAllChannels = vi.fn();
     Echo.prototype.join = vi.fn(() => mockPresenceChannel);
@@ -165,7 +179,7 @@ describe("useEcho hook", async () => {
         expect(echoInstance.leaveChannel).toHaveBeenCalled();
     });
 
-    it("won't subscribe multiple times to the same channel", async () => {
+    it("keeps the channel until the last hook releases it", async () => {
         const mockCallback = vi.fn();
         const channelName = "test-channel";
         const event = "test-event";
@@ -178,8 +192,6 @@ describe("useEcho hook", async () => {
             echoModule.useEcho(channelName, event, mockCallback),
         );
 
-        expect(echoInstance.private).toHaveBeenCalledTimes(1);
-
         expect(() => unmount1()).not.toThrow();
 
         expect(echoInstance.leaveChannel).not.toHaveBeenCalled();
@@ -187,6 +199,46 @@ describe("useEcho hook", async () => {
         expect(() => unmount2()).not.toThrow();
 
         expect(echoInstance.leaveChannel).toHaveBeenCalled();
+    });
+
+    it("keeps the channel while another holder still shares it", async () => {
+        const mockCallback = vi.fn();
+        const channelName = "test-channel";
+        const event = "test-event";
+
+        const { unmount } = renderHook(() =>
+            echoModule.useEcho(channelName, event, mockCallback),
+        );
+
+        const shared = configModule.echo().share(channelName, "private");
+        unmount();
+
+        expect(echoInstance.leaveChannel).not.toHaveBeenCalled();
+
+        shared.release();
+
+        expect(echoInstance.leaveChannel).toHaveBeenCalledWith(
+            `private-${channelName}`,
+        );
+    });
+
+    it("leaves the channel on the instance it joined after Echo is reconfigured", async () => {
+        const { unmount } = renderHook(() =>
+            echoModule.useEcho("test-channel", "test-event", vi.fn()),
+        );
+
+        const joined = configModule.echo();
+
+        configModule.configureEcho({ broadcaster: "null" });
+
+        const constructed = vi.mocked(Echo).mock.instances.length;
+
+        unmount();
+
+        expect(vi.mocked(Echo).mock.instances).toHaveLength(constructed);
+        expect(vi.mocked(echoInstance.leaveChannel).mock.contexts).toEqual([
+            joined,
+        ]);
     });
 
     it("will register callbacks for events", async () => {
@@ -231,7 +283,86 @@ describe("useEcho hook", async () => {
 
         result.current.leave();
 
-        expect(echoInstance.leave).toHaveBeenCalledWith(channelName);
+        expect(echoInstance.leaveUnheld).toHaveBeenCalledWith(channelName);
+    });
+
+    it("keeps the channel for other hooks after one leaves and then unmounts", async () => {
+        const channelName = "test-channel";
+        const first = renderHook(() =>
+            echoModule.useEcho(channelName, "test-event", vi.fn()),
+        );
+        const second = renderHook(() =>
+            echoModule.useEcho(channelName, "test-event", vi.fn()),
+        );
+
+        first.result.current.leaveChannel();
+        first.unmount();
+
+        expect(echoInstance.leaveChannel).not.toHaveBeenCalled();
+
+        second.unmount();
+
+        expect(echoInstance.leaveChannel).toHaveBeenCalledWith(
+            `private-${channelName}`,
+        );
+    });
+
+    it("keeps a variant another holder shares when leaving all variants", async () => {
+        const { default: ActualEcho } =
+            await vi.importActual<typeof import("laravel-echo")>(
+                "laravel-echo",
+            );
+        const channelName = "orders.1";
+        const instance = configModule.echo();
+
+        vi.mocked(instance.leaveUnheld).mockImplementationOnce(
+            ActualEcho.prototype.leaveUnheld,
+        );
+
+        const { result } = renderHook(() =>
+            echoModule.useEcho(channelName, "test-event", vi.fn()),
+        );
+
+        const presence = instance.share(channelName, "presence");
+
+        result.current.leave();
+
+        expect(instance.leaveChannel).toHaveBeenCalledWith(
+            `private-${channelName}`,
+        );
+        expect(instance.leaveChannel).toHaveBeenCalledWith(channelName);
+        expect(instance.leaveChannel).toHaveBeenCalledWith(
+            `private-encrypted-${channelName}`,
+        );
+        expect(instance.leaveChannel).not.toHaveBeenCalledWith(
+            `presence-${channelName}`,
+        );
+
+        presence.release();
+
+        expect(instance.leaveChannel).toHaveBeenLastCalledWith(
+            `presence-${channelName}`,
+        );
+    });
+
+    it("leaves nothing with leave() while another holder still shares the channel", async () => {
+        const channelName = "test-channel";
+        const { result } = renderHook(() =>
+            echoModule.useEcho(channelName, "test-event", vi.fn()),
+        );
+
+        const shared = configModule.echo().share(channelName, "private");
+
+        result.current.leave();
+
+        expect(echoInstance.leaveUnheld).not.toHaveBeenCalled();
+        expect(echoInstance.leaveChannel).not.toHaveBeenCalled();
+
+        shared.release();
+
+        expect(echoInstance.leaveChannel).toHaveBeenCalledWith(
+            `private-${channelName}`,
+        );
     });
 
     it("can connect to a public channel", async () => {
@@ -544,7 +675,7 @@ describe("useEchoModel hook", async () => {
         );
     });
 
-    it("won't subscribe multiple times to the same model channel", async () => {
+    it("keeps the model channel until the last hook releases it", async () => {
         const mockCallback = vi.fn();
         const model = "App.Models.User";
         const identifier = "123";
@@ -569,7 +700,6 @@ describe("useEchoModel hook", async () => {
         );
 
         const expectedChannelName = `${model}.${identifier}`;
-        expect(echoInstance.private).toHaveBeenCalledTimes(1);
         expect(echoInstance.private).toHaveBeenCalledWith(expectedChannelName);
 
         expect(() => unmount1()).not.toThrow();
@@ -622,7 +752,9 @@ describe("useEchoModel hook", async () => {
         result.current.leave();
 
         const expectedChannelName = `${model}.${identifier}`;
-        expect(echoInstance.leave).toHaveBeenCalledWith(expectedChannelName);
+        expect(echoInstance.leaveUnheld).toHaveBeenCalledWith(
+            expectedChannelName,
+        );
     });
 
     it("handles model events with dots in the name", async () => {
@@ -745,7 +877,7 @@ describe("useEchoPublic hook", async () => {
         expect(echoInstance.leaveChannel).toHaveBeenCalledWith(channelName);
     });
 
-    it("won't subscribe multiple times to the same channel", async () => {
+    it("keeps the channel until the last hook releases it", async () => {
         const mockCallback = vi.fn();
         const channelName = "test-channel";
         const event = "test-event";
@@ -758,7 +890,6 @@ describe("useEchoPublic hook", async () => {
             echoModule.useEchoPublic(channelName, event, mockCallback),
         );
 
-        expect(echoInstance.channel).toHaveBeenCalledTimes(1);
         expect(echoInstance.channel).toHaveBeenCalledWith(channelName);
 
         expect(() => unmount1()).not.toThrow();
@@ -793,7 +924,7 @@ describe("useEchoPublic hook", async () => {
 
         result.current.leave();
 
-        expect(echoInstance.leave).toHaveBeenCalledWith(channelName);
+        expect(echoInstance.leaveUnheld).toHaveBeenCalledWith(channelName);
     });
 
     it("events and listeners are optional", async () => {
@@ -903,7 +1034,7 @@ describe("useEchoPresence hook", async () => {
         );
     });
 
-    it("won't subscribe multiple times to the same channel", async () => {
+    it("keeps the channel until the last hook releases it", async () => {
         const mockCallback = vi.fn();
         const channelName = "test-channel";
         const event = "test-event";
@@ -916,7 +1047,6 @@ describe("useEchoPresence hook", async () => {
             echoModule.useEchoPresence(channelName, event, mockCallback),
         );
 
-        expect(echoInstance.join).toHaveBeenCalledTimes(1);
         expect(echoInstance.join).toHaveBeenCalledWith(channelName);
 
         expect(() => unmount1()).not.toThrow();
@@ -955,7 +1085,7 @@ describe("useEchoPresence hook", async () => {
 
         result.current.leave();
 
-        expect(echoInstance.leave).toHaveBeenCalledWith(channelName);
+        expect(echoInstance.leaveUnheld).toHaveBeenCalledWith(channelName);
     });
 
     it("events and listeners are optional", async () => {
@@ -1164,7 +1294,7 @@ describe("useEchoNotification hook", async () => {
         );
     });
 
-    it("won't subscribe multiple times to the same channel", async () => {
+    it("keeps the channel until the last hook releases it", async () => {
         const mockCallback = vi.fn();
         const channelName = "test-channel";
 
@@ -1175,8 +1305,6 @@ describe("useEchoNotification hook", async () => {
         const { unmount: unmount2 } = renderHook(() =>
             echoModule.useEchoNotification(channelName, mockCallback),
         );
-
-        expect(echoInstance.private).toHaveBeenCalledTimes(1);
 
         expect(() => unmount1()).not.toThrow();
         expect(echoInstance.leaveChannel).not.toHaveBeenCalled();
@@ -1212,7 +1340,7 @@ describe("useEchoNotification hook", async () => {
 
         result.current.leave();
 
-        expect(echoInstance.leave).toHaveBeenCalledWith(channelName);
+        expect(echoInstance.leaveUnheld).toHaveBeenCalledWith(channelName);
     });
 
     it("can manually start and stop listening", async () => {

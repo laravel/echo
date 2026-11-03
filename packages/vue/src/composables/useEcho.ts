@@ -1,10 +1,10 @@
+import type Echo from "laravel-echo";
 import { type BroadcastDriver, type ConnectionStatus } from "laravel-echo";
 import { onMounted, onUnmounted, ref, watch, type Ref } from "vue";
 import { echo } from "../config";
 import type {
     BroadcastNotification,
     Channel,
-    ChannelData,
     ChannelReturnType,
     Connection,
     Dependency,
@@ -15,60 +15,32 @@ import type {
 } from "../types";
 import { toArray } from "../util";
 
-const channels: Record<string, ChannelData<BroadcastDriver>> = {};
-
-const resolveChannelSubscription = <T extends BroadcastDriver>(
-    channel: Channel,
-): Connection<T> => {
-    if (channels[channel.id]) {
-        channels[channel.id].count += 1;
-
-        return channels[channel.id].connection;
-    }
-
-    const channelSubscription = subscribeToChannel<T>(channel);
-
-    channels[channel.id] = {
-        count: 1,
-        connection: channelSubscription,
-    };
-
-    return channelSubscription;
+type HeldChannel<T extends BroadcastDriver> = {
+    name: string;
+    instance: Echo<T>;
+    connection: Connection<T>;
+    release: () => boolean;
 };
 
-const subscribeToChannel = <T extends BroadcastDriver>(
+const holdChannel = <T extends BroadcastDriver>(
     channel: Channel,
-): Connection<T> => {
+): HeldChannel<T> => {
     const instance = echo<T>();
+    const { channel: connection, release } = instance.share(
+        channel.name,
+        channel.visibility,
+    );
 
-    if (channel.visibility === "presence") {
-        return instance.join(channel.name);
-    }
-
-    if (channel.visibility === "private") {
-        return instance.private(channel.name);
-    }
-
-    return instance.channel(channel.name);
+    return { name: channel.name, instance, connection, release };
 };
 
-const leaveChannel = (channel: Channel, leaveAll: boolean = false): void => {
-    if (!channels[channel.id]) {
-        return;
-    }
-
-    channels[channel.id].count -= 1;
-
-    if (channels[channel.id].count > 0) {
-        return;
-    }
-
-    delete channels[channel.id];
-
-    if (leaveAll) {
-        echo().leave(channel.name);
-    } else {
-        echo().leaveChannel(channel.id);
+const releaseChannel = <T extends BroadcastDriver>(
+    held: HeldChannel<T> | null,
+    leaveAll: boolean,
+): void => {
+    // Leaving the other variants only once nothing holds this one keeps every holder listening
+    if (held?.release() && leaveAll) {
+        held.instance.leaveUnheld(held.name);
     }
 };
 
@@ -153,17 +125,19 @@ export function useEcho<
 
     const channel: Channel = {
         name: channelName,
-        id: ["private", "presence"].includes(visibility)
-            ? `${visibility}-${channelName}`
-            : channelName,
         visibility,
     };
 
-    const subscription: Connection<TDriver> =
-        resolveChannelSubscription<TDriver>(channel);
+    let held: HeldChannel<TDriver> | null = holdChannel<TDriver>(channel);
+    let subscription: Connection<TDriver> = held.connection;
     const events = Array.isArray(event) ? event : [event];
 
     const setupSubscription = () => {
+        if (!held) {
+            held = holdChannel<TDriver>(channel);
+            subscription = held.connection;
+        }
+
         listen();
     };
 
@@ -193,7 +167,8 @@ export function useEcho<
 
     const tearDown = (leaveAll: boolean = false) => {
         stopListening();
-        leaveChannel(channel, leaveAll);
+        releaseChannel(held, leaveAll);
+        held = null;
     };
 
     onMounted(() => {
@@ -360,17 +335,15 @@ export function useChannel<
 >(channelName: string, visibility: TVisibility = "private" as TVisibility) {
     const channel: Channel = {
         name: channelName,
-        id: ["private", "presence"].includes(visibility)
-            ? `${visibility}-${channelName}`
-            : channelName,
         visibility,
     };
 
-    const subscription: Connection<TDriver> =
-        resolveChannelSubscription<TDriver>(channel);
+    let held: HeldChannel<TDriver> | null = holdChannel<TDriver>(channel);
+    const subscription: Connection<TDriver> = held.connection;
 
     const tearDown = (leaveAll: boolean = false) => {
-        leaveChannel(channel, leaveAll);
+        releaseChannel(held, leaveAll);
+        held = null;
     };
 
     onUnmounted(() => {

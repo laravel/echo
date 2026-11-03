@@ -1,3 +1,4 @@
+import type Echo from "laravel-echo";
 import { type BroadcastDriver, type ConnectionStatus } from "laravel-echo";
 import {
     type DependencyList,
@@ -12,7 +13,6 @@ import { echo } from "../config";
 import type {
     BroadcastNotification,
     Channel,
-    ChannelData,
     ChannelReturnType,
     Connection,
     EventName,
@@ -22,61 +22,33 @@ import type {
 } from "../types";
 import { toArray } from "../util";
 
-const channels: Record<string, ChannelData<BroadcastDriver>> = {};
+type HeldChannel<T extends BroadcastDriver> = {
+    name: string;
+    instance: Echo<T>;
+    connection: Connection<T>;
+    release: () => boolean;
+};
 
-const subscribeToChannel = <T extends BroadcastDriver>(
+const holdChannel = <T extends BroadcastDriver>(
     channel: Channel,
-): Connection<T> => {
+): HeldChannel<T> => {
     const instance = echo<T>();
+    const { channel: connection, release } = instance.share(
+        channel.name,
+        channel.visibility,
+    );
 
-    if (channel.visibility === "presence") {
-        return instance.join(channel.name);
-    }
-
-    if (channel.visibility === "private") {
-        return instance.private(channel.name);
-    }
-
-    return instance.channel(channel.name);
+    return { name: channel.name, instance, connection, release };
 };
 
-const leaveChannel = (channel: Channel, leaveAll: boolean): void => {
-    if (!channels[channel.id]) {
-        return;
+const releaseChannel = <T extends BroadcastDriver>(
+    held: HeldChannel<T> | null,
+    leaveAll: boolean,
+): void => {
+    // Leaving the other variants only once nothing holds this one keeps every holder listening
+    if (held?.release() && leaveAll) {
+        held.instance.leaveUnheld(held.name);
     }
-
-    channels[channel.id].count -= 1;
-
-    if (channels[channel.id].count > 0) {
-        return;
-    }
-
-    if (leaveAll) {
-        echo().leave(channel.name);
-    } else {
-        echo().leaveChannel(channel.id);
-    }
-
-    delete channels[channel.id];
-};
-
-const resolveChannelSubscription = <T extends BroadcastDriver>(
-    channel: Channel,
-): Connection<T> => {
-    if (channels[channel.id]) {
-        channels[channel.id].count += 1;
-
-        return channels[channel.id].connection;
-    }
-
-    const channelSubscription = subscribeToChannel<T>(channel);
-
-    channels[channel.id] = {
-        count: 1,
-        connection: channelSubscription,
-    };
-
-    return channelSubscription;
 };
 
 // Overload for automatic type inference from event name
@@ -151,9 +123,6 @@ export function useEcho<
     const channel: Channel = useMemo(
         () => ({
             name: channelName,
-            id: ["private", "presence"].includes(visibility)
-                ? `${visibility}-${channelName}`
-                : channelName,
             visibility,
         }),
         [channelName, visibility],
@@ -163,6 +132,7 @@ export function useEcho<
     // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/use-memo
     const callbackFunc = useCallback(callback, dependencies);
     const listening = useRef(false);
+    const held = useRef<HeldChannel<TDriver> | null>(null);
     const subscription = useRef<Connection<TDriver> | null>(null);
 
     const eventKey = Array.isArray(event) ? JSON.stringify(event) : event;
@@ -197,10 +167,10 @@ export function useEcho<
     const tearDown = useCallback(
         (leaveAll: boolean = false) => {
             stopListening();
-
-            leaveChannel(channel, leaveAll);
+            releaseChannel(held.current, leaveAll);
+            held.current = null;
         },
-        [stopListening, channel],
+        [stopListening],
     );
 
     const leave = useCallback(() => {
@@ -208,7 +178,8 @@ export function useEcho<
     }, [tearDown]);
 
     useEffect(() => {
-        subscription.current = resolveChannelSubscription<TDriver>(channel);
+        held.current = holdChannel<TDriver>(channel);
+        subscription.current = held.current.connection;
 
         listen();
 
@@ -393,29 +364,26 @@ export function useChannel<
     const channel: Channel = useMemo(
         () => ({
             name: channelName,
-            id: ["private", "presence"].includes(visibility)
-                ? `${visibility}-${channelName}`
-                : channelName,
             visibility,
         }),
         [channelName, visibility],
     );
 
+    const held = useRef<HeldChannel<TDriver> | null>(null);
     const subscription = useRef<Connection<TDriver> | null>(null);
 
-    const tearDown = useCallback(
-        (leaveAll: boolean = false) => {
-            leaveChannel(channel, leaveAll);
-        },
-        [channel],
-    );
+    const tearDown = useCallback((leaveAll: boolean = false) => {
+        releaseChannel(held.current, leaveAll);
+        held.current = null;
+    }, []);
 
     const leave = useCallback(() => {
         tearDown(true);
     }, [tearDown]);
 
     useEffect(() => {
-        subscription.current = resolveChannelSubscription<TDriver>(channel);
+        held.current = holdChannel<TDriver>(channel);
+        subscription.current = held.current.connection;
 
         return () => tearDown();
     }, [tearDown, channel]);

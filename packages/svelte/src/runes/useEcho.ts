@@ -5,7 +5,6 @@ import type {
     BroadcastNotification,
     CallbackInput,
     Channel,
-    ChannelData,
     ChannelReturnType,
     Connection,
     Dependency,
@@ -17,77 +16,32 @@ import type {
 } from "../types";
 import { toArray } from "../util";
 
-const channels: Record<string, ChannelData<BroadcastDriver>> = {};
-let activeEchoInstance: Echo<BroadcastDriver> | null = null;
-
-const clearChannelCache = (): void => {
-    Object.keys(channels).forEach((channelId) => {
-        delete channels[channelId];
-    });
+type HeldChannel<T extends BroadcastDriver> = {
+    name: string;
+    instance: Echo<T>;
+    connection: Connection<T>;
+    release: () => boolean;
 };
 
-const resolveChannelSubscription = <T extends BroadcastDriver>(
+const holdChannel = <T extends BroadcastDriver>(
     channel: Channel,
-): Connection<T> => {
+): HeldChannel<T> => {
     const instance = echo<T>();
+    const { channel: connection, release } = instance.share(
+        channel.name,
+        channel.visibility,
+    );
 
-    if (
-        activeEchoInstance !== null &&
-        activeEchoInstance !== (instance as Echo<BroadcastDriver>)
-    ) {
-        clearChannelCache();
-    }
-
-    activeEchoInstance = instance;
-
-    if (channels[channel.id]) {
-        channels[channel.id].count += 1;
-
-        return channels[channel.id].connection;
-    }
-
-    const channelSubscription = subscribeToChannel<T>(instance, channel);
-
-    channels[channel.id] = {
-        count: 1,
-        connection: channelSubscription,
-    };
-
-    return channelSubscription;
+    return { name: channel.name, instance, connection, release };
 };
 
-const subscribeToChannel = <T extends BroadcastDriver>(
-    instance: Echo<T>,
-    channel: Channel,
-): Connection<T> => {
-    if (channel.visibility === "presence") {
-        return instance.join(channel.name);
-    }
-
-    if (channel.visibility === "private") {
-        return instance.private(channel.name);
-    }
-
-    return instance.channel(channel.name);
-};
-
-const leaveChannel = (channel: Channel, leaveAll: boolean = false): void => {
-    if (!channels[channel.id]) {
-        return;
-    }
-
-    channels[channel.id].count -= 1;
-
-    if (channels[channel.id].count > 0) {
-        return;
-    }
-
-    delete channels[channel.id];
-
-    if (leaveAll) {
-        echo().leave(channel.name);
-    } else {
-        echo().leaveChannel(channel.id);
+const releaseChannel = <T extends BroadcastDriver>(
+    held: HeldChannel<T> | null,
+    leaveAll: boolean,
+): void => {
+    // Leaving the other variants only once nothing holds this one keeps every holder listening
+    if (held?.release() && leaveAll) {
+        held.instance.leaveUnheld(held.name);
     }
 };
 
@@ -131,9 +85,6 @@ const resolveChannel = <TVisibility extends Channel["visibility"]>(
 
     return {
         name: resolvedChannelName,
-        id: ["private", "presence"].includes(visibility)
-            ? `${visibility}-${resolvedChannelName}`
-            : resolvedChannelName,
         visibility,
     };
 };
@@ -208,11 +159,10 @@ export function useEcho<
     visibility: TVisibility = "private" as TVisibility,
 ) {
     let listening = false;
-    let initialized = false;
     let channel = resolveChannel(channelName, visibility);
     let events = toArray(resolveInput(event));
-    let subscription: Connection<TDriver> =
-        resolveChannelSubscription<TDriver>(channel);
+    let held: HeldChannel<TDriver> | null = holdChannel<TDriver>(channel);
+    let subscription: Connection<TDriver> = held.connection;
 
     const eventCallback = (payload: TPayload) => {
         resolveCallback(callback)(payload);
@@ -244,7 +194,8 @@ export function useEcho<
 
     const tearDown = (leaveAll: boolean = false) => {
         stopListening();
-        leaveChannel(channel, leaveAll);
+        releaseChannel(held, leaveAll);
+        held = null;
     };
 
     $effect(() => {
@@ -252,11 +203,11 @@ export function useEcho<
         channel = resolveChannel(channelName, visibility);
         events = toArray(resolveInput(event));
 
-        if (initialized) {
-            subscription = resolveChannelSubscription<TDriver>(channel);
+        if (!held) {
+            held = holdChannel<TDriver>(channel);
+            subscription = held.connection;
         }
 
-        initialized = true;
         listen();
 
         return () => tearDown();
@@ -416,17 +367,23 @@ export function useChannel<
     channelName: ReactiveInput<string>,
     visibility: TVisibility = "private" as TVisibility,
 ) {
-    let channel = resolveChannel(channelName, visibility);
-    let subscription: Connection<TDriver> =
-        resolveChannelSubscription<TDriver>(channel);
+    let held: HeldChannel<TDriver> | null = holdChannel<TDriver>(
+        resolveChannel(channelName, visibility),
+    );
+    let subscription: Connection<TDriver> = held.connection;
 
     const tearDown = (leaveAll: boolean = false) => {
-        leaveChannel(channel, leaveAll);
+        releaseChannel(held, leaveAll);
+        held = null;
     };
 
     $effect(() => {
-        channel = resolveChannel(channelName, visibility);
-        subscription = resolveChannelSubscription<TDriver>(channel);
+        const channel = resolveChannel(channelName, visibility);
+
+        if (!held) {
+            held = holdChannel<TDriver>(channel);
+            subscription = held.connection;
+        }
 
         return () => tearDown();
     });

@@ -17,7 +17,7 @@ import {
     useEchoPublic,
     useSocketId,
 } from "../src/composables/useEcho";
-import { configureEcho } from "../src/config/index";
+import { configureEcho, echo } from "../src/config/index";
 
 const getUnConfiguredTestComponent = (
     channelName: string,
@@ -36,6 +36,10 @@ const getUnConfiguredTestComponent = (
 
     return mount(TestComponent);
 };
+
+// Mounts against the Echo instance already configured, since configureEcho() replaces it
+const mountWithoutConfiguring = (setup: () => Record<string, unknown>) =>
+    mount(defineComponent({ setup, template: "<div></div>" }));
 
 const getTestComponent = (
     channelName: string,
@@ -137,7 +141,10 @@ const getNotificationTestComponent = (
     return mount(TestComponent);
 };
 
-vi.mock("laravel-echo", () => {
+vi.mock("laravel-echo", async (importOriginal) => {
+    const { default: ActualEcho } =
+        await importOriginal<typeof import("laravel-echo")>();
+
     const mockPrivateChannel = {
         leaveChannel: vi.fn(),
         listen: vi.fn(),
@@ -162,13 +169,24 @@ vi.mock("laravel-echo", () => {
         whisper: vi.fn(),
     };
 
-    const Echo = vi.fn();
+    // Starts from the real Echo methods so share() and its helpers run for real, then mocks the rest
+    const Echo = vi.fn(function (this: { heldChannels: Map<string, unknown> }) {
+        this.heldChannels = new Map();
+    });
+
+    for (const key of Object.getOwnPropertyNames(ActualEcho.prototype)) {
+        if (key !== "constructor") {
+            Echo.prototype[key] =
+                ActualEcho.prototype[key as keyof Echo<"null">];
+        }
+    }
 
     Echo.prototype.private = vi.fn(() => mockPrivateChannel);
     Echo.prototype.channel = vi.fn(() => mockPublicChannel);
     Echo.prototype.encryptedPrivate = vi.fn();
     Echo.prototype.listen = vi.fn();
     Echo.prototype.leave = vi.fn();
+    Echo.prototype.leaveUnheld = vi.fn();
     Echo.prototype.leaveChannel = vi.fn();
     Echo.prototype.leaveAllChannels = vi.fn();
     Echo.prototype.join = vi.fn(() => mockPresenceChannel);
@@ -278,16 +296,16 @@ describe("useEcho hook", async () => {
         expect(echoInstance.leaveChannel).toHaveBeenCalled();
     });
 
-    it("won't subscribe multiple times to the same channel", async () => {
+    it("keeps the channel until the last hook releases it", async () => {
         const mockCallback = vi.fn();
         const channelName = "test-channel";
         const event = "test-event";
 
         wrapper = getTestComponent(channelName, event, mockCallback);
 
-        const wrapper2 = getTestComponent(channelName, event, mockCallback);
-
-        expect(echoInstance.private).toHaveBeenCalledTimes(1);
+        const wrapper2 = mountWithoutConfiguring(() =>
+            useEcho(channelName, event, mockCallback),
+        );
 
         wrapper.unmount();
 
@@ -296,6 +314,46 @@ describe("useEcho hook", async () => {
         wrapper2.unmount();
 
         expect(echoInstance.leaveChannel).toHaveBeenCalled();
+    });
+
+    it("keeps the channel for other components after one leaves and then unmounts", async () => {
+        const channelName = "test-channel";
+
+        wrapper = getTestComponent(channelName, "test-event", vi.fn());
+
+        const wrapper2 = mountWithoutConfiguring(() =>
+            useEcho(channelName, "test-event", vi.fn()),
+        );
+
+        wrapper.vm.leaveChannel();
+        wrapper.unmount();
+
+        expect(echoInstance.leaveChannel).not.toHaveBeenCalled();
+
+        wrapper2.unmount();
+
+        expect(echoInstance.leaveChannel).toHaveBeenCalledWith(
+            `private-${channelName}`,
+        );
+    });
+
+    it("keeps the channel while another holder still shares it", async () => {
+        const mockCallback = vi.fn();
+        const channelName = "test-channel";
+        const event = "test-event";
+
+        wrapper = getTestComponent(channelName, event, mockCallback);
+
+        const shared = echo().share(channelName, "private");
+        wrapper.unmount();
+
+        expect(echoInstance.leaveChannel).not.toHaveBeenCalled();
+
+        shared.release();
+
+        expect(echoInstance.leaveChannel).toHaveBeenCalledWith(
+            `private-${channelName}`,
+        );
     });
 
     it("will register callbacks for events", async () => {
@@ -336,7 +394,7 @@ describe("useEcho hook", async () => {
 
         wrapper.vm.leave();
 
-        expect(echoInstance.leave).toHaveBeenCalledWith(channelName);
+        expect(echoInstance.leaveUnheld).toHaveBeenCalledWith(channelName);
     });
 
     it("can connect to a public channel", async () => {
@@ -542,20 +600,17 @@ describe("useEchoPublic hook", async () => {
         expect(echoInstance.leaveChannel).toHaveBeenCalledWith(channelName);
     });
 
-    it("won't subscribe multiple times to the same channel", async () => {
+    it("keeps the channel until the last hook releases it", async () => {
         const mockCallback = vi.fn();
         const channelName = "test-channel";
         const event = "test-event";
 
         wrapper = getPublicTestComponent(channelName, event, mockCallback);
 
-        const wrapper2 = getPublicTestComponent(
-            channelName,
-            event,
-            mockCallback,
+        const wrapper2 = mountWithoutConfiguring(() =>
+            useEchoPublic(channelName, event, mockCallback),
         );
 
-        expect(echoInstance.channel).toHaveBeenCalledTimes(1);
         expect(echoInstance.channel).toHaveBeenCalledWith(channelName);
 
         wrapper.unmount();
@@ -586,7 +641,7 @@ describe("useEchoPublic hook", async () => {
 
         wrapper.vm.leave();
 
-        expect(echoInstance.leave).toHaveBeenCalledWith(channelName);
+        expect(echoInstance.leaveUnheld).toHaveBeenCalledWith(channelName);
     });
 
     it("events and listeners are optional", async () => {
@@ -681,20 +736,17 @@ describe("useEchoPresence hook", async () => {
         );
     });
 
-    it("won't subscribe multiple times to the same channel", async () => {
+    it("keeps the channel until the last hook releases it", async () => {
         const mockCallback = vi.fn();
         const channelName = "test-channel";
         const event = "test-event";
 
         wrapper = getPresenceTestComponent(channelName, event, mockCallback);
 
-        const wrapper2 = getPresenceTestComponent(
-            channelName,
-            event,
-            mockCallback,
+        const wrapper2 = mountWithoutConfiguring(() =>
+            useEchoPresence(channelName, event, mockCallback),
         );
 
-        expect(echoInstance.join).toHaveBeenCalledTimes(1);
         expect(echoInstance.join).toHaveBeenCalledWith(channelName);
 
         wrapper.unmount();
@@ -729,7 +781,7 @@ describe("useEchoPresence hook", async () => {
 
         wrapper.vm.leave();
 
-        expect(echoInstance.leave).toHaveBeenCalledWith(channelName);
+        expect(echoInstance.leaveUnheld).toHaveBeenCalledWith(channelName);
     });
 
     it("events and listeners are optional", async () => {
@@ -946,7 +998,7 @@ describe("useEchoNotification hook", async () => {
         );
     });
 
-    it("won't subscribe multiple times to the same channel", async () => {
+    it("keeps the channel until the last hook releases it", async () => {
         const mockCallback = vi.fn();
         const channelName = "test-channel";
 
@@ -956,13 +1008,9 @@ describe("useEchoNotification hook", async () => {
             undefined,
         );
 
-        const wrapper2 = getNotificationTestComponent(
-            channelName,
-            mockCallback,
-            undefined,
+        const wrapper2 = mountWithoutConfiguring(() =>
+            useEchoNotification(channelName, mockCallback, undefined),
         );
-
-        expect(echoInstance.private).toHaveBeenCalledTimes(1);
 
         wrapper.unmount();
         expect(echoInstance.leaveChannel).not.toHaveBeenCalled();
@@ -1002,7 +1050,7 @@ describe("useEchoNotification hook", async () => {
 
         wrapper.vm.leave();
 
-        expect(echoInstance.leave).toHaveBeenCalledWith(channelName);
+        expect(echoInstance.leaveUnheld).toHaveBeenCalledWith(channelName);
     });
 
     it("can manually start and stop listening", async () => {

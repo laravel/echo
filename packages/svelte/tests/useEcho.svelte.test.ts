@@ -35,7 +35,10 @@ const createMockPresenceChannel = () => ({
     whisper: vi.fn(),
 });
 
-vi.mock("laravel-echo", () => {
+vi.mock("laravel-echo", async (importOriginal) => {
+    const { default: ActualEcho } =
+        await importOriginal<typeof import("laravel-echo")>();
+
     const Echo = vi.fn(function (config: unknown) {
         const privateChannel = createMockPrivateChannel();
         const publicChannel = createMockPublicChannel();
@@ -48,7 +51,9 @@ vi.mock("laravel-echo", () => {
             private: vi.fn(() => privateChannel),
             channel: vi.fn(() => publicChannel),
             join: vi.fn(() => presenceChannel),
+            heldChannels: new Map(),
             leave: vi.fn(),
+            leaveUnheld: vi.fn(),
             leaveChannel: vi.fn(),
             leaveAllChannels: vi.fn(),
             connectionStatus: vi.fn(() => "connected"),
@@ -69,6 +74,8 @@ vi.mock("laravel-echo", () => {
             __unsubscribe: unsubscribe,
         };
 
+        // Inherits share() and its helpers from the real Echo, so only the connector-facing calls are mocked
+        Object.setPrototypeOf(instance, ActualEcho.prototype);
         echoInstances.push(instance);
 
         return instance;
@@ -181,7 +188,7 @@ describe("useEcho (Svelte runes)", () => {
         expect(instance.leaveChannel).toHaveBeenCalledWith("private-orders.2");
     });
 
-    it("subscribes once for identical private channels and leaves after last teardown", async () => {
+    it("shares identical private channels and leaves after last teardown", async () => {
         const { echoModule, instance } = await setupConfiguredEcho();
 
         const cleanupA = $effect.root(() => {
@@ -194,7 +201,6 @@ describe("useEcho (Svelte runes)", () => {
 
         await tick();
 
-        expect(instance.private).toHaveBeenCalledTimes(1);
         expect(instance.__privateChannel.listen).toHaveBeenCalledTimes(2);
 
         cleanupA();
@@ -206,6 +212,23 @@ describe("useEcho (Svelte runes)", () => {
         await tick();
 
         expect(instance.leaveChannel).toHaveBeenCalledWith("private-orders.3");
+    });
+
+    it("keeps the channel while another holder still shares it", async () => {
+        const { configModule, instance, cleanup } = await mountRune(
+            (echoModule) =>
+                echoModule.useEcho("orders.12", "OrderUpdated", noop),
+        );
+
+        const shared = configModule.echo().share("orders.12", "private");
+        cleanup();
+        await tick();
+
+        expect(instance.leaveChannel).not.toHaveBeenCalled();
+
+        shared.release();
+
+        expect(instance.leaveChannel).toHaveBeenCalledWith("private-orders.12");
     });
 
     it("can leave a private channel", async () => {
@@ -225,7 +248,7 @@ describe("useEcho (Svelte runes)", () => {
         );
 
         value.leave();
-        expect(instance.leave).toHaveBeenCalledWith("orders.4");
+        expect(instance.leaveUnheld).toHaveBeenCalledWith("orders.4");
 
         cleanup();
     });
@@ -426,7 +449,7 @@ describe("useEcho (Svelte runes)", () => {
         cleanup();
     });
 
-    it("clears stale channel cache when configureEcho swaps instances", async () => {
+    it("keeps each instance's channels apart when configureEcho swaps instances", async () => {
         const {
             echoModule,
             configModule,
@@ -455,8 +478,30 @@ describe("useEcho (Svelte runes)", () => {
         expect(secondInstance).not.toBe(firstInstance);
         expect(secondInstance.private).toHaveBeenCalledTimes(1);
 
-        secondCleanup();
         firstCleanup();
+        await tick();
+
+        expect(secondInstance.leaveChannel).not.toHaveBeenCalled();
+
+        secondCleanup();
+        await tick();
+
+        expect(secondInstance.leaveChannel).toHaveBeenCalledWith(
+            "private-orders.9",
+        );
+    });
+
+    it("leaves a useChannel channel when its only holder tears down", async () => {
+        const { instance, cleanup } = await mountRune((echoModule) =>
+            echoModule.useChannel("orders.13"),
+        );
+
+        expect(instance.private).toHaveBeenCalledTimes(1);
+
+        cleanup();
+        await tick();
+
+        expect(instance.leaveChannel).toHaveBeenCalledWith("private-orders.13");
     });
 });
 
