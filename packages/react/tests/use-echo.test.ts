@@ -279,6 +279,27 @@ describe("useEcho hook", async () => {
         expect(echoInstance.leaveUnheld).toHaveBeenCalledWith(channelName);
     });
 
+    it("keeps the channel for other hooks after one leaves and then unmounts", async () => {
+        const channelName = "test-channel";
+        const first = renderHook(() =>
+            echoModule.useEcho(channelName, "test-event", vi.fn()),
+        );
+        const second = renderHook(() =>
+            echoModule.useEcho(channelName, "test-event", vi.fn()),
+        );
+
+        first.result.current.leaveChannel();
+        first.unmount();
+
+        expect(echoInstance.leaveChannel).not.toHaveBeenCalled();
+
+        second.unmount();
+
+        expect(echoInstance.leaveChannel).toHaveBeenCalledWith(
+            `private-${channelName}`,
+        );
+    });
+
     it("keeps a variant another holder borrowed when leaving all variants", async () => {
         const { default: ActualEcho } =
             await vi.importActual<typeof import("laravel-echo")>(

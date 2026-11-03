@@ -448,7 +448,7 @@ describe("useEcho (Svelte runes)", () => {
         cleanup();
     });
 
-    it("clears stale channel cache when configureEcho swaps instances", async () => {
+    it("keeps each instance's channels apart when configureEcho swaps instances", async () => {
         const {
             echoModule,
             configModule,
@@ -477,8 +477,30 @@ describe("useEcho (Svelte runes)", () => {
         expect(secondInstance).not.toBe(firstInstance);
         expect(secondInstance.private).toHaveBeenCalledTimes(1);
 
-        secondCleanup();
         firstCleanup();
+        await tick();
+
+        expect(secondInstance.leaveChannel).not.toHaveBeenCalled();
+
+        secondCleanup();
+        await tick();
+
+        expect(secondInstance.leaveChannel).toHaveBeenCalledWith(
+            "private-orders.9",
+        );
+    });
+
+    it("leaves a useChannel channel when its only holder tears down", async () => {
+        const { instance, cleanup } = await mountRune((echoModule) =>
+            echoModule.useChannel("orders.13"),
+        );
+
+        expect(instance.private).toHaveBeenCalledTimes(1);
+
+        cleanup();
+        await tick();
+
+        expect(instance.leaveChannel).toHaveBeenCalledWith("private-orders.13");
     });
 });
 

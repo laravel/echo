@@ -37,6 +37,10 @@ const getUnConfiguredTestComponent = (
     return mount(TestComponent);
 };
 
+// Mounts against the Echo instance already configured, since configureEcho() replaces it
+const mountWithoutConfiguring = (setup: () => Record<string, unknown>) =>
+    mount(defineComponent({ setup, template: "<div></div>" }));
+
 const getTestComponent = (
     channelName: string,
     event: string | string[] | undefined,
@@ -290,7 +294,9 @@ describe("useEcho hook", async () => {
 
         wrapper = getTestComponent(channelName, event, mockCallback);
 
-        const wrapper2 = getTestComponent(channelName, event, mockCallback);
+        const wrapper2 = mountWithoutConfiguring(() =>
+            useEcho(channelName, event, mockCallback),
+        );
 
         expect(echoInstance.private).toHaveBeenCalledTimes(1);
 
@@ -301,6 +307,27 @@ describe("useEcho hook", async () => {
         wrapper2.unmount();
 
         expect(echoInstance.leaveChannel).toHaveBeenCalled();
+    });
+
+    it("keeps the channel for other components after one leaves and then unmounts", async () => {
+        const channelName = "test-channel";
+
+        wrapper = getTestComponent(channelName, "test-event", vi.fn());
+
+        const wrapper2 = mountWithoutConfiguring(() =>
+            useEcho(channelName, "test-event", vi.fn()),
+        );
+
+        wrapper.vm.leaveChannel();
+        wrapper.unmount();
+
+        expect(echoInstance.leaveChannel).not.toHaveBeenCalled();
+
+        wrapper2.unmount();
+
+        expect(echoInstance.leaveChannel).toHaveBeenCalledWith(
+            `private-${channelName}`,
+        );
     });
 
     it("keeps the channel while another holder still shares it", async () => {
@@ -573,10 +600,8 @@ describe("useEchoPublic hook", async () => {
 
         wrapper = getPublicTestComponent(channelName, event, mockCallback);
 
-        const wrapper2 = getPublicTestComponent(
-            channelName,
-            event,
-            mockCallback,
+        const wrapper2 = mountWithoutConfiguring(() =>
+            useEchoPublic(channelName, event, mockCallback),
         );
 
         expect(echoInstance.channel).toHaveBeenCalledTimes(1);
@@ -712,10 +737,8 @@ describe("useEchoPresence hook", async () => {
 
         wrapper = getPresenceTestComponent(channelName, event, mockCallback);
 
-        const wrapper2 = getPresenceTestComponent(
-            channelName,
-            event,
-            mockCallback,
+        const wrapper2 = mountWithoutConfiguring(() =>
+            useEchoPresence(channelName, event, mockCallback),
         );
 
         expect(echoInstance.join).toHaveBeenCalledTimes(1);
@@ -980,10 +1003,8 @@ describe("useEchoNotification hook", async () => {
             undefined,
         );
 
-        const wrapper2 = getNotificationTestComponent(
-            channelName,
-            mockCallback,
-            undefined,
+        const wrapper2 = mountWithoutConfiguring(() =>
+            useEchoNotification(channelName, mockCallback, undefined),
         );
 
         expect(echoInstance.private).toHaveBeenCalledTimes(1);

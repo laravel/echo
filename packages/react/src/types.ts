@@ -5,11 +5,6 @@ export type Connection<T extends BroadcastDriver> =
     | Broadcaster[T]["private"]
     | Broadcaster[T]["presence"];
 
-export type ChannelData<T extends BroadcastDriver> = {
-    count: number;
-    connection: Connection<T>;
-};
-
 export type Channel = {
     name: string;
     id: string;
