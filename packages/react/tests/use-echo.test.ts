@@ -192,7 +192,6 @@ describe("useEcho hook", async () => {
             echoModule.useEcho(channelName, event, mockCallback),
         );
 
-
         expect(() => unmount1()).not.toThrow();
 
         expect(echoInstance.leaveChannel).not.toHaveBeenCalled();
@@ -1306,7 +1305,6 @@ describe("useEchoNotification hook", async () => {
         const { unmount: unmount2 } = renderHook(() =>
             echoModule.useEchoNotification(channelName, mockCallback),
         );
-
 
         expect(() => unmount1()).not.toThrow();
         expect(echoInstance.leaveChannel).not.toHaveBeenCalled();

@@ -307,7 +307,6 @@ describe("useEcho hook", async () => {
             useEcho(channelName, event, mockCallback),
         );
 
-
         wrapper.unmount();
 
         expect(echoInstance.leaveChannel).not.toHaveBeenCalled();
@@ -1012,7 +1011,6 @@ describe("useEchoNotification hook", async () => {
         const wrapper2 = mountWithoutConfiguring(() =>
             useEchoNotification(channelName, mockCallback, undefined),
         );
-
 
         wrapper.unmount();
         expect(echoInstance.leaveChannel).not.toHaveBeenCalled();
