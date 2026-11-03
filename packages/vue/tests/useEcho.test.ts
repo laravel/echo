@@ -169,7 +169,17 @@ vi.mock("laravel-echo", async (importOriginal) => {
         whisper: vi.fn(),
     };
 
-    const Echo = vi.fn();
+    // Starts from the real Echo methods so share() and its helpers run for real, then mocks the rest
+    const Echo = vi.fn(function (this: { heldChannels: Map<string, unknown> }) {
+        this.heldChannels = new Map();
+    });
+
+    for (const key of Object.getOwnPropertyNames(ActualEcho.prototype)) {
+        if (key !== "constructor") {
+            Echo.prototype[key] =
+                ActualEcho.prototype[key as keyof Echo<"null">];
+        }
+    }
 
     Echo.prototype.private = vi.fn(() => mockPrivateChannel);
     Echo.prototype.channel = vi.fn(() => mockPublicChannel);
@@ -180,7 +190,6 @@ vi.mock("laravel-echo", async (importOriginal) => {
     Echo.prototype.leaveChannel = vi.fn();
     Echo.prototype.leaveAllChannels = vi.fn();
     Echo.prototype.join = vi.fn(() => mockPresenceChannel);
-    Echo.prototype.share = ActualEcho.prototype.share;
     Echo.prototype.connectionStatus = vi.fn(() => "connected");
     Echo.prototype.socketId = vi.fn(() => undefined);
     Echo.prototype.connector = { onConnectionChange: vi.fn(() => () => {}) };

@@ -51,7 +51,7 @@ vi.mock("laravel-echo", async (importOriginal) => {
             private: vi.fn(() => privateChannel),
             channel: vi.fn(() => publicChannel),
             join: vi.fn(() => presenceChannel),
-            share: ActualEcho.prototype.share,
+            heldChannels: new Map(),
             leave: vi.fn(),
             leaveUnheld: vi.fn(),
             leaveChannel: vi.fn(),
@@ -74,6 +74,8 @@ vi.mock("laravel-echo", async (importOriginal) => {
             __unsubscribe: unsubscribe,
         };
 
+        // Inherits share() and its helpers from the real Echo, so only the connector-facing calls are mocked
+        Object.setPrototypeOf(instance, ActualEcho.prototype);
         echoInstances.push(instance);
 
         return instance;

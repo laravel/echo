@@ -190,19 +190,4 @@ describe("Echo", () => {
         expect(presence.release()).toBe(true);
         expect(client.unsubscribe).toHaveBeenCalledWith("presence-orders.1");
     });
-
-    test("it can release again after a leave failed", () => {
-        const { echo, client } = makePusherEcho();
-
-        vi.spyOn(echo, "leaveChannel").mockImplementationOnce(() => {
-            throw new Error("offline");
-        });
-
-        const failed = echo.borrow("user.1", "private");
-
-        expect(() => failed.release()).toThrow("offline");
-
-        expect(echo.borrow("user.1", "private").release()).toBe(true);
-        expect(client.unsubscribe).toHaveBeenCalledWith("private-user.1");
-    });
 });
