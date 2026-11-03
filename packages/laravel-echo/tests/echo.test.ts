@@ -144,6 +144,29 @@ describe("Echo", () => {
         expect(client.unsubscribe).toHaveBeenCalledWith("private-user.1");
     });
 
+    test.each([
+        ["share() releases last", ["borrowed", "shared"]],
+        ["borrow() releases last", ["shared", "borrowed"]],
+    ] as const)(
+        "it leaves a channel joined before it was held once a share() holder lets go, when %s",
+        (_, order) => {
+            const { echo, client } = makePusherEcho();
+
+            echo.private("user.1");
+
+            const holds = {
+                shared: echo.share("user.1", "private"),
+                borrowed: echo.borrow("user.1", "private"),
+            };
+
+            expect(holds[order[0]].release()).toBe(false);
+            expect(client.unsubscribe).not.toHaveBeenCalled();
+
+            expect(holds[order[1]].release()).toBe(true);
+            expect(client.unsubscribe).toHaveBeenCalledWith("private-user.1");
+        },
+    );
+
     test("it never leaves a borrowed channel other code joined again after it was left", () => {
         const { echo, client } = makePusherEcho();
         const borrowed = echo.borrow("user.1", "private");

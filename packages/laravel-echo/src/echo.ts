@@ -68,7 +68,12 @@ const channelPrefixes: Record<ChannelType, string> = {
 /**
  * A channel held through share() or borrow().
  */
-type HeldChannel = { count: number; existing: boolean; channel: unknown };
+type HeldChannel = {
+    count: number;
+    existing: boolean;
+    shared: boolean;
+    channel: unknown;
+};
 
 /**
  * This class is the primary API for interacting with broadcasting.
@@ -152,6 +157,7 @@ export default class Echo<T extends keyof Broadcaster> {
             entry = {
                 count: 0,
                 existing,
+                shared: false,
                 channel: this.channelOfType(channel, type),
             };
 
@@ -163,6 +169,7 @@ export default class Echo<T extends keyof Broadcaster> {
         }
 
         entry.count += 1;
+        entry.shared ||= !borrowed;
 
         let released = false;
 
@@ -175,7 +182,7 @@ export default class Echo<T extends keyof Broadcaster> {
 
                 released = true;
 
-                return this.releaseChannel(name, borrowed);
+                return this.releaseChannel(name);
             },
         };
     }
@@ -183,7 +190,7 @@ export default class Echo<T extends keyof Broadcaster> {
     /**
      * Drop one hold on a shared channel and leave it after the last one.
      */
-    private releaseChannel(name: string, borrowed: boolean): boolean {
+    private releaseChannel(name: string): boolean {
         const entry = this.heldChannels.get(name);
 
         if (!entry) {
@@ -204,7 +211,8 @@ export default class Echo<T extends keyof Broadcaster> {
             Object.prototype.hasOwnProperty.call(channels, name) &&
             channels[name] !== entry.channel;
 
-        if (borrowed && (entry.existing || replaced)) {
+        // Deciding from every holder, not just the last to release, keeps the result independent of release order
+        if (!entry.shared && (entry.existing || replaced)) {
             return false;
         }
 
