@@ -50,9 +50,9 @@ const leaveChannel = (channel: Channel, leaveAll: boolean): void => {
 
     delete channels[channel.id];
 
-    // Leaving every variant only once nothing else holds this one keeps other holders listening
+    // Leaving the other variants only once nothing holds this one keeps every holder listening
     if (release() && leaveAll) {
-        instance.leave(channel.name);
+        instance.leaveUnheld(channel.name);
     }
 };
 

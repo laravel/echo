@@ -341,6 +341,22 @@ export default class Echo<T extends keyof Broadcaster> {
     }
 
     /**
+     * Leave the given channel and its private and presence variants, skipping any still held
+     * through share() or borrow().
+     */
+    leaveUnheld(channel: string): void {
+        const held = heldChannels.get(this);
+
+        for (const prefix of Object.values(channelPrefixes)) {
+            const name = prefix + channel;
+
+            if ((held?.get(name)?.count ?? 0) === 0) {
+                this.leaveChannel(name);
+            }
+        }
+    }
+
+    /**
      * Leave all channels.
      */
     leaveAllChannels(): void {

@@ -53,6 +53,7 @@ vi.mock("laravel-echo", async (importOriginal) => {
             join: vi.fn(() => presenceChannel),
             share: ActualEcho.prototype.share,
             leave: vi.fn(),
+            leaveUnheld: vi.fn(),
             leaveChannel: vi.fn(),
             leaveAllChannels: vi.fn(),
             connectionStatus: vi.fn(() => "connected"),
@@ -246,7 +247,7 @@ describe("useEcho (Svelte runes)", () => {
         );
 
         value.leave();
-        expect(instance.leave).toHaveBeenCalledWith("orders.4");
+        expect(instance.leaveUnheld).toHaveBeenCalledWith("orders.4");
 
         cleanup();
     });

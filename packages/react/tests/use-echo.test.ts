@@ -47,6 +47,7 @@ vi.mock("laravel-echo", async (importOriginal) => {
     Echo.prototype.encryptedPrivate = vi.fn();
     Echo.prototype.listen = vi.fn();
     Echo.prototype.leave = vi.fn();
+    Echo.prototype.leaveUnheld = vi.fn();
     Echo.prototype.leaveChannel = vi.fn();
     Echo.prototype.leaveAllChannels = vi.fn();
     Echo.prototype.join = vi.fn(() => mockPresenceChannel);
@@ -275,7 +276,49 @@ describe("useEcho hook", async () => {
 
         result.current.leave();
 
-        expect(echoInstance.leave).toHaveBeenCalledWith(channelName);
+        expect(echoInstance.leaveUnheld).toHaveBeenCalledWith(channelName);
+    });
+
+    it("keeps a variant another holder borrowed when leaving all variants", async () => {
+        const { default: ActualEcho } =
+            await vi.importActual<typeof import("laravel-echo")>(
+                "laravel-echo",
+            );
+        const channelName = "orders.1";
+        const instance = configModule.echo();
+
+        vi.mocked(instance.leaveUnheld).mockImplementationOnce(
+            ActualEcho.prototype.leaveUnheld,
+        );
+
+        const { result } = renderHook(() =>
+            echoModule.useEcho(channelName, "test-event", vi.fn()),
+        );
+
+        const presence = ActualEcho.prototype.borrow.call(
+            instance,
+            channelName,
+            "presence",
+        );
+
+        result.current.leave();
+
+        expect(instance.leaveChannel).toHaveBeenCalledWith(
+            `private-${channelName}`,
+        );
+        expect(instance.leaveChannel).toHaveBeenCalledWith(channelName);
+        expect(instance.leaveChannel).toHaveBeenCalledWith(
+            `private-encrypted-${channelName}`,
+        );
+        expect(instance.leaveChannel).not.toHaveBeenCalledWith(
+            `presence-${channelName}`,
+        );
+
+        presence.release();
+
+        expect(instance.leaveChannel).toHaveBeenLastCalledWith(
+            `presence-${channelName}`,
+        );
     });
 
     it("leaves nothing with leave() while another holder still shares the channel", async () => {
@@ -288,7 +331,7 @@ describe("useEcho hook", async () => {
 
         result.current.leave();
 
-        expect(echoInstance.leave).not.toHaveBeenCalled();
+        expect(echoInstance.leaveUnheld).not.toHaveBeenCalled();
         expect(echoInstance.leaveChannel).not.toHaveBeenCalled();
 
         shared.release();
@@ -686,7 +729,9 @@ describe("useEchoModel hook", async () => {
         result.current.leave();
 
         const expectedChannelName = `${model}.${identifier}`;
-        expect(echoInstance.leave).toHaveBeenCalledWith(expectedChannelName);
+        expect(echoInstance.leaveUnheld).toHaveBeenCalledWith(
+            expectedChannelName,
+        );
     });
 
     it("handles model events with dots in the name", async () => {
@@ -857,7 +902,7 @@ describe("useEchoPublic hook", async () => {
 
         result.current.leave();
 
-        expect(echoInstance.leave).toHaveBeenCalledWith(channelName);
+        expect(echoInstance.leaveUnheld).toHaveBeenCalledWith(channelName);
     });
 
     it("events and listeners are optional", async () => {
@@ -1019,7 +1064,7 @@ describe("useEchoPresence hook", async () => {
 
         result.current.leave();
 
-        expect(echoInstance.leave).toHaveBeenCalledWith(channelName);
+        expect(echoInstance.leaveUnheld).toHaveBeenCalledWith(channelName);
     });
 
     it("events and listeners are optional", async () => {
@@ -1276,7 +1321,7 @@ describe("useEchoNotification hook", async () => {
 
         result.current.leave();
 
-        expect(echoInstance.leave).toHaveBeenCalledWith(channelName);
+        expect(echoInstance.leaveUnheld).toHaveBeenCalledWith(channelName);
     });
 
     it("can manually start and stop listening", async () => {

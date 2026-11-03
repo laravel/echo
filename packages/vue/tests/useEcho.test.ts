@@ -172,6 +172,7 @@ vi.mock("laravel-echo", async (importOriginal) => {
     Echo.prototype.encryptedPrivate = vi.fn();
     Echo.prototype.listen = vi.fn();
     Echo.prototype.leave = vi.fn();
+    Echo.prototype.leaveUnheld = vi.fn();
     Echo.prototype.leaveChannel = vi.fn();
     Echo.prototype.leaveAllChannels = vi.fn();
     Echo.prototype.join = vi.fn(() => mockPresenceChannel);
@@ -359,7 +360,7 @@ describe("useEcho hook", async () => {
 
         wrapper.vm.leave();
 
-        expect(echoInstance.leave).toHaveBeenCalledWith(channelName);
+        expect(echoInstance.leaveUnheld).toHaveBeenCalledWith(channelName);
     });
 
     it("can connect to a public channel", async () => {
@@ -609,7 +610,7 @@ describe("useEchoPublic hook", async () => {
 
         wrapper.vm.leave();
 
-        expect(echoInstance.leave).toHaveBeenCalledWith(channelName);
+        expect(echoInstance.leaveUnheld).toHaveBeenCalledWith(channelName);
     });
 
     it("events and listeners are optional", async () => {
@@ -752,7 +753,7 @@ describe("useEchoPresence hook", async () => {
 
         wrapper.vm.leave();
 
-        expect(echoInstance.leave).toHaveBeenCalledWith(channelName);
+        expect(echoInstance.leaveUnheld).toHaveBeenCalledWith(channelName);
     });
 
     it("events and listeners are optional", async () => {
@@ -1025,7 +1026,7 @@ describe("useEchoNotification hook", async () => {
 
         wrapper.vm.leave();
 
-        expect(echoInstance.leave).toHaveBeenCalledWith(channelName);
+        expect(echoInstance.leaveUnheld).toHaveBeenCalledWith(channelName);
     });
 
     it("can manually start and stop listening", async () => {

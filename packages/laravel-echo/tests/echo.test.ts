@@ -169,6 +169,28 @@ describe("Echo", () => {
         expect(echo.connector.channels["private-user.1"]).toBe(fresh.channel);
     });
 
+    test("it leaves every variant except the ones still held", () => {
+        const { echo, client } = makePusherEcho();
+
+        echo.channel("orders.1");
+        echo.private("orders.1");
+        const presence = echo.borrow("orders.1", "presence");
+
+        echo.leaveUnheld("orders.1");
+
+        expect(client.unsubscribe).toHaveBeenCalledWith("orders.1");
+        expect(client.unsubscribe).toHaveBeenCalledWith("private-orders.1");
+        expect(client.unsubscribe).not.toHaveBeenCalledWith(
+            "presence-orders.1",
+        );
+        expect(echo.connector.channels["presence-orders.1"]).toBe(
+            presence.channel,
+        );
+
+        expect(presence.release()).toBe(true);
+        expect(client.unsubscribe).toHaveBeenCalledWith("presence-orders.1");
+    });
+
     test("it can release again after a leave failed", () => {
         const { echo, client } = makePusherEcho();
 
