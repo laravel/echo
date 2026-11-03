@@ -1,5 +1,9 @@
 import type Echo from "laravel-echo";
-import { type BroadcastDriver, type ConnectionStatus } from "laravel-echo";
+import {
+    type BroadcastDriver,
+    type ConnectionStatus,
+    type SharedChannel,
+} from "laravel-echo";
 import { onMounted, onUnmounted, ref, watch, type Ref } from "vue";
 import { echo } from "../config";
 import type {
@@ -18,7 +22,10 @@ import { toArray } from "../util";
 
 const channels: Record<
     string,
-    ChannelData<BroadcastDriver> & { instance: Echo<BroadcastDriver> }
+    ChannelData<BroadcastDriver> & {
+        instance: Echo<BroadcastDriver>;
+        release: SharedChannel<unknown>["release"];
+    }
 > = {};
 
 const resolveChannelSubscription = <T extends BroadcastDriver>(
@@ -31,18 +38,14 @@ const resolveChannelSubscription = <T extends BroadcastDriver>(
     }
 
     const instance = echo<T>();
-    const channelSubscription = instance.acquire(
+    const { channel: connection, release } = instance.share(
         channel.name,
         channel.visibility,
     );
 
-    channels[channel.id] = {
-        count: 1,
-        connection: channelSubscription,
-        instance,
-    };
+    channels[channel.id] = { count: 1, connection, instance, release };
 
-    return channelSubscription;
+    return connection;
 };
 
 const leaveChannel = (channel: Channel, leaveAll: boolean = false): void => {
@@ -56,22 +59,13 @@ const leaveChannel = (channel: Channel, leaveAll: boolean = false): void => {
         return;
     }
 
-    const { instance } = channels[channel.id];
+    const { instance, release } = channels[channel.id];
 
     delete channels[channel.id];
 
-    if (instance === echo()) {
-        instance.release(channel.name, channel.visibility, { leaveAll });
-
-        return;
-    }
-
-    instance.release(channel.name, channel.visibility, { leave: false });
-
-    if (leaveAll) {
-        echo().leave(channel.name);
-    } else {
-        echo().leaveChannel(channel.id);
+    // Leaving every variant only once nothing else holds this one keeps other holders listening
+    if (release() && leaveAll) {
+        instance.leave(channel.name);
     }
 };
 

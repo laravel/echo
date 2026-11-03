@@ -175,8 +175,7 @@ vi.mock("laravel-echo", async (importOriginal) => {
     Echo.prototype.leaveChannel = vi.fn();
     Echo.prototype.leaveAllChannels = vi.fn();
     Echo.prototype.join = vi.fn(() => mockPresenceChannel);
-    Echo.prototype.acquire = ActualEcho.prototype.acquire;
-    Echo.prototype.release = ActualEcho.prototype.release;
+    Echo.prototype.share = ActualEcho.prototype.share;
     Echo.prototype.connectionStatus = vi.fn(() => "connected");
     Echo.prototype.socketId = vi.fn(() => undefined);
     Echo.prototype.connector = { onConnectionChange: vi.fn(() => () => {}) };
@@ -303,19 +302,19 @@ describe("useEcho hook", async () => {
         expect(echoInstance.leaveChannel).toHaveBeenCalled();
     });
 
-    it("keeps the channel while another acquire still holds it", async () => {
+    it("keeps the channel while another holder still shares it", async () => {
         const mockCallback = vi.fn();
         const channelName = "test-channel";
         const event = "test-event";
 
         wrapper = getTestComponent(channelName, event, mockCallback);
 
-        echo().acquire(channelName, "private");
+        const shared = echo().share(channelName, "private");
         wrapper.unmount();
 
         expect(echoInstance.leaveChannel).not.toHaveBeenCalled();
 
-        echo().release(channelName, "private");
+        shared.release();
 
         expect(echoInstance.leaveChannel).toHaveBeenCalledWith(
             `private-${channelName}`,

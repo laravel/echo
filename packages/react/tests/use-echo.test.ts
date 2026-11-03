@@ -50,8 +50,7 @@ vi.mock("laravel-echo", async (importOriginal) => {
     Echo.prototype.leaveChannel = vi.fn();
     Echo.prototype.leaveAllChannels = vi.fn();
     Echo.prototype.join = vi.fn(() => mockPresenceChannel);
-    Echo.prototype.acquire = ActualEcho.prototype.acquire;
-    Echo.prototype.release = ActualEcho.prototype.release;
+    Echo.prototype.share = ActualEcho.prototype.share;
     Echo.prototype.connectionStatus = vi.fn(() => "connected");
     Echo.prototype.socketId = vi.fn(() => undefined);
     Echo.prototype.connector = { onConnectionChange: vi.fn(() => () => {}) };
@@ -194,7 +193,7 @@ describe("useEcho hook", async () => {
         expect(echoInstance.leaveChannel).toHaveBeenCalled();
     });
 
-    it("keeps the channel while another acquire still holds it", async () => {
+    it("keeps the channel while another holder still shares it", async () => {
         const mockCallback = vi.fn();
         const channelName = "test-channel";
         const event = "test-event";
@@ -203,16 +202,35 @@ describe("useEcho hook", async () => {
             echoModule.useEcho(channelName, event, mockCallback),
         );
 
-        configModule.echo().acquire(channelName, "private");
+        const shared = configModule.echo().share(channelName, "private");
         unmount();
 
         expect(echoInstance.leaveChannel).not.toHaveBeenCalled();
 
-        configModule.echo().release(channelName, "private");
+        shared.release();
 
         expect(echoInstance.leaveChannel).toHaveBeenCalledWith(
             `private-${channelName}`,
         );
+    });
+
+    it("leaves the channel on the instance it joined after Echo is reconfigured", async () => {
+        const { unmount } = renderHook(() =>
+            echoModule.useEcho("test-channel", "test-event", vi.fn()),
+        );
+
+        const joined = configModule.echo();
+
+        configModule.configureEcho({ broadcaster: "null" });
+
+        const constructed = vi.mocked(Echo).mock.instances.length;
+
+        unmount();
+
+        expect(vi.mocked(Echo).mock.instances).toHaveLength(constructed);
+        expect(vi.mocked(echoInstance.leaveChannel).mock.contexts).toEqual([
+            joined,
+        ]);
     });
 
     it("will register callbacks for events", async () => {
@@ -258,6 +276,26 @@ describe("useEcho hook", async () => {
         result.current.leave();
 
         expect(echoInstance.leave).toHaveBeenCalledWith(channelName);
+    });
+
+    it("leaves nothing with leave() while another holder still shares the channel", async () => {
+        const channelName = "test-channel";
+        const { result } = renderHook(() =>
+            echoModule.useEcho(channelName, "test-event", vi.fn()),
+        );
+
+        const shared = configModule.echo().share(channelName, "private");
+
+        result.current.leave();
+
+        expect(echoInstance.leave).not.toHaveBeenCalled();
+        expect(echoInstance.leaveChannel).not.toHaveBeenCalled();
+
+        shared.release();
+
+        expect(echoInstance.leaveChannel).toHaveBeenCalledWith(
+            `private-${channelName}`,
+        );
     });
 
     it("can connect to a public channel", async () => {

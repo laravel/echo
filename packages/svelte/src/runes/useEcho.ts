@@ -1,5 +1,9 @@
 import type Echo from "laravel-echo";
-import { type BroadcastDriver, type ConnectionStatus } from "laravel-echo";
+import {
+    type BroadcastDriver,
+    type ConnectionStatus,
+    type SharedChannel,
+} from "laravel-echo";
 import { echo } from "../config";
 import type {
     BroadcastNotification,
@@ -21,17 +25,14 @@ const channels: Record<
     string,
     ChannelData<BroadcastDriver> & {
         instance: Echo<BroadcastDriver>;
-        channel: Channel;
+        release: SharedChannel<unknown>["release"];
     }
 > = {};
 let activeEchoInstance: Echo<BroadcastDriver> | null = null;
 
 const clearChannelCache = (): void => {
     Object.keys(channels).forEach((channelId) => {
-        const { instance, channel } = channels[channelId];
-
-        instance.release(channel.name, channel.visibility, { leave: false });
-
+        // Not released: components still mounted against the old instance keep listening on it
         delete channels[channelId];
     });
 };
@@ -56,19 +57,14 @@ const resolveChannelSubscription = <T extends BroadcastDriver>(
         return channels[channel.id].connection;
     }
 
-    const channelSubscription = instance.acquire(
+    const { channel: connection, release } = instance.share(
         channel.name,
         channel.visibility,
     );
 
-    channels[channel.id] = {
-        count: 1,
-        connection: channelSubscription,
-        instance,
-        channel,
-    };
+    channels[channel.id] = { count: 1, connection, instance, release };
 
-    return channelSubscription;
+    return connection;
 };
 
 const leaveChannel = (channel: Channel, leaveAll: boolean = false): void => {
@@ -82,22 +78,13 @@ const leaveChannel = (channel: Channel, leaveAll: boolean = false): void => {
         return;
     }
 
-    const { instance } = channels[channel.id];
+    const { instance, release } = channels[channel.id];
 
     delete channels[channel.id];
 
-    if (instance === echo()) {
-        instance.release(channel.name, channel.visibility, { leaveAll });
-
-        return;
-    }
-
-    instance.release(channel.name, channel.visibility, { leave: false });
-
-    if (leaveAll) {
-        echo().leave(channel.name);
-    } else {
-        echo().leaveChannel(channel.id);
+    // Leaving every variant only once nothing else holds this one keeps other holders listening
+    if (release() && leaveAll) {
+        instance.leave(channel.name);
     }
 };
 

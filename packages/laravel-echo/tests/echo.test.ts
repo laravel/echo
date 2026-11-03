@@ -85,95 +85,102 @@ describe("Echo", () => {
 
     test("it shares one channel and leaves it after the last release", () => {
         const { echo, client } = makePusherEcho();
-        const channel = echo.acquire("user.1", "private");
+        const first = echo.share("user.1", "private");
+        const second = echo.share("user.1", "private");
 
-        expect(echo.acquire("user.1", "private")).toBe(channel);
+        expect(second.channel).toBe(first.channel);
         expect(client.subscribe).toHaveBeenCalledTimes(1);
-        expect(echo.release("user.1", "presence")).toBe(false);
-        expect(echo.release("user.1", "private")).toBe(false);
+        expect(first.release()).toBe(false);
         expect(client.unsubscribe).not.toHaveBeenCalled();
 
-        expect(echo.release("user.1", "private")).toBe(true);
+        expect(second.release()).toBe(true);
         expect(client.unsubscribe).toHaveBeenCalledWith("private-user.1");
     });
 
-    test("it keeps a channel joined before it was acquired with keepExisting", () => {
+    test("it ignores a second release from the same handle", () => {
+        const { echo, client } = makePusherEcho();
+        const first = echo.share("user.1", "private");
+
+        echo.share("user.1", "private");
+
+        expect(first.release()).toBe(false);
+        expect(first.release()).toBe(false);
+        expect(client.unsubscribe).not.toHaveBeenCalled();
+    });
+
+    test("it never leaves a borrowed channel that was joined before it was borrowed", () => {
         const { echo, client } = makePusherEcho();
 
         echo.private("user.1");
-        echo.acquire("user.1", "private");
-        echo.acquire("user.2", "private");
 
-        expect(echo.release("user.1", "private", { keepExisting: true })).toBe(
-            false,
-        );
-        expect(echo.release("user.2", "private", { keepExisting: true })).toBe(
-            true,
-        );
+        const joinedFirst = echo.borrow("user.1", "private");
+        const borrowedFirst = echo.borrow("user.2", "private");
+
+        expect(joinedFirst.release()).toBe(false);
+        expect(borrowedFirst.release()).toBe(true);
         expect(client.unsubscribe).toHaveBeenCalledTimes(1);
         expect(client.unsubscribe).toHaveBeenCalledWith("private-user.2");
     });
 
-    test("it keeps a channel other code joined again after it was left with keepExisting", () => {
+    test("it leaves a shared channel even when it was joined before it was shared", () => {
         const { echo, client } = makePusherEcho();
 
-        echo.acquire("user.1", "private");
+        echo.private("user.1");
+
+        expect(echo.share("user.1", "private").release()).toBe(true);
+        expect(client.unsubscribe).toHaveBeenCalledWith("private-user.1");
+    });
+
+    test("it shares one count between share() and borrow()", () => {
+        const { echo, client } = makePusherEcho();
+        const shared = echo.share("user.1", "private");
+        const borrowed = echo.borrow("user.1", "private");
+
+        expect(borrowed.channel).toBe(shared.channel);
+        expect(shared.release()).toBe(false);
+        expect(client.unsubscribe).not.toHaveBeenCalled();
+
+        expect(borrowed.release()).toBe(true);
+        expect(client.unsubscribe).toHaveBeenCalledWith("private-user.1");
+    });
+
+    test("it never leaves a borrowed channel other code joined again after it was left", () => {
+        const { echo, client } = makePusherEcho();
+        const borrowed = echo.borrow("user.1", "private");
+
         echo.leave("user.1");
 
         const joined = echo.private("user.1");
 
-        expect(echo.release("user.1", "private", { keepExisting: true })).toBe(
-            false,
-        );
+        expect(borrowed.release()).toBe(false);
         expect(client.unsubscribe).toHaveBeenCalledTimes(1);
         expect(echo.connector.channels["private-user.1"]).toBe(joined);
     });
 
-    test("it acquires a fresh channel after the channel was left", () => {
+    test("it shares a fresh channel after the channel was left", () => {
         const { echo } = makePusherEcho();
-        const stale = echo.acquire("user.1", "private");
+        const stale = echo.share("user.1", "private");
 
         echo.leaveChannel("private-user.1");
 
-        const fresh = echo.acquire("user.1", "private");
+        const fresh = echo.share("user.1", "private");
 
-        expect(fresh).not.toBe(stale);
-        expect(echo.connector.channels["private-user.1"]).toBe(fresh);
+        expect(fresh.channel).not.toBe(stale.channel);
+        expect(echo.connector.channels["private-user.1"]).toBe(fresh.channel);
     });
 
-    test("it leaves every variant with leaveAll and counts without leaving with leave: false", () => {
-        const { echo, client } = makePusherEcho();
-
-        echo.private("chat");
-        echo.acquire("chat", "presence");
-        echo.acquire("user.1", "private");
-
-        expect(echo.release("user.1", "private", { leave: false })).toBe(true);
-        expect(client.unsubscribe).not.toHaveBeenCalled();
-
-        expect(echo.release("chat", "presence", { leaveAll: true })).toBe(true);
-        expect(client.unsubscribe).toHaveBeenCalledWith("presence-chat");
-        expect(client.unsubscribe).toHaveBeenCalledWith("private-chat");
-    });
-
-    test("it can retry a release whose leave failed", () => {
+    test("it can release again after a leave failed", () => {
         const { echo, client } = makePusherEcho();
 
         vi.spyOn(echo, "leaveChannel").mockImplementationOnce(() => {
             throw new Error("offline");
         });
 
-        echo.acquire("user.1", "private");
+        const failed = echo.borrow("user.1", "private");
 
-        expect(() =>
-            echo.release("user.1", "private", { keepExisting: true }),
-        ).toThrow("offline");
+        expect(() => failed.release()).toThrow("offline");
 
-        echo.acquire("user.1", "private");
-
-        expect(echo.release("user.1", "private", { keepExisting: true })).toBe(
-            true,
-        );
+        expect(echo.borrow("user.1", "private").release()).toBe(true);
         expect(client.unsubscribe).toHaveBeenCalledWith("private-user.1");
     });
 });
