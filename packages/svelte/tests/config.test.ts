@@ -56,4 +56,39 @@ describe("echo helper", () => {
         expect(instance.connector).toBeInstanceOf(CustomConnector);
         expect(instance.options.authEndpoint).toBe("/custom/auth");
     });
+
+    it("configures a non-Pusher broadcaster without requiring pusher-js", async () => {
+        const { configureEcho, echo } = await import("../src/config");
+
+        configureEcho({
+            broadcaster: "mercure",
+            host: "http://localhost/.well-known/mercure",
+        });
+
+        expect(echo()).toBeDefined();
+        expect(echo().options.broadcaster).toBe("mercure");
+        expect(echo().options.Pusher).toBeUndefined();
+    });
+
+    it("uses a Pusher client passed to configureEcho", async () => {
+        const { configureEcho, echo } = await import("../src/config");
+
+        class FakePusher {
+            constructor(
+                public key: string,
+                public options: unknown,
+            ) {}
+        }
+
+        configureEcho<"reverb">({
+            broadcaster: "reverb",
+            key: "app-key",
+            Pusher: FakePusher as never,
+        });
+
+        const instance = echo<"reverb">();
+
+        expect(instance.options.Pusher).toBe(FakePusher);
+        expect(instance.connector.pusher).toBeInstanceOf(FakePusher);
+    });
 });

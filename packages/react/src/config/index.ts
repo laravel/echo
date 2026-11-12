@@ -3,7 +3,6 @@ import Echo, {
     type Broadcaster,
     type EchoOptions,
 } from "laravel-echo";
-import Pusher from "pusher-js";
 import type { ConfigDefaults } from "../types";
 
 /**
@@ -24,8 +23,6 @@ const getEchoInstance = <T extends keyof Broadcaster>(): Echo<T> => {
             "Echo has not been configured. Please call `configureEcho()`.",
         );
     }
-
-    echoConfig.Pusher ??= Pusher;
 
     echoInstance = new Echo<keyof Broadcaster>(echoConfig);
 

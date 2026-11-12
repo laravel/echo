@@ -5,10 +5,12 @@
 You must call this function somewhere in your app _before_ you use `useEcho` in a component to configure your Echo instance. You only need to pass the required data:
 
 ```ts
+import Pusher from "pusher-js";
 import { configureEcho } from "@laravel/echo-svelte";
 
 configureEcho({
     broadcaster: "reverb",
+    Pusher,
 });
 ```
 
