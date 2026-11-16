@@ -66,6 +66,12 @@
             "svelte": "./dist/index.js",
             "import": "./dist/index.js",
             "require": "./dist/index.common.js"
+        },
+        "./core": {
+            "types": "./dist/core.d.ts",
+            "svelte": "./dist/core.js",
+            "import": "./dist/core.js",
+            "require": "./dist/core.common.js"
         }
     },
     "svelte": "./dist/index.js",

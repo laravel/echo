@@ -1,3 +1,5 @@
+import "./config/pusher";
+
 export { configureEcho, echo, echoIsConfigured } from "./config/index";
 export {
     useConnectionStatus,

@@ -1,3 +1,5 @@
+import "./config/pusher";
+
 export {
     useEcho,
     useEchoModel,

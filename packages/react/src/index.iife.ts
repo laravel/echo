@@ -1,3 +1,5 @@
+import "./config/pusher";
+
 export { configureEcho, echo } from "./config/index";
 export {
     useEcho,

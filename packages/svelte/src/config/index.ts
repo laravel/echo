@@ -3,7 +3,6 @@ import Echo, {
     type Broadcaster,
     type EchoOptions,
 } from "laravel-echo";
-import Pusher from "pusher-js";
 import type { ConfigDefaults } from "../types";
 
 /**
@@ -11,8 +10,23 @@ import type { ConfigDefaults } from "../types";
  */
 type EchoConfig = ConstructorParameters<typeof Echo<keyof Broadcaster>>[0];
 
+/**
+ * The Pusher client constructor accepted by the Pusher-based broadcasters.
+ */
+type PusherClient = NonNullable<EchoOptions<"pusher">["Pusher"]>;
+
 let echoInstance: Echo<keyof Broadcaster> | null = null;
 let echoConfig: EchoConfig | null = null;
+let defaultPusher: PusherClient | null = null;
+
+/**
+ * Register the Pusher client used when the configuration does not provide one.
+ *
+ * The default entry point registers `pusher-js`; the `core` entry point does not.
+ */
+export const registerDefaultPusher = (Pusher: PusherClient): void => {
+    defaultPusher = Pusher;
+};
 
 const getEchoInstance = <T extends keyof Broadcaster>(): Echo<T> => {
     if (echoInstance) {
@@ -25,7 +39,9 @@ const getEchoInstance = <T extends keyof Broadcaster>(): Echo<T> => {
         );
     }
 
-    echoConfig.Pusher ??= Pusher;
+    if (defaultPusher) {
+        echoConfig.Pusher ??= defaultPusher;
+    }
 
     echoInstance = new Echo<keyof Broadcaster>(echoConfig);
 

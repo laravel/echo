@@ -38,6 +38,30 @@ configureEcho({
 });
 ```
 
+### Without `pusher-js`
+
+The default entry point imports `pusher-js` and uses it as the Pusher client for the Pusher-based broadcasters. If your application uses another broadcaster, such as Mercure, Socket.IO or the null broadcaster, import from `@laravel/echo-vue/core` instead, so `pusher-js` doesn't need to be installed:
+
+```ts
+import { configureEcho, useEcho } from "@laravel/echo-vue/core";
+
+configureEcho({
+    broadcaster: "mercure",
+});
+```
+
+The `core` entry point exports the same API. To use a Pusher-based broadcaster with it, pass the client yourself:
+
+```ts
+import Pusher from "pusher-js";
+import { configureEcho } from "@laravel/echo-vue/core";
+
+configureEcho({
+    broadcaster: "reverb",
+    Pusher,
+});
+```
+
 ## Connection Status
 
 You can get the current WebSocket connection status using the `useConnectionStatus` composable or the `echo().connectionStatus()` utility function.

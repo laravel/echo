@@ -79,6 +79,8 @@ const config: UserConfig = (() => {
                 id.startsWith("svelte/") ||
                 id === "pusher-js",
             output: {
+                // Both entry points share this chunk, and with it one Echo instance.
+                chunkFileNames: "[name]-[hash].[format].js",
                 globals: (id) => (id === "pusher-js" ? "Pusher" : "Svelte"),
             },
         },
@@ -119,7 +121,10 @@ const config: UserConfig = (() => {
         ]),
         build: {
             lib: {
-                entry: resolve(import.meta.dirname, "src/index.ts"),
+                entry: {
+                    index: resolve(import.meta.dirname, "src/index.ts"),
+                    core: resolve(import.meta.dirname, "src/core.ts"),
+                },
                 formats: ["es", "cjs"],
                 fileName: (format, entryName) => {
                     return `${entryName}.${format === "es" ? "js" : "common.js"}`;
